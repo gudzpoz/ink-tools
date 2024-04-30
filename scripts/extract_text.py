@@ -41,13 +41,15 @@ def should_skip(path: list[str], data: str) -> bool:
     return False
 
 
-def dump_data(csv_writer, data: Any, path: list[str] = [], verbose=False) -> None:
+def dump_data(
+    csv_writer, data: Any, path: list[str] = [], verbose=False, parent=None
+) -> None:
     if isinstance(data, dict):
         for k, v in data.items():
-            dump_data(csv_writer, v, path + [k], verbose)
+            dump_data(csv_writer, v, path + [k], verbose, parent=data)
     elif isinstance(data, list):
         for i, item in enumerate(data):
-            dump_data(csv_writer, item, path + [str(i)], verbose)
+            dump_data(csv_writer, item, path + [str(i)], verbose, parent=data)
     elif isinstance(data, str):
         key = '.'.join(path)
         if should_skip(path, data):
@@ -56,7 +58,12 @@ def dump_data(csv_writer, data: Any, path: list[str] = [], verbose=False) -> Non
             return
         if verbose:
             print(f'{key}: {data}')
-        csv_writer.writerow([key, data, data])
+        context = ''
+        if isinstance(parent, list):
+            p = parent[-1]
+            if isinstance(p, dict):
+                context = p.get('divert', '')
+        csv_writer.writerow([key, data, data, context])
     elif isinstance(data, int) or isinstance(data, float) or isinstance(data, bool):
         if verbose:
             key = '.'.join(path)
@@ -90,7 +97,7 @@ def import_one(data: dict[str, Any], input_file: Path, verbose=False) -> Any:
     with input_file.open(encoding='utf-8-sig') as f:
         csv_reader = csv.reader(f)
         for row in csv_reader:
-            key, _, translation = row
+            key, translation = row[0], row[2]
             path = key.split('.')
             current = data
             for k in path[:-1]:
