@@ -13,12 +13,12 @@ SKIPPED_PATH_LEAFS = [
     'initial',
     'func',
     'get',
-    'set',
     'linkPath',
     'divert',
     'buildingBlock',
     'action',
 ]
+SKIPPED_PARENT_LEAFS = ['set', 'params']
 SKIPPED_VALUES = ['<br><br>']
 NO_SKIP = False
 REMOVE_EMPTY = True
@@ -34,7 +34,7 @@ def should_skip(path: list[str], data: str) -> bool:
         return False
     if path[-1] in SKIPPED_PATH_LEAFS:
         return True
-    if len(path) > 1 and path[-2] == 'params':
+    if len(path) > 1 and path[-2] in SKIPPED_PARENT_LEAFS:
         return True
     if data.strip() == '':
         return True
@@ -157,12 +157,12 @@ class Main:
             print(f'({i + 1}/{njobs}) ', end='')
             extract_one(json.loads(json_str), output_path / f'{key}.csv', verbose)
 
+        futures = []
         with ThreadPoolExecutor(max_workers=threads) as executor:
-            futures = []
             for i, (key, value) in enumerate(ranges.items()):
                 futures.append(executor.submit(process, i, key, value))
-            for future in futures:
-                future.result()
+        for future in futures:
+            future.result()
         print(f'Finished extracting to {output_path}')
         print(f'Time elapsed: {time.time() - start_time:.2f}s')
 
@@ -216,17 +216,17 @@ class Main:
             data = import_one(json.loads(json_str), input_path / f'{key}.csv', verbose)
             return data
 
+        futures = []
         with ThreadPoolExecutor(max_workers=threads) as executor:
-            futures = []
             for i, (key, value) in enumerate(ranges.items()):
                 futures.append(executor.submit(process, i, key, value))
-            for future in futures:
-                data = future.result()
-                output_bytes = to_json_bytes(data) + b'\n'
-                output_bytes_len = len(output_bytes)
-                output_content.write(output_bytes)
-                current_bytes += output_bytes_len
-                ranges[key] = f'{current_bytes} {len(output_bytes)}'
+        for future in futures:
+            data = future.result()
+            output_bytes = to_json_bytes(data) + b'\n'
+            output_bytes_len = len(output_bytes)
+            output_content.write(output_bytes)
+            current_bytes += output_bytes_len
+            ranges[key] = f'{current_bytes} {len(output_bytes)}'
         output_content.close()
         import_meta(metadata, input_path, verbose)
         output_meta_file.write_bytes(to_json_bytes(metadata))
