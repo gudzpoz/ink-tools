@@ -74,7 +74,7 @@ def extract_meta(data: dict[str, Any], output_path: Path, verbose=False) -> None
 
 def extract_one(data: dict[str, Any], csv_file: Path, verbose=False) -> None:
     print(f'Extracting to {csv_file}')
-    with csv_file.open('w', encoding='utf-8', newline='') as f:
+    with csv_file.open('w', encoding='utf-8-sig', newline='') as f:
         csv_writer = csv.writer(f)
         dump_data(csv_writer, data, [], verbose)
     if REMOVE_EMPTY and csv_file.stat().st_size == 0:
@@ -87,7 +87,7 @@ def import_one(data: dict[str, Any], input_file: Path, verbose=False) -> Any:
     if not input_file.exists():
         print(f'{input_file} not found. Skipping')
         return data
-    with input_file.open(encoding='utf-8') as f:
+    with input_file.open(encoding='utf-8-sig') as f:
         csv_reader = csv.reader(f)
         for row in csv_reader:
             key, _, translation = row

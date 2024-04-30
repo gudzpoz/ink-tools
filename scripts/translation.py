@@ -73,8 +73,8 @@ def translate_file(
     only_count=False,
 ) -> tuple[int, int]:
     input, output = 0, 0
-    with src_file.open('r', encoding='utf-8') as f, dst_file.open(
-        'w', encoding='utf-8', newline=''
+    with src_file.open('r', encoding='utf-8-sig') as f, dst_file.open(
+        'w', encoding='utf-8-sig', newline=''
     ) as f_out:
         csv_reader = csv.reader(f)
         csv_writer = csv.writer(f_out)
