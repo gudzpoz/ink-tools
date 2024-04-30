@@ -122,6 +122,7 @@ class Main:
         meta_file: str,
         output_path: str,
         verbose=False,
+        numbering=False,
         threads=4,
     ) -> None:
         meta_file = Path(meta_file)
@@ -149,18 +150,22 @@ class Main:
 
         extract_meta(metadata, output_path, verbose)
 
-        njobs = len(ranges) + 1
+        njobs = len(ranges)
+        ndigits = len(str(njobs))
 
         def process(i, key, value):
             start, length = map(int, value.split())
             json_str = content[start : start + length]
-            print(f'({i + 1}/{njobs}) ', end='')
-            extract_one(json.loads(json_str), output_path / f'{key}.csv', verbose)
+            print(f'({i}/{njobs}) ', end='')
+            filename = f'{key}.csv'
+            if numbering:
+                filename = f'{i:0{ndigits}}-{filename}'
+            extract_one(json.loads(json_str), output_path / filename, verbose)
 
         futures = []
         with ThreadPoolExecutor(max_workers=threads) as executor:
             for i, (key, value) in enumerate(ranges.items()):
-                futures.append(executor.submit(process, i, key, value))
+                futures.append(executor.submit(process, i + 1, key, value))
         for future in futures:
             future.result()
         print(f'Finished extracting to {output_path}')
@@ -172,6 +177,7 @@ class Main:
         meta_file: str,
         output_path: str,
         verbose=False,
+        numbering=False,
         threads=4,
     ) -> None:
         input_path = Path(input_path)
@@ -207,19 +213,23 @@ class Main:
         output_content = output_content_file.open('wb')
 
         current_bytes = 0
-        njobs = len(ranges) + 1
+        njobs = len(ranges)
+        ndigits = len(str(njobs))
 
         def process(i, key, value):
             start, length = map(int, value.split())
             json_str = content[start : start + length]
-            print(f'({i + 1}/{njobs}) ', end='')
-            data = import_one(json.loads(json_str), input_path / f'{key}.csv', verbose)
+            print(f'({i}/{njobs}) ', end='')
+            filename = f'{key}.csv'
+            if numbering:
+                filename = f'{i:0{ndigits}}-{filename}'
+            data = import_one(json.loads(json_str), input_path / filename, verbose)
             return data
 
         futures = []
         with ThreadPoolExecutor(max_workers=threads) as executor:
             for i, (key, value) in enumerate(ranges.items()):
-                futures.append(executor.submit(process, i, key, value))
+                futures.append(executor.submit(process, i + 1, key, value))
         for future in futures:
             data = future.result()
             output_bytes = to_json_bytes(data) + b'\n'
