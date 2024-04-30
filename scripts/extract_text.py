@@ -6,6 +6,8 @@ from typing import Any
 
 import fire
 
+from utils import to_json_bytes
+
 META_PREFIX = '$meta'
 # TODO: should we extract variables?
 META_FIELD_KEYS = ['variables', 'buildingBlocks']
@@ -22,10 +24,6 @@ SKIPPED_PARENT_LEAFS = ['set', 'params']
 SKIPPED_VALUES = ['<br><br>']
 NO_SKIP = False
 REMOVE_EMPTY = True
-
-
-def to_json_bytes(data: Any) -> bytes:
-    return json.dumps(data, separators=(',', ':'), ensure_ascii=False).encode('utf-8')
 
 
 # Skip common special paths or values
