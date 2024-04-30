@@ -1,4 +1,6 @@
 import csv, json
+import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
@@ -115,7 +117,13 @@ class Main:
     def __init__(self) -> None:
         self.__dict__['import'] = self._import
 
-    def extract(self, meta_file: str, output_path: str, verbose=False) -> None:
+    def extract(
+        self,
+        meta_file: str,
+        output_path: str,
+        verbose=False,
+        threads=4,
+    ) -> None:
         meta_file = Path(meta_file)
         output_path = Path(output_path)
         print(f'Extracting {meta_file} to {output_path}')
@@ -130,6 +138,7 @@ class Main:
             for file in output_path.iterdir():
                 file.unlink()
 
+        start_time = time.time()
         metadata = json.loads(meta_file.read_text(encoding='utf-8'))
         indexed_content = metadata['indexed-content']
         ranges = indexed_content['ranges']
@@ -141,12 +150,21 @@ class Main:
         extract_meta(metadata, output_path, verbose)
 
         njobs = len(ranges) + 1
-        for i, (key, value) in enumerate(ranges.items()):
+
+        def process(i, key, value):
             start, length = map(int, value.split())
             json_str = content[start : start + length]
             print(f'({i + 1}/{njobs}) ', end='')
             extract_one(json.loads(json_str), output_path / f'{key}.csv', verbose)
+
+        with ThreadPoolExecutor(max_workers=threads) as executor:
+            futures = []
+            for i, (key, value) in enumerate(ranges.items()):
+                futures.append(executor.submit(process, i, key, value))
+            for future in futures:
+                future.result()
         print(f'Finished extracting to {output_path}')
+        print(f'Time elapsed: {time.time() - start_time:.2f}s')
 
     def _import(
         self,
@@ -154,12 +172,15 @@ class Main:
         meta_file: str,
         output_path: str,
         verbose=False,
+        threads=4,
     ) -> None:
         input_path = Path(input_path)
         meta_file = Path(meta_file)
         output_path = Path(output_path)
         if meta_file.resolve().parent == output_path.resolve():
-            raise ValueError('Output path cannot be the same as the input meta file path')
+            raise ValueError(
+                'Output path cannot be the same as the input meta file path'
+            )
         output_meta_file = output_path / meta_file.name
         print(f'Extracting {meta_file} to {output_path}')
         if not output_path.exists():
@@ -173,6 +194,7 @@ class Main:
             for file in output_path.iterdir():
                 file.unlink()
 
+        start_time = time.time()
         metadata = json.loads(meta_file.read_text(encoding='utf-8'))
         indexed_content = metadata['indexed-content']
         ranges = indexed_content['ranges']
@@ -186,20 +208,30 @@ class Main:
 
         current_bytes = 0
         njobs = len(ranges) + 1
-        for i, (key, value) in enumerate(ranges.items()):
+
+        def process(i, key, value):
             start, length = map(int, value.split())
             json_str = content[start : start + length]
             print(f'({i + 1}/{njobs}) ', end='')
             data = import_one(json.loads(json_str), input_path / f'{key}.csv', verbose)
-            output_bytes = to_json_bytes(data) + b'\n'
-            output_bytes_len = len(output_bytes)
-            output_content.write(output_bytes)
-            current_bytes += output_bytes_len
-            ranges[key] = f'{current_bytes} {len(output_bytes)}'
+            return data
+
+        with ThreadPoolExecutor(max_workers=threads) as executor:
+            futures = []
+            for i, (key, value) in enumerate(ranges.items()):
+                futures.append(executor.submit(process, i, key, value))
+            for future in futures:
+                data = future.result()
+                output_bytes = to_json_bytes(data) + b'\n'
+                output_bytes_len = len(output_bytes)
+                output_content.write(output_bytes)
+                current_bytes += output_bytes_len
+                ranges[key] = f'{current_bytes} {len(output_bytes)}'
         output_content.close()
         import_meta(metadata, input_path, verbose)
         output_meta_file.write_bytes(to_json_bytes(metadata))
         print(f'Finished importing to {output_meta_file} and {output_content_file}')
+        print(f'Time elapsed: {time.time() - start_time:.2f}s')
 
 
 if __name__ == '__main__':
