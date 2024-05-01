@@ -1,12 +1,4 @@
-import csv, json
-import time
-from concurrent.futures import ThreadPoolExecutor
-from pathlib import Path
-from typing import Any
-
-import fire
-
-from utils import to_json_bytes
+from utils import *
 
 META_PREFIX = '$meta'
 # TODO: should we extract variables?
@@ -145,13 +137,8 @@ class Main:
                 file.unlink()
 
         start_time = time.time()
-        metadata = json.loads(meta_file.read_text(encoding='utf-8'))
-        indexed_content = metadata['indexed-content']
-        ranges = indexed_content['ranges']
-
-        content_filename = f'{indexed_content["filename"]}.txt'
-        content_file = meta_file.parent / content_filename
-        content = content_file.read_bytes()
+        metadata, content = load_meta_and_content(meta_file)
+        ranges = metadata['indexed-content']['ranges']
 
         extract_meta(metadata, output_path, verbose)
 
@@ -206,14 +193,11 @@ class Main:
                 file.unlink()
 
         start_time = time.time()
-        metadata = json.loads(meta_file.read_text(encoding='utf-8'))
+        metadata, content = load_meta_and_content(meta_file)
         indexed_content = metadata['indexed-content']
         ranges = indexed_content['ranges']
 
         content_filename = f'{indexed_content["filename"]}.txt'
-        content_file = meta_file.parent / content_filename
-        content = content_file.read_bytes()
-
         output_content_file = output_path / content_filename
         output_content = output_content_file.open('wb')
 

@@ -1,13 +1,9 @@
-import csv, json
 import os
-import time
-
-from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
-from pathlib import Path
 
-import fire
 from openai import OpenAI
+
+from utils import *
 
 CACHED_MAX_LEN = 256
 CONTEXT_MAX_LEN = 7  # should be an odd number
