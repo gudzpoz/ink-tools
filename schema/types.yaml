@@ -1,0 +1,107 @@
+openapi: 3.0.0
+info:
+  title: Converted from types.yaml with typeconv
+  version: '1'
+  x-id: types.yaml
+  x-comment: >-
+    Generated from src/types.ts by core-types-json-schema
+    (https://github.com/grantila/core-types-json-schema) on behalf of typeconv
+    (https://github.com/grantila/typeconv)
+paths: {}
+components:
+  schemas:
+    InkBlock:
+      title: InkBlock
+    InkRootNode:
+      properties:
+        variables:
+          title: InkRootNode.variables
+          description: 全局变量默认值。
+        buildingBlocks:
+          title: InkRootNode.buildingBlocks
+          description: 看起来是一大堆全局函数定义。
+        initial:
+          title: InkRootNode.initial
+          description: 不知道为什么是 'storycrashed'，但总之似乎是故事入口名称。
+          type: string
+        '''indexed-content''':
+          properties:
+            filename:
+              title: InkRootNode.'indexed-content'.filename
+              type: string
+            ranges:
+              title: InkRootNode.'indexed-content'.ranges
+              description: 格式是 `Record<章节名, 空格分开的两个数字>`，其中两个数字分别代表开始字节和长度。
+          required:
+            - filename
+            - ranges
+          additionalProperties: false
+          title: InkRootNode.'indexed-content'
+          description: 对应 `80days.inkcontent.txt` 里内容的索引。
+          type: object
+      required:
+        - variables
+        - buildingBlocks
+        - initial
+        - '''indexed-content'''
+      additionalProperties: false
+      title: InkRootNode
+      description: '`80days.txt` 的根节点类型信息。'
+      type: object
+    InkChunkWithStitches:
+      properties:
+        initial:
+          title: InkChunkWithStitches.initial
+          type: string
+        stitches:
+          title: InkChunkWithStitches.stitches
+      required:
+        - initial
+        - stitches
+      additionalProperties: false
+      title: InkChunkWithStitches
+      type: object
+    InkChunkNode:
+      anyOf:
+        - $ref: '#/components/schemas/InkChunkWithStitches'
+          title: InkChunkNode
+        - items:
+            $ref: '#/components/schemas/InkBlock'
+            title: InkChunkNode.[]
+          title: InkChunkNode.[]
+          type: array
+        - additionalProperties: false
+          title: InkChunkNode
+          type: object
+      title: InkChunkNode
+      description: |-
+        `80days.inkcontent.txt` 里内容的节点类型信息。
+
+        似乎有两种文件，一种根节点是数组，另外的有 stitches。
+        另外，ENDFLOW 文件两种都不符合，内容就是 `{}` 而已。
+    InkFuncType:
+      enum:
+        - Add
+        - And
+        - Decrement
+        - Divide
+        - Equals
+        - FlagIsNotSet
+        - FlagIsSet
+        - GreaterThan
+        - GreaterThanOrEqualTo
+        - HasNotRead
+        - HasRead
+        - Increment
+        - LessThan
+        - LessThanOrEqualTo
+        - Log10
+        - Mod
+        - Multiply
+        - Not
+        - NotEquals
+        - Or
+        - Subtract
+      title: InkFuncType
+      description: 这个是 `Type_func` 类型的所有可能取值。
+      type: string

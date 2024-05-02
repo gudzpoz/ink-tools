@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "unpack": "ts-node src/unpack.ts"
+    "unpack": "ts-node src/unpack.ts",
+    "decompile": "ts-node src/decompile.ts",
+    "schema": "typeconv -f ts -t oapi -o schema src/auto-types.ts src/types.ts"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +16,7 @@
     "@types/node": "^20.12.8",
     "eslint": "^9.1.1",
     "ts-node": "^10.9.2",
+    "typeconv": "^2.3.1",
     "typescript": "^5.4.5"
   }
 }

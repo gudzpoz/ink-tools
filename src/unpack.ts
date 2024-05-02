@@ -140,6 +140,7 @@ function collectInfoFromFile(blocks: typeof buildingBlocks, info: Info) {
     }
     // 我们认为主要节点就是 then 数组里的元素。
     // 所以把根数组里的也算在 then 里。
+    // 把这个改成 'root' 之类的不重复的字段也可以。
     collectStructures('then', block, info);
   });
 }
@@ -268,7 +269,9 @@ collectInfoFromFile(buildingBlocks, info);
   });
   await fs.writeFile('./data/80days.format.json', prettyJson(info));
   const types = new TypeGenerator(info).generate();
-  await fs.writeFile('./src/auto-types.ts', types);
+  if (process.env.GENERATE_TYPES !== undefined) {
+    await fs.writeFile('./src/auto-types.ts', types);
+  }
   await fs.writeFile(
     './data/80days.enum.json',
     prettyJson(

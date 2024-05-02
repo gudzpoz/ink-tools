@@ -1,0 +1,619 @@
+openapi: 3.0.0
+info:
+  title: Converted from auto-types.yaml with typeconv
+  version: '1'
+  x-id: auto-types.yaml
+  x-comment: >-
+    Generated from src/auto-types.ts by core-types-json-schema
+    (https://github.com/grantila/core-types-json-schema) on behalf of typeconv
+    (https://github.com/grantila/typeconv)
+paths: {}
+components:
+  schemas:
+    Type_buildingBlockWithParams:
+      properties:
+        buildingBlock:
+          $ref: '#/components/schemas/Type_buildingBlock'
+          title: Type_buildingBlockWithParams.buildingBlock
+        params:
+          $ref: '#/components/schemas/Type_params'
+          title: Type_buildingBlockWithParams.params
+      required:
+        - buildingBlock
+        - params
+      additionalProperties: false
+      title: Type_buildingBlockWithParams
+      description: '`buildingBlock` 是自定义的函数。'
+      type: object
+    Type_funcWithParams:
+      properties:
+        func:
+          $ref: '#/components/schemas/Type_func'
+          title: Type_funcWithParams.func
+        params:
+          $ref: '#/components/schemas/Type_params'
+          title: Type_funcWithParams.params
+      required:
+        - func
+        - params
+      additionalProperties: false
+      title: Type_funcWithParams
+      description: '`func` 是引擎内置的例如 `Equals, HasRead` 等函数。'
+      type: object
+    Type_somethingWithParams:
+      anyOf:
+        - $ref: '#/components/schemas/Type_buildingBlockWithParams'
+          title: Type_somethingWithParams
+        - $ref: '#/components/schemas/Type_funcWithParams'
+          title: Type_somethingWithParams
+      title: Type_somethingWithParams
+      description: |-
+        下面是生成的类型（人工改过）。原本显得似乎 `func, params, buildingBlock` 都是可选的，
+        但是实际上有上面的有两种类型。什么意思不知道。
+    Type_conditionThen:
+      properties:
+        condition:
+          $ref: '#/components/schemas/Type_condition'
+          title: Type_conditionThen.condition
+        then:
+          $ref: '#/components/schemas/Type_then'
+          title: Type_conditionThen.then
+        otherwise:
+          $ref: '#/components/schemas/Type_otherwise'
+          title: Type_conditionThen.otherwise
+      required:
+        - condition
+        - then
+      additionalProperties: false
+      title: Type_conditionThen
+      description: 同上，`condition` 可以拆分出两种。
+      type: object
+    Type_optionLink:
+      properties:
+        option:
+          $ref: '#/components/schemas/Type_option'
+          title: Type_optionLink.option
+        linkPath:
+          $ref: '#/components/schemas/Type_linkPath'
+          title: Type_optionLink.linkPath
+        condition:
+          $ref: '#/components/schemas/Type_condition'
+          title: Type_optionLink.condition
+        inlineOption:
+          $ref: '#/components/schemas/Type_inlineOption'
+          title: Type_optionLink.inlineOption
+      required:
+        - option
+        - linkPath
+      additionalProperties: false
+      title: Type_optionLink
+      description: 另外一种含 `condition` 的类型其实是 `option` 就是了……被字母顺序误导了以为还是 `condition` 一族的了。
+      type: object
+    Type_doFuncsNode:
+      properties:
+        doFuncs:
+          $ref: '#/components/schemas/Type_doFuncs'
+          title: Type_doFuncsNode.doFuncs
+      required:
+        - doFuncs
+      additionalProperties: false
+      title: Type_doFuncsNode
+      description: 大概是 `~ expr` 这些节点？
+      type: object
+    Type_returnNode:
+      properties:
+        return:
+          $ref: '#/components/schemas/Type_return'
+          title: Type_returnNode.return
+      required:
+        - return
+      additionalProperties: false
+      title: Type_returnNode
+      description: '`~ return (...)`'
+      type: object
+    Type_cycleNode:
+      properties:
+        cycle:
+          $ref: '#/components/schemas/Type_cycle'
+          title: Type_cycleNode.cycle
+      required:
+        - cycle
+      additionalProperties: false
+      title: Type_cycleNode
+      description: |-
+        ```
+        { cycle:
+          - A
+          - B
+        }
+        ```
+      type: object
+    Type_sequenceNode:
+      properties:
+        sequence:
+          $ref: '#/components/schemas/Type_sequence'
+          title: Type_sequenceNode.sequence
+      required:
+        - sequence
+      additionalProperties: false
+      title: Type_sequenceNode
+      description: |-
+        ```
+        { stopping:
+          - A
+          - B
+        }
+        ```
+      type: object
+    Type_divertNode:
+      properties:
+        divert:
+          $ref: '#/components/schemas/Type_divert'
+          title: Type_divertNode.divert
+      required:
+        - divert
+      additionalProperties: false
+      title: Type_divertNode
+      description: '`-> knot`'
+      type: object
+    Type_then:
+      items:
+        anyOf:
+          - title: Type_then.[]
+            type: string
+          - $ref: '#/components/schemas/Type_actionTag'
+            title: Type_then.[]
+          - $ref: '#/components/schemas/Type_doFuncsNode'
+            title: Type_then.[]
+          - $ref: '#/components/schemas/Type_returnNode'
+            title: Type_then.[]
+          - $ref: '#/components/schemas/Type_optionLink'
+            title: Type_then.[]
+          - $ref: '#/components/schemas/Type_conditionThen'
+            title: Type_then.[]
+          - $ref: '#/components/schemas/Type_buildingBlockWithParams'
+            title: Type_then.[]
+          - $ref: '#/components/schemas/Type_cycleNode'
+            title: Type_then.[]
+          - $ref: '#/components/schemas/Type_sequenceNode'
+            title: Type_then.[]
+          - $ref: '#/components/schemas/Type_divertNode'
+            title: Type_then.[]
+          - $ref: '#/components/schemas/Type_customDictionary'
+            title: Type_then.[]
+        title: Type_then.[]
+      title: Type_then.[]
+      description: 基本上可以覆盖所有数组类型的节点。懒得继续合并了。
+      type: array
+    Type_actionTag:
+      properties:
+        action:
+          $ref: '#/components/schemas/Type_action'
+          title: Type_actionTag.action
+        userInfo:
+          $ref: '#/components/schemas/Type_userInfo'
+          title: Type_actionTag.userInfo
+      required:
+        - action
+      additionalProperties: false
+      title: Type_actionTag
+      description: |-
+        感觉 `Type_userInfo` 和 `Type_action` 都是和 tag 相关的。
+        后者是 tag 名称，前者附加额外信息。
+
+        总之感觉不需要太在意。
+      type: object
+    Type_action:
+      title: Type_action
+      description: 见 `Type_userInfo` 的猜想。
+      type: string
+    Type_userInfo:
+      anyOf:
+        - properties:
+            now:
+              $ref: '#/components/schemas/Type_now'
+              title: Type_userInfo.now
+          required:
+            - now
+          additionalProperties: false
+          title: Type_userInfo
+          type: object
+        - properties:
+            city:
+              $ref: '#/components/schemas/Type_city'
+              title: Type_userInfo.city
+            generateSpeaker:
+              $ref: '#/components/schemas/Type_generateSpeaker'
+              title: Type_userInfo.generateSpeaker
+            journey:
+              $ref: '#/components/schemas/Type_journey'
+              title: Type_userInfo.journey
+            retelling:
+              $ref: '#/components/schemas/Type_retelling'
+              title: Type_userInfo.retelling
+            speaker:
+              $ref: '#/components/schemas/Type_speaker'
+              title: Type_userInfo.speaker
+            text:
+              $ref: '#/components/schemas/Type_text'
+              title: Type_userInfo.text
+          required:
+            - text
+          additionalProperties: false
+          title: Type_userInfo
+          type: object
+        - properties:
+            by:
+              $ref: '#/components/schemas/Type_by'
+              title: Type_userInfo.by
+          required:
+            - by
+          additionalProperties: false
+          title: Type_userInfo
+          type: object
+        - properties:
+            copyingJourney:
+              $ref: '#/components/schemas/Type_copyingJourney'
+              title: Type_userInfo.copyingJourney
+            duration:
+              $ref: '#/components/schemas/Type_duration'
+              title: Type_userInfo.duration
+            to:
+              $ref: '#/components/schemas/Type_to'
+              title: Type_userInfo.to
+          required:
+            - to
+          additionalProperties: false
+          title: Type_userInfo
+          type: object
+        - properties:
+            number:
+              $ref: '#/components/schemas/Type_number'
+              title: Type_userInfo.number
+          required:
+            - number
+          additionalProperties: false
+          title: Type_userInfo
+          type: object
+        - properties:
+            at:
+              $ref: '#/components/schemas/Type_at'
+              title: Type_userInfo.at
+          required:
+            - at
+          additionalProperties: false
+          title: Type_userInfo
+          type: object
+        - properties:
+            name:
+              $ref: '#/components/schemas/Type_name'
+              title: Type_userInfo.name
+          required:
+            - name
+          additionalProperties: false
+          title: Type_userInfo
+          type: object
+        - properties:
+            title:
+              $ref: '#/components/schemas/Type_title'
+              title: Type_userInfo.title
+          required:
+            - title
+          additionalProperties: false
+          title: Type_userInfo
+          type: object
+        - properties:
+            disable:
+              $ref: '#/components/schemas/Type_disable'
+              title: Type_userInfo.disable
+          required:
+            - disable
+          additionalProperties: false
+          title: Type_userInfo
+          type: object
+      title: Type_userInfo
+      description: 见 `Type_userInfo` 的猜想。
+    Type_now:
+      title: Type_now
+      type: boolean
+    Type_doFuncs:
+      items:
+        anyOf:
+          - properties:
+              set:
+                $ref: '#/components/schemas/Type_set'
+                title: Type_doFuncs.[].set
+            required:
+              - set
+            additionalProperties: false
+            title: Type_doFuncs.[]
+            type: object
+          - $ref: '#/components/schemas/Type_somethingWithParams'
+            title: Type_doFuncs.[]
+        title: Type_doFuncs.[]
+      title: Type_doFuncs.[]
+      type: array
+    Type_set:
+      items:
+        anyOf:
+          - title: Type_set.[]
+            type: string
+          - title: Type_set.[]
+            type: boolean
+          - title: Type_set.[]
+            type: number
+          - $ref: '#/components/schemas/Type_somethingWithParams'
+            title: Type_set.[]
+          - properties:
+              get:
+                $ref: '#/components/schemas/Type_get'
+                title: Type_set.[].get
+            required:
+              - get
+            additionalProperties: false
+            title: Type_set.[]
+            type: object
+        title: Type_set.[]
+      title: Type_set.[]
+      description: |-
+        离谱，为什么会有 `set: { get: Type_get }` 这种操作呢？
+        是因为这个其实大概是 Ink 的 ref 语法，实际传递过去的参数是参数名称字符串，
+        需要通过一个 get 函数来获取参数值。
+
+        同样，看 Type_get。
+      type: array
+    Type_return:
+      title: Type_return
+    Type_func:
+      title: Type_func
+      type: string
+    Type_params:
+      anyOf:
+        - items:
+            anyOf:
+              - title: Type_params.[]
+                type: number
+              - title: Type_params.[]
+                type: boolean
+              - title: Type_params.[]
+                type: string
+              - properties:
+                  get:
+                    $ref: '#/components/schemas/Type_get'
+                    title: Type_params.[].get
+                required:
+                  - get
+                additionalProperties: false
+                title: Type_params.[]
+                type: object
+              - $ref: '#/components/schemas/Type_somethingWithParams'
+                title: Type_params.[]
+            title: Type_params.[]
+          title: Type_params.[]
+          type: array
+        - additionalProperties: false
+          title: Type_params
+          type: object
+      title: Type_params
+    Type_get:
+      anyOf:
+        - title: Type_get
+          type: string
+        - properties:
+            get:
+              $ref: '#/components/schemas/Type_get'
+              title: Type_get.get
+          required:
+            - get
+          additionalProperties: false
+          title: Type_get
+          type: object
+      title: Type_get
+      description: |-
+        和 `Type_set` 一样，这里既可以是字符串，直接传参。
+        也可以是 `get: { get: Type_get }` 形式，需要通过 get 函数来获取参数值。
+    Type_buildingBlock:
+      title: Type_buildingBlock
+      type: string
+    Type_condition:
+      $ref: '#/components/schemas/Type_somethingWithParams'
+      title: Type_condition
+    Type_otherwise:
+      items:
+        anyOf:
+          - title: Type_otherwise.[]
+            type: string
+          - $ref: '#/components/schemas/Type_returnNode'
+            title: Type_otherwise.[]
+          - $ref: '#/components/schemas/Type_optionLink'
+            title: Type_otherwise.[]
+          - $ref: '#/components/schemas/Type_conditionThen'
+            title: Type_otherwise.[]
+          - $ref: '#/components/schemas/Type_actionTag'
+            title: Type_otherwise.[]
+          - $ref: '#/components/schemas/Type_cycleNode'
+            title: Type_otherwise.[]
+          - $ref: '#/components/schemas/Type_buildingBlockWithParams'
+            title: Type_otherwise.[]
+          - $ref: '#/components/schemas/Type_divertNode'
+            title: Type_otherwise.[]
+          - $ref: '#/components/schemas/Type_doFuncsNode'
+            title: Type_otherwise.[]
+          - $ref: '#/components/schemas/Type_sequenceNode'
+            title: Type_otherwise.[]
+          - $ref: '#/components/schemas/Type_customDictionary'
+            title: Type_otherwise.[]
+        title: Type_otherwise.[]
+      title: Type_otherwise.[]
+      type: array
+    Type_text:
+      title: Type_text
+      type: string
+    Type_cycle:
+      items:
+        items:
+          anyOf:
+            - title: Type_cycle.[].[]
+              type: string
+            - $ref: '#/components/schemas/Type_optionLink'
+              title: Type_cycle.[].[]
+            - $ref: '#/components/schemas/Type_conditionThen'
+              title: Type_cycle.[].[]
+            - $ref: '#/components/schemas/Type_cycleNode'
+              title: Type_cycle.[].[]
+            - $ref: '#/components/schemas/Type_returnNode'
+              title: Type_cycle.[].[]
+            - $ref: '#/components/schemas/Type_buildingBlockWithParams'
+              title: Type_cycle.[].[]
+            - $ref: '#/components/schemas/Type_sequenceNode'
+              title: Type_cycle.[].[]
+            - $ref: '#/components/schemas/Type_divertNode'
+              title: Type_cycle.[].[]
+          title: Type_cycle.[].[]
+        title: Type_cycle.[].[]
+        type: array
+      title: Type_cycle.[]
+      type: array
+    Type_by:
+      title: Type_by
+      type: number
+    Type_to:
+      title: Type_to
+      anyOf:
+        - type: number
+        - type: string
+    Type_number:
+      title: Type_number
+      type: number
+    Type_sequence:
+      items:
+        items:
+          anyOf:
+            - title: Type_sequence.[].[]
+              type: string
+            - $ref: '#/components/schemas/Type_doFuncsNode'
+              title: Type_sequence.[].[]
+            - $ref: '#/components/schemas/Type_divertNode'
+              title: Type_sequence.[].[]
+            - $ref: '#/components/schemas/Type_cycleNode'
+              title: Type_sequence.[].[]
+            - $ref: '#/components/schemas/Type_optionLink'
+              title: Type_sequence.[].[]
+            - $ref: '#/components/schemas/Type_conditionThen'
+              title: Type_sequence.[].[]
+            - $ref: '#/components/schemas/Type_sequenceNode'
+              title: Type_sequence.[].[]
+            - $ref: '#/components/schemas/Type_buildingBlockWithParams'
+              title: Type_sequence.[].[]
+            - $ref: '#/components/schemas/Type_actionTag'
+              title: Type_sequence.[].[]
+          title: Type_sequence.[].[]
+        title: Type_sequence.[].[]
+        type: array
+      title: Type_sequence.[]
+      type: array
+    Type_divert:
+      title: Type_divert
+      description: |-
+        看起来语法有 `:knot`, `:knot:stitche` 和 `stitche` 三种，
+        分别是绝对 knot 路径、绝对 stitche 路径和相对 stitche 路径。
+
+        当然，“现代” Ink 用的是 `knot.stitche` 的形式，要转换。
+      type: string
+    Type_at:
+      title: Type_at
+      anyOf:
+        - type: number
+        - type: string
+    Type_city:
+      title: Type_city
+      type: string
+    Type_journey:
+      title: Type_journey
+      type: string
+    Type_generateSpeaker:
+      title: Type_generateSpeaker
+      type: boolean
+    Type_retelling:
+      title: Type_retelling
+      type: string
+    Type_option:
+      title: Type_option
+      type: string
+    Type_linkPath:
+      title: Type_linkPath
+      type: string
+    Type_inlineOption:
+      title: Type_inlineOption
+      type: boolean
+    Type_storyCustomContentClass:
+      title: Type_storyCustomContentClass
+      type: string
+    Type_dictionary:
+      anyOf:
+        - additionalProperties: false
+          title: Type_dictionary
+          type: object
+        - properties:
+            styleName:
+              $ref: '#/components/schemas/Type_styleName'
+              title: Type_dictionary.styleName
+          required:
+            - styleName
+          additionalProperties: false
+          title: Type_dictionary
+          type: object
+        - properties:
+            isNewspaper:
+              $ref: '#/components/schemas/Type_isNewspaper'
+              title: Type_dictionary.isNewspaper
+            speakerName:
+              $ref: '#/components/schemas/Type_speakerName'
+              title: Type_dictionary.speakerName
+          required:
+            - speakerName
+          additionalProperties: false
+          title: Type_dictionary
+          type: object
+      title: Type_dictionary
+    Type_customDictionary:
+      properties:
+        dictionary:
+          $ref: '#/components/schemas/Type_dictionary'
+          title: Type_customDictionary.dictionary
+        storyCustomContentClass:
+          $ref: '#/components/schemas/Type_storyCustomContentClass'
+          title: Type_customDictionary.storyCustomContentClass
+      required:
+        - dictionary
+        - storyCustomContentClass
+      additionalProperties: false
+      title: Type_customDictionary
+      type: object
+    Type_speaker:
+      title: Type_speaker
+      type: string
+    Type_duration:
+      title: Type_duration
+      type: number
+    Type_name:
+      title: Type_name
+      type: string
+    Type_title:
+      title: Type_title
+      type: string
+    Type_styleName:
+      title: Type_styleName
+      type: string
+    Type_speakerName:
+      title: Type_speakerName
+      type: string
+    Type_isNewspaper:
+      title: Type_isNewspaper
+      type: boolean
+    Type_disable:
+      title: Type_disable
+      type: boolean
+    Type_copyingJourney:
+      title: Type_copyingJourney
+      type: string

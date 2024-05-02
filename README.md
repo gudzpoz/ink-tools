@@ -27,6 +27,10 @@ Import content:
 $ python ./scripts/extract_text.py import ./exported ./data/meta.json ./data-new
 ```
 
+## TODO
+
+- [ ] Figure out a way to detect `ref` parameters.
+
 ## License
 
 [GPL-3.0](./LICENSE)
