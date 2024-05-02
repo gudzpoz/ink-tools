@@ -6,7 +6,7 @@
  */
 export type Type_buildingBlockWithParams = {
   buildingBlock: Type_buildingBlock,
-  params: Type_params,
+  params: Type_paramsForbuildingBlocks,
 };
 
 /**
@@ -14,17 +14,13 @@ export type Type_buildingBlockWithParams = {
  */
 export type Type_funcWithParams = {
   func: Type_func,
-  params: Type_params,
+  params: Type_paramsForFuncs,
 };
 
-/**
- * 下面是生成的类型（人工改过）。原本显得似乎 `func, params, buildingBlock` 都是可选的，
- * 但是实际上有上面的有两种类型。什么意思不知道。
- */
 export type Type_somethingWithParams = (Type_buildingBlockWithParams | Type_funcWithParams);
 
 /**
- * 同上，`condition` 可以拆分出两种。
+ * 普通的条件。
  */
 export type Type_conditionThen = {
   condition: Type_condition,
@@ -33,12 +29,15 @@ export type Type_conditionThen = {
 };
 
 /**
- * 另外一种含 `condition` 的类型其实是 `option` 就是了……被字母顺序误导了以为还是 `condition` 一族的了。
+ * 选项。
  */
 export type Type_optionLink = {
   option: Type_option,
   linkPath: Type_linkPath,
   condition?: Type_condition,
+  /**
+   * 看群里的代码似乎是 Ink 里 `<>` 的意思。
+   */
   inlineOption?: Type_inlineOption,
 }
 
@@ -159,9 +158,11 @@ export type Type_return = (Type_set[number]);
 
 export type Type_func = (string);
 
-export type Type_params = (number | boolean | string | {
+export type Type_paramsForFuncs = (number | boolean | string | {
   get: Type_get,
-} | Type_somethingWithParams)[] | { [key: `__bb${string}`]: Type_return | undefined };
+} | Type_somethingWithParams)[];
+
+export type Type_paramsForbuildingBlocks = { [key: `__bb${string}`]: Type_return | undefined };
 
 /**
  * 和 `Type_set` 一样，这里既可以是字符串，直接传参。

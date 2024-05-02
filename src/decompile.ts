@@ -21,11 +21,13 @@ import { InkChunkNode, InkRootNode } from './types';
   ));
 
   await fs.mkdir('./serialization/content', { recursive: true });
-  for (let knot in rootNode['indexed-content'].ranges) {
+  const keys = Object.keys(rootNode['indexed-content'].ranges);
+  for (let i in keys) {
+    const knot = keys[i];
     const file = `./data/chunks/${knot}.json`;
     const json: InkChunkNode = JSON.parse(await fs.readFile(file, 'utf-8'));
     const content = serializer.decompile(knot, json);
-    await fs.writeFile(`./serialization/content/${knot}.ink`, content);
+    await fs.writeFile(`./serialization/content/${String(parseInt(i) + 1).padStart(4, '0')}-${knot}.ink`, content);
   }
 })();
 

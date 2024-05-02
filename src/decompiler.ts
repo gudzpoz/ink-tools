@@ -9,6 +9,7 @@ import {
   Type_funcWithParams,
   Type_get,
   Type_optionLink,
+  Type_paramsForFuncs,
   Type_returnNode,
   Type_sequenceNode,
   Type_set,
@@ -25,7 +26,7 @@ import { InkBlock, InkChunkNode, InkChunkWithStitches, InkFuncType, InkRootNode 
 class PoorOldInkSerializer {
   root: InkRootNode;
   indentation: number;
-  argStack: Set<string>[];
+  argStack: { args: Set<string>, refs: Set<string> }[];
 
   constructor(root: InkRootNode) {
     this.root = root;
@@ -47,16 +48,33 @@ class PoorOldInkSerializer {
     return '\n' + '    '.repeat(this.indentation);
   }
 
-  checkIfIsArg(name: string) {
+  checkIfIsArg(name: Type_paramsForFuncs[number], nestLevel: number): string {
+    if (typeof name === 'number' || typeof name === 'boolean'
+      || typeof name !== 'string' && !(name as { get: Type_get }).get) {
+      throw new Error(`Unknown arg type: ${name}`);
+    }
+    /**
+     * 我们暂时把 double set + get 这种情况都看作是 ref 值。
+     */
+    if (typeof name !== 'string') {
+      return this.checkIfIsArg((name as { get: Type_get }).get, nestLevel + 1);
+    }
     if (name.startsWith('__bb')) {
       if (this.argStack.length > 0) {
-        this.argStack[this.argStack.length - 1].add(name);
+        const { args, refs } = this.argStack[this.argStack.length - 1];
+        args.add(name);
+        if (nestLevel >= 2) {
+          refs.add(name);
+        }
       }
     }
     return name;
   }
 
-  fixDivertFormat(divert: string) {
+  fixDivertFormat(divert: Type_paramsForFuncs[number]) {
+    if (typeof divert !== 'string') {
+      throw new Error(`Unknown divert type: ${divert}`);
+    }
     if (divert.startsWith(':')) {
       divert = divert.slice(1);
     }
@@ -67,32 +85,26 @@ class PoorOldInkSerializer {
   serializeExpr(expr: Type_set[number]): string {
     if (typeof expr !== 'object') {
       if (typeof expr === 'string') {
-        this.checkIfIsArg(expr);
+        this.checkIfIsArg(expr, 0);
         return expr;
       }
       return JSON.stringify(expr);
     }
     if ((expr as { get: Type_get }).get !== undefined) {
-      let { get } = expr as { get: Type_get };
-      while (typeof get === 'object') {
-        get = get.get;
-      }
-      return this.checkIfIsArg(get);
+      return this.checkIfIsArg(expr as { get: Type_get }, 0);
     }
     if ((expr as Type_buildingBlockWithParams).buildingBlock !== undefined) {
       const { buildingBlock, params } = expr as Type_buildingBlockWithParams;
       let paramList = Array.isArray(params)
         ? params
-        : Object.entries(params)
-            .filter((p) => p[1]).sort((a, b) => a[0].localeCompare(b[0]))
-            .map(([, value]) => value!);
+        : Object.keys(params).sort()
+            .filter((k) => params[k as any])
+            .map((k) => params[k as any]!);
       return `${buildingBlock}(${paramList.map((p) => this.serializeExpr(p)).join(', ')})`;
     }
     const { func, params } = expr as Type_funcWithParams;
     const op: InkFuncType = func as any;
-    const paramList = (params as Type_set).map((p) => this.serializeExpr(p));
-    const [param1, param2] = paramList;
-    paramList.forEach((s) => this.checkIfIsArg(s as string));
+    const [param1, param2] = params;
     switch (op) {
       case 'FlagIsSet':
       case 'HasRead':
@@ -107,9 +119,9 @@ class PoorOldInkSerializer {
         return `${this.serializeExpr(param1)}`;
       // Increment 和 Decrement 都不会用作其它表达式的输入
       case 'Increment':
-        return `${param1} += 1`;
+        return `${this.checkIfIsArg(param1, 0)} += 1`;
       case 'Decrement':
-        return `${param1} -= 1`;
+        return `${this.checkIfIsArg(param1, 0)} -= 1`;
       // 其它的似乎都是双参数（见 80days.enum.json）
       default: {
         const mapping: Record<typeof op, string> = {
@@ -127,7 +139,7 @@ class PoorOldInkSerializer {
           Or: '||',
           Subtract: '-',
         };
-        return `(${this.serializeExpr(param1)} ${mapping[op]} ${param2})`;
+        return `(${this.serializeExpr(param1)} ${mapping[op]} ${this.serializeExpr(param2)})`;
       }
     }
   }
@@ -155,7 +167,11 @@ class PoorOldInkSerializer {
 
   serializeInkBlock(block: InkBlock): string {
     if (typeof block === 'string') {
-      return block.replaceAll('<br>', this.nl());
+      const s = block.replace(/^-/, '\\-');
+      if (s.indexOf('<br><br>') !== -1) {
+        return s.replace('<br><br>', '<br><br>' + this.nl().repeat(2));
+      }
+      return s + ' <>';
     }
 
     if ((block as Type_actionTag).action !== undefined) {
@@ -184,10 +200,12 @@ class PoorOldInkSerializer {
 
     if ((block as Type_optionLink).option !== undefined) {
       const { option, linkPath, condition, inlineOption } = block as Type_optionLink;
-      const postfix = inlineOption ? ' # inline' : '';
+      const postfix = inlineOption ? ' <>' : '';
       const marker = `+ `;
       const cond = condition ? `{${this.serializeExpr(condition)}} ` : '';
-      return `${this.nl()}${marker}${cond}${option}${postfix}${this.nl()}  -> ${this.fixDivertFormat(linkPath)}`;
+      return `${this.nl()}${marker}${cond}${option}${postfix}${
+        this.nl()
+      }  -> ${this.fixDivertFormat(linkPath)}${this.nl()}`;
     }
 
     if ((block as Type_conditionThen).condition !== undefined) {
@@ -195,10 +213,10 @@ class PoorOldInkSerializer {
       let s = `{${this.nl()}  - ${this.serializeExpr(condition)}:${this.nl()}${
         this.serializeBlocks(then)
       }`;
-      if (otherwise) {
+      if (otherwise && otherwise.filter((s) => typeof s !== 'string' || s.trim() !== '').length > 0) {
         s += `${this.nl()}  - else:${this.nl()}${this.serializeBlocks(otherwise)}`;
       }
-      s += `${this.nl()}}`;
+      s += `${this.nl()}}${this.nl()}`;
       return s;
     }
 
@@ -214,21 +232,25 @@ class PoorOldInkSerializer {
 
     if ((block as Type_divertNode).divert !== undefined) {
       const { divert } = block as Type_divertNode;
-      return `-> ${this.fixDivertFormat(divert)}`
+      return `-> ${this.fixDivertFormat(divert)}${this.nl()}`
     }
 
     throw new Error(`Unknown block type: ${Object.keys(block)}`);
   }
 
   serializeBuildingBlock(name: string, content: InkBlock[]) {
-    this.argStack.push(new Set());
+    this.argStack.push({ args: new Set(), refs: new Set() });
     this.indentation -= 1;
-    const serialization = this.serializeBlocks(content);
-    const args = this.argStack.pop() ?? [];
+    // 不知道为什么 have_raced 函数是空白的，总之应付一下先。
+    const serialization = content.length === 0 ? '\n~ return 0\n' : this.serializeBlocks(content);
+    const args = this.argStack.pop()!;
     this.indentation += 1;
     return `=== function ${name} (${
-      [...args].sort().filter((arg) => arg.startsWith(`__bb${name}`)).join(', ')
-    }) ===${this.nl()}${serialization}`
+      [...args.args].sort()
+        .filter((arg) => arg.startsWith(`__bb${name}`))
+        .map((arg) => args.refs.has(arg) ? `ref ${arg}` : arg)
+        .join(', ')
+    }) ===${this.nl()}${serialization}`;
   }
 
   decompileMeta() {
@@ -246,7 +268,7 @@ INCLUDE indexed-content.ink
         'indexed-content.ink': Object.entries(root['indexed-content'].ranges)
           .map(
             ([name], i) =>
-              `INCLUDE content/${String(i + 1).padStart(4)}-${name}.ink`
+              `INCLUDE content/${String(i + 1).padStart(4, '0')}-${name}.ink`
           )
           .join('\n'),
         'buildingBlocks.ink': Object.entries(root.buildingBlocks)
