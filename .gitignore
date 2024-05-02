@@ -1,5 +1,19 @@
+# Python
 /build/
 /data/
 /exported*/
 /translated*/
 __pycache__/
+
+# PDM
+.pdm/
+.pdm-python
+.venv/
+
+# Node
+node_modules/
+.vscode/
+
+# Outputs
+output/
+data/
