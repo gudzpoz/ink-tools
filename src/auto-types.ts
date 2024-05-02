@@ -1,38 +1,76 @@
+export type Type_then = (string | {
+  action: Type_action,
+  userInfo?: Type_userInfo,
+} | {
+  doFuncs: Type_doFuncs,
+} | {
+  return: Type_return,
+} | {
+  condition?: Type_condition,
+  inlineOption?: Type_inlineOption,
+  linkPath?: Type_linkPath,
+  option?: Type_option,
+  otherwise?: Type_otherwise,
+  then?: Type_then,
+} | {
+  buildingBlock: Type_buildingBlock,
+  params: Type_params,
+} | {
+  cycle: Type_cycle,
+} | {
+  sequence: Type_sequence,
+} | {
+  divert: Type_divert,
+} | {
+  dictionary: Type_dictionary,
+  storyCustomContentClass: Type_storyCustomContentClass,
+})[];
+
 export type Type_action = (string);
 
 export type Type_userInfo = ({
-  at?: Type_at,
-  by?: Type_by,
+  now: Type_now,
+} | {
   city?: Type_city,
-  copyingJourney?: Type_copyingJourney,
-  disable?: Type_disable,
-  duration?: Type_duration,
   generateSpeaker?: Type_generateSpeaker,
   journey?: Type_journey,
-  name?: Type_name,
-  now?: Type_now,
-  number?: Type_number,
   retelling?: Type_retelling,
   speaker?: Type_speaker,
-  text?: Type_text,
-  title?: Type_title,
-  to?: Type_to,
+  text: Type_text,
+} | {
+  by: Type_by,
+} | {
+  copyingJourney?: Type_copyingJourney,
+  duration?: Type_duration,
+  to: Type_to,
+} | {
+  number: Type_number,
+} | {
+  at: Type_at,
+} | {
+  name: Type_name,
+} | {
+  title: Type_title,
+} | {
+  disable: Type_disable,
 });
 
 export type Type_now = (boolean);
 
 export type Type_doFuncs = ({
+  set: Type_set,
+} | {
   buildingBlock?: Type_buildingBlock,
   func?: Type_func,
-  params?: Type_params,
-  set?: Type_set,
+  params: Type_params,
 })[];
 
 export type Type_set = (string | boolean | number | {
   buildingBlock?: Type_buildingBlock,
   func?: Type_func,
-  get?: Type_get,
-  params?: Type_params,
+  params: Type_params,
+} | {
+  get: Type_get,
 })[];
 
 export type Type_return = (Type_set[number]);
@@ -40,14 +78,15 @@ export type Type_return = (Type_set[number]);
 export type Type_func = (string);
 
 export type Type_params = (number | boolean | string | {
+  get: Type_get,
+} | {
   buildingBlock?: Type_buildingBlock,
   func?: Type_func,
-  get?: Type_get,
-  params?: Type_params,
+  params: Type_params,
 })[] | { [key: `__bb${string}`]: Type_return | undefined };
 
 export type Type_get = (string | {
-  get?: Type_get,
+  get: Type_get,
 });
 
 export type Type_buildingBlock = (string);
@@ -55,64 +94,58 @@ export type Type_buildingBlock = (string);
 export type Type_condition = ({
   buildingBlock?: Type_buildingBlock,
   func?: Type_func,
-  params?: Type_params,
+  params: Type_params,
 });
 
-export type Type_then = (string | {
-  action?: Type_action,
-  buildingBlock?: Type_buildingBlock,
-  condition?: Type_condition,
-  cycle?: Type_cycle,
-  dictionary?: Type_dictionary,
-  divert?: Type_divert,
-  doFuncs?: Type_doFuncs,
-  inlineOption?: Type_inlineOption,
-  linkPath?: Type_linkPath,
-  option?: Type_option,
-  otherwise?: Type_otherwise,
-  params?: Type_params,
-  return?: Type_return,
-  sequence?: Type_sequence,
-  storyCustomContentClass?: Type_storyCustomContentClass,
-  then?: Type_then,
-  userInfo?: Type_userInfo,
-})[];
-
 export type Type_otherwise = (string | {
-  action?: Type_action,
-  buildingBlock?: Type_buildingBlock,
+  return: Type_return,
+} | {
   condition?: Type_condition,
-  cycle?: Type_cycle,
-  dictionary?: Type_dictionary,
-  divert?: Type_divert,
-  doFuncs?: Type_doFuncs,
   inlineOption?: Type_inlineOption,
   linkPath?: Type_linkPath,
   option?: Type_option,
   otherwise?: Type_otherwise,
-  params?: Type_params,
-  return?: Type_return,
-  sequence?: Type_sequence,
-  storyCustomContentClass?: Type_storyCustomContentClass,
   then?: Type_then,
-  userInfo?: Type_userInfo,
+} | {
+  action: Type_action,
+  userInfo: Type_userInfo,
+} | {
+  cycle: Type_cycle,
+} | {
+  buildingBlock: Type_buildingBlock,
+  params: Type_params,
+} | {
+  divert: Type_divert,
+} | {
+  doFuncs: Type_doFuncs,
+} | {
+  sequence: Type_sequence,
+} | {
+  dictionary: Type_dictionary,
+  storyCustomContentClass: Type_storyCustomContentClass,
 })[];
 
 export type Type_text = (string);
 
 export type Type_cycle = (string | {
-  buildingBlock?: Type_buildingBlock,
-  condition?: Type_condition,
-  cycle?: Type_cycle,
-  divert?: Type_divert,
-  inlineOption?: Type_inlineOption,
-  linkPath?: Type_linkPath,
-  option?: Type_option,
+  condition: Type_condition,
   otherwise?: Type_otherwise,
-  params?: Type_params,
-  return?: Type_return,
-  sequence?: Type_sequence,
-  then?: Type_then,
+  then: Type_then,
+} | {
+  cycle: Type_cycle,
+} | {
+  return: Type_return,
+} | {
+  buildingBlock: Type_buildingBlock,
+  params: Type_params,
+} | {
+  sequence: Type_sequence,
+} | {
+  inlineOption?: Type_inlineOption,
+  linkPath: Type_linkPath,
+  option: Type_option,
+} | {
+  divert: Type_divert,
 })[][];
 
 export type Type_by = (number);
@@ -122,19 +155,25 @@ export type Type_to = (number | string);
 export type Type_number = (number);
 
 export type Type_sequence = (string | {
-  action?: Type_action,
-  buildingBlock?: Type_buildingBlock,
+  doFuncs: Type_doFuncs,
+} | {
+  divert: Type_divert,
+} | {
+  cycle: Type_cycle,
+} | {
   condition?: Type_condition,
-  cycle?: Type_cycle,
-  divert?: Type_divert,
-  doFuncs?: Type_doFuncs,
   linkPath?: Type_linkPath,
   option?: Type_option,
   otherwise?: Type_otherwise,
-  params?: Type_params,
-  sequence?: Type_sequence,
   then?: Type_then,
-  userInfo?: Type_userInfo,
+} | {
+  sequence: Type_sequence,
+} | {
+  buildingBlock: Type_buildingBlock,
+  params: Type_params,
+} | {
+  action: Type_action,
+  userInfo: Type_userInfo,
 })[][];
 
 export type Type_divert = (string);
@@ -157,10 +196,11 @@ export type Type_inlineOption = (boolean);
 
 export type Type_storyCustomContentClass = (string);
 
-export type Type_dictionary = ({
+export type Type_dictionary = ({} | {
+  styleName: Type_styleName,
+} | {
   isNewspaper?: Type_isNewspaper,
-  speakerName?: Type_speakerName,
-  styleName?: Type_styleName,
+  speakerName: Type_speakerName,
 });
 
 export type Type_speaker = (string);

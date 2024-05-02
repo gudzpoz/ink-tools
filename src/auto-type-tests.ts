@@ -1,7 +1,6 @@
-import { InkBlock } from './types';
 import { InkChunkNode } from './types';
 import testeeJson0 from '../data/chunks/storycrashed.json';
-const testeeJson0Typed: InkBlock[] = testeeJson0;
+const testeeJson0Typed: InkChunkNode = testeeJson0;
 console.assert(testeeJson0Typed);
 
 import testeeJson1 from '../data/chunks/repeat_visit_bank.json';
@@ -9,15 +8,15 @@ const testeeJson1Typed: InkChunkNode = testeeJson1;
 console.assert(testeeJson1Typed);
 
 import testeeJson2 from '../data/chunks/village_bank.json';
-const testeeJson2Typed: InkBlock[] = testeeJson2;
+const testeeJson2Typed: InkChunkNode = testeeJson2;
 console.assert(testeeJson2Typed);
 
 import testeeJson3 from '../data/chunks/medium_bank.json';
-const testeeJson3Typed: InkBlock[] = testeeJson3;
+const testeeJson3Typed: InkChunkNode = testeeJson3;
 console.assert(testeeJson3Typed);
 
 import testeeJson4 from '../data/chunks/town_bank.json';
-const testeeJson4Typed: InkBlock[] = testeeJson4;
+const testeeJson4Typed: InkChunkNode = testeeJson4;
 console.assert(testeeJson4Typed);
 
 import testeeJson5 from '../data/chunks/withdrawal_options.json';
@@ -25,11 +24,11 @@ const testeeJson5Typed: InkChunkNode = testeeJson5;
 console.assert(testeeJson5Typed);
 
 import testeeJson6 from '../data/chunks/bank_done.json';
-const testeeJson6Typed: InkBlock[] = testeeJson6;
+const testeeJson6Typed: InkChunkNode = testeeJson6;
 console.assert(testeeJson6Typed);
 
 import testeeJson7 from '../data/chunks/begging.json';
-const testeeJson7Typed: InkBlock[] = testeeJson7;
+const testeeJson7Typed: InkChunkNode = testeeJson7;
 console.assert(testeeJson7Typed);
 
 import testeeJson8 from '../data/chunks/return_to_sending_paragraph.json';
@@ -37,11 +36,11 @@ const testeeJson8Typed: InkChunkNode = testeeJson8;
 console.assert(testeeJson8Typed);
 
 import testeeJson9 from '../data/chunks/create_passenger_name.json';
-const testeeJson9Typed: InkBlock[] = testeeJson9;
+const testeeJson9Typed: InkChunkNode = testeeJson9;
 console.assert(testeeJson9Typed);
 
 import testeeJson10 from '../data/chunks/create_official_name.json';
-const testeeJson10Typed: InkBlock[] = testeeJson10;
+const testeeJson10Typed: InkChunkNode = testeeJson10;
 console.assert(testeeJson10Typed);
 
 import testeeJson11 from '../data/chunks/days_content.json';
@@ -53,7 +52,7 @@ const testeeJson12Typed: InkChunkNode = testeeJson12;
 console.assert(testeeJson12Typed);
 
 import testeeJson13 from '../data/chunks/generic_explore_content.json';
-const testeeJson13Typed: InkBlock[] = testeeJson13;
+const testeeJson13Typed: InkChunkNode = testeeJson13;
 console.assert(testeeJson13Typed);
 
 import testeeJson14 from '../data/chunks/generic_hotel.json';
@@ -61,7 +60,7 @@ const testeeJson14Typed: InkChunkNode = testeeJson14;
 console.assert(testeeJson14Typed);
 
 import testeeJson15 from '../data/chunks/post_generic_overnight_content.json';
-const testeeJson15Typed: InkBlock[] = testeeJson15;
+const testeeJson15Typed: InkChunkNode = testeeJson15;
 console.assert(testeeJson15Typed);
 
 import testeeJson16 from '../data/chunks/generic_lookingaround.json';
@@ -77,11 +76,11 @@ const testeeJson18Typed: InkChunkNode = testeeJson18;
 console.assert(testeeJson18Typed);
 
 import testeeJson19 from '../data/chunks/london.json';
-const testeeJson19Typed: InkBlock[] = testeeJson19;
+const testeeJson19Typed: InkChunkNode = testeeJson19;
 console.assert(testeeJson19Typed);
 
 import testeeJson20 from '../data/chunks/paris_explore.json';
-const testeeJson20Typed: InkBlock[] = testeeJson20;
+const testeeJson20Typed: InkChunkNode = testeeJson20;
 console.assert(testeeJson20Typed);
 
 import testeeJson21 from '../data/chunks/vienna.json';
@@ -93,7 +92,7 @@ const testeeJson22Typed: InkChunkNode = testeeJson22;
 console.assert(testeeJson22Typed);
 
 import testeeJson23 from '../data/chunks/oslo_overnight.json';
-const testeeJson23Typed: InkBlock[] = testeeJson23;
+const testeeJson23Typed: InkChunkNode = testeeJson23;
 console.assert(testeeJson23Typed);
 
 import testeeJson24 from '../data/chunks/oslo_roughsleep.json';
@@ -105,11 +104,11 @@ const testeeJson25Typed: InkChunkNode = testeeJson25;
 console.assert(testeeJson25Typed);
 
 import testeeJson26 from '../data/chunks/belgrade_overnight.json';
-const testeeJson26Typed: InkBlock[] = testeeJson26;
+const testeeJson26Typed: InkChunkNode = testeeJson26;
 console.assert(testeeJson26Typed);
 
 import testeeJson27 from '../data/chunks/belgrade_roughsleep.json';
-const testeeJson27Typed: InkBlock[] = testeeJson27;
+const testeeJson27Typed: InkChunkNode = testeeJson27;
 console.assert(testeeJson27Typed);
 
 import testeeJson28 from '../data/chunks/browse_bucharest.json';
@@ -117,15 +116,15 @@ const testeeJson28Typed: InkChunkNode = testeeJson28;
 console.assert(testeeJson28Typed);
 
 import testeeJson29 from '../data/chunks/rome_hub.json';
-const testeeJson29Typed: InkBlock[] = testeeJson29;
+const testeeJson29Typed: InkChunkNode = testeeJson29;
 console.assert(testeeJson29Typed);
 
 import testeeJson30 from '../data/chunks/istanbul_night.json';
-const testeeJson30Typed: InkBlock[] = testeeJson30;
+const testeeJson30Typed: InkChunkNode = testeeJson30;
 console.assert(testeeJson30Typed);
 
 import testeeJson31 from '../data/chunks/istanbul_day.json';
-const testeeJson31Typed: InkBlock[] = testeeJson31;
+const testeeJson31Typed: InkChunkNode = testeeJson31;
 console.assert(testeeJson31Typed);
 
 import testeeJson32 from '../data/chunks/explore.json';
@@ -137,7 +136,7 @@ const testeeJson33Typed: InkChunkNode = testeeJson33;
 console.assert(testeeJson33Typed);
 
 import testeeJson34 from '../data/chunks/smeerenburg.json';
-const testeeJson34Typed: InkBlock[] = testeeJson34;
+const testeeJson34Typed: InkChunkNode = testeeJson34;
 console.assert(testeeJson34Typed);
 
 import testeeJson35 from '../data/chunks/cairo_souk.json';
@@ -149,23 +148,23 @@ const testeeJson36Typed: InkChunkNode = testeeJson36;
 console.assert(testeeJson36Typed);
 
 import testeeJson37 from '../data/chunks/stonetownhub.json';
-const testeeJson37Typed: InkBlock[] = testeeJson37;
+const testeeJson37Typed: InkChunkNode = testeeJson37;
 console.assert(testeeJson37Typed);
 
 import testeeJson38 from '../data/chunks/antananarivo.json';
-const testeeJson38Typed: InkBlock[] = testeeJson38;
+const testeeJson38Typed: InkChunkNode = testeeJson38;
 console.assert(testeeJson38Typed);
 
 import testeeJson39 from '../data/chunks/bloemfontein.json';
-const testeeJson39Typed: InkBlock[] = testeeJson39;
+const testeeJson39Typed: InkChunkNode = testeeJson39;
 console.assert(testeeJson39Typed);
 
 import testeeJson40 from '../data/chunks/nsenga.json';
-const testeeJson40Typed: InkBlock[] = testeeJson40;
+const testeeJson40Typed: InkChunkNode = testeeJson40;
 console.assert(testeeJson40Typed);
 
 import testeeJson41 from '../data/chunks/izmir.json';
-const testeeJson41Typed: InkBlock[] = testeeJson41;
+const testeeJson41Typed: InkChunkNode = testeeJson41;
 console.assert(testeeJson41Typed);
 
 import testeeJson42 from '../data/chunks/novorossiysk.json';
@@ -177,11 +176,11 @@ const testeeJson43Typed: InkChunkNode = testeeJson43;
 console.assert(testeeJson43Typed);
 
 import testeeJson44 from '../data/chunks/beirut.json';
-const testeeJson44Typed: InkBlock[] = testeeJson44;
+const testeeJson44Typed: InkChunkNode = testeeJson44;
 console.assert(testeeJson44Typed);
 
 import testeeJson45 from '../data/chunks/exit_beirut.json';
-const testeeJson45Typed: InkBlock[] = testeeJson45;
+const testeeJson45Typed: InkChunkNode = testeeJson45;
 console.assert(testeeJson45Typed);
 
 import testeeJson46 from '../data/chunks/beirut_intro.json';
@@ -197,11 +196,11 @@ const testeeJson48Typed: InkChunkNode = testeeJson48;
 console.assert(testeeJson48Typed);
 
 import testeeJson49 from '../data/chunks/beirut_again.json';
-const testeeJson49Typed: InkBlock[] = testeeJson49;
+const testeeJson49Typed: InkChunkNode = testeeJson49;
 console.assert(testeeJson49Typed);
 
 import testeeJson50 from '../data/chunks/beirut_overnight.json';
-const testeeJson50Typed: InkBlock[] = testeeJson50;
+const testeeJson50Typed: InkChunkNode = testeeJson50;
 console.assert(testeeJson50Typed);
 
 import testeeJson51 from '../data/chunks/hail_intro.json';
@@ -213,7 +212,7 @@ const testeeJson52Typed: InkChunkNode = testeeJson52;
 console.assert(testeeJson52Typed);
 
 import testeeJson53 from '../data/chunks/altalibcamp.json';
-const testeeJson53Typed: InkBlock[] = testeeJson53;
+const testeeJson53Typed: InkChunkNode = testeeJson53;
 console.assert(testeeJson53Typed);
 
 import testeeJson54 from '../data/chunks/fogg_lost.json';
@@ -225,7 +224,7 @@ const testeeJson55Typed: InkChunkNode = testeeJson55;
 console.assert(testeeJson55Typed);
 
 import testeeJson56 from '../data/chunks/manila.json';
-const testeeJson56Typed: InkBlock[] = testeeJson56;
+const testeeJson56Typed: InkChunkNode = testeeJson56;
 console.assert(testeeJson56Typed);
 
 import testeeJson57 from '../data/chunks/moscow.json';
@@ -237,51 +236,51 @@ const testeeJson58Typed: InkChunkNode = testeeJson58;
 console.assert(testeeJson58Typed);
 
 import testeeJson59 from '../data/chunks/krasnovodsk.json';
-const testeeJson59Typed: InkBlock[] = testeeJson59;
+const testeeJson59Typed: InkChunkNode = testeeJson59;
 console.assert(testeeJson59Typed);
 
 import testeeJson60 from '../data/chunks/pyongyang.json';
-const testeeJson60Typed: InkBlock[] = testeeJson60;
+const testeeJson60Typed: InkChunkNode = testeeJson60;
 console.assert(testeeJson60Typed);
 
 import testeeJson61 from '../data/chunks/elbrus_to_kabul.json';
-const testeeJson61Typed: InkBlock[] = testeeJson61;
+const testeeJson61Typed: InkChunkNode = testeeJson61;
 console.assert(testeeJson61Typed);
 
 import testeeJson62 from '../data/chunks/elbrus_to_karachi.json';
-const testeeJson62Typed: InkBlock[] = testeeJson62;
+const testeeJson62Typed: InkChunkNode = testeeJson62;
 console.assert(testeeJson62Typed);
 
 import testeeJson63 from '../data/chunks/elbrus_to_ekaterinburg.json';
-const testeeJson63Typed: InkBlock[] = testeeJson63;
+const testeeJson63Typed: InkChunkNode = testeeJson63;
 console.assert(testeeJson63Typed);
 
 import testeeJson64 from '../data/chunks/delhi_hub.json';
-const testeeJson64Typed: InkBlock[] = testeeJson64;
+const testeeJson64Typed: InkChunkNode = testeeJson64;
 console.assert(testeeJson64Typed);
 
 import testeeJson65 from '../data/chunks/endbombay.json';
-const testeeJson65Typed: InkBlock[] = testeeJson65;
+const testeeJson65Typed: InkChunkNode = testeeJson65;
 console.assert(testeeJson65Typed);
 
 import testeeJson66 from '../data/chunks/chittagong.json';
-const testeeJson66Typed: InkBlock[] = testeeJson66;
+const testeeJson66Typed: InkChunkNode = testeeJson66;
 console.assert(testeeJson66Typed);
 
 import testeeJson67 from '../data/chunks/DONE_chittagong_last_Ditch_catch.json';
-const testeeJson67Typed: InkBlock[] = testeeJson67;
+const testeeJson67Typed: InkChunkNode = testeeJson67;
 console.assert(testeeJson67Typed);
 
 import testeeJson68 from '../data/chunks/rangoon.json';
-const testeeJson68Typed: InkBlock[] = testeeJson68;
+const testeeJson68Typed: InkChunkNode = testeeJson68;
 console.assert(testeeJson68Typed);
 
 import testeeJson69 from '../data/chunks/overnight_pp.json';
-const testeeJson69Typed: InkBlock[] = testeeJson69;
+const testeeJson69Typed: InkChunkNode = testeeJson69;
 console.assert(testeeJson69Typed);
 
 import testeeJson70 from '../data/chunks/hongkong_hub.json';
-const testeeJson70Typed: InkBlock[] = testeeJson70;
+const testeeJson70Typed: InkChunkNode = testeeJson70;
 console.assert(testeeJson70Typed);
 
 import testeeJson71 from '../data/chunks/batavia_overnight.json';
@@ -301,31 +300,31 @@ const testeeJson74Typed: InkChunkNode = testeeJson74;
 console.assert(testeeJson74Typed);
 
 import testeeJson75 from '../data/chunks/caracas.json';
-const testeeJson75Typed: InkBlock[] = testeeJson75;
+const testeeJson75Typed: InkChunkNode = testeeJson75;
 console.assert(testeeJson75Typed);
 
 import testeeJson76 from '../data/chunks/panama_city.json';
-const testeeJson76Typed: InkBlock[] = testeeJson76;
+const testeeJson76Typed: InkChunkNode = testeeJson76;
 console.assert(testeeJson76Typed);
 
 import testeeJson77 from '../data/chunks/dakar_rough.json';
-const testeeJson77Typed: InkBlock[] = testeeJson77;
+const testeeJson77Typed: InkChunkNode = testeeJson77;
 console.assert(testeeJson77Typed);
 
 import testeeJson78 from '../data/chunks/dakar_hotel.json';
-const testeeJson78Typed: InkBlock[] = testeeJson78;
+const testeeJson78Typed: InkChunkNode = testeeJson78;
 console.assert(testeeJson78Typed);
 
 import testeeJson79 from '../data/chunks/freetown_done.json';
-const testeeJson79Typed: InkBlock[] = testeeJson79;
+const testeeJson79Typed: InkChunkNode = testeeJson79;
 console.assert(testeeJson79Typed);
 
 import testeeJson80 from '../data/chunks/sf_night.json';
-const testeeJson80Typed: InkBlock[] = testeeJson80;
+const testeeJson80Typed: InkChunkNode = testeeJson80;
 console.assert(testeeJson80Typed);
 
 import testeeJson81 from '../data/chunks/sf_day.json';
-const testeeJson81Typed: InkBlock[] = testeeJson81;
+const testeeJson81Typed: InkChunkNode = testeeJson81;
 console.assert(testeeJson81Typed);
 
 import testeeJson82 from '../data/chunks/endsf.json';
@@ -337,147 +336,147 @@ const testeeJson83Typed: InkChunkNode = testeeJson83;
 console.assert(testeeJson83Typed);
 
 import testeeJson84 from '../data/chunks/qausuittuq.json';
-const testeeJson84Typed: InkBlock[] = testeeJson84;
+const testeeJson84Typed: InkChunkNode = testeeJson84;
 console.assert(testeeJson84Typed);
 
 import testeeJson85 from '../data/chunks/qausuittuq_stuck.json';
-const testeeJson85Typed: InkBlock[] = testeeJson85;
+const testeeJson85Typed: InkChunkNode = testeeJson85;
 console.assert(testeeJson85Typed);
 
 import testeeJson86 from '../data/chunks/overnight_zurich.json';
-const testeeJson86Typed: InkBlock[] = testeeJson86;
+const testeeJson86Typed: InkChunkNode = testeeJson86;
 console.assert(testeeJson86Typed);
 
 import testeeJson87 from '../data/chunks/zurich.json';
-const testeeJson87Typed: InkBlock[] = testeeJson87;
+const testeeJson87Typed: InkChunkNode = testeeJson87;
 console.assert(testeeJson87Typed);
 
 import testeeJson88 from '../data/chunks/zurich_hotel.json';
-const testeeJson88Typed: InkBlock[] = testeeJson88;
+const testeeJson88Typed: InkChunkNode = testeeJson88;
 console.assert(testeeJson88Typed);
 
 import testeeJson89 from '../data/chunks/meteora_explore_either.json';
-const testeeJson89Typed: InkBlock[] = testeeJson89;
+const testeeJson89Typed: InkChunkNode = testeeJson89;
 console.assert(testeeJson89Typed);
 
 import testeeJson90 from '../data/chunks/meteora2.json';
-const testeeJson90Typed: InkBlock[] = testeeJson90;
+const testeeJson90Typed: InkChunkNode = testeeJson90;
 console.assert(testeeJson90Typed);
 
 import testeeJson91 from '../data/chunks/hanuabada_overnight.json';
-const testeeJson91Typed: InkBlock[] = testeeJson91;
+const testeeJson91Typed: InkChunkNode = testeeJson91;
 console.assert(testeeJson91Typed);
 
 import testeeJson92 from '../data/chunks/pitcairn.json';
-const testeeJson92Typed: InkBlock[] = testeeJson92;
+const testeeJson92Typed: InkChunkNode = testeeJson92;
 console.assert(testeeJson92Typed);
 
 import testeeJson93 from '../data/chunks/albuquerque.json';
-const testeeJson93Typed: InkBlock[] = testeeJson93;
+const testeeJson93Typed: InkChunkNode = testeeJson93;
 console.assert(testeeJson93Typed);
 
 import testeeJson94 from '../data/chunks/buenosaires.json';
-const testeeJson94Typed: InkBlock[] = testeeJson94;
+const testeeJson94Typed: InkChunkNode = testeeJson94;
 console.assert(testeeJson94Typed);
 
 import testeeJson95 from '../data/chunks/go_to_ba_river.json';
-const testeeJson95Typed: InkBlock[] = testeeJson95;
+const testeeJson95Typed: InkChunkNode = testeeJson95;
 console.assert(testeeJson95Typed);
 
 import testeeJson96 from '../data/chunks/greenlandoutpost_content.json';
-const testeeJson96Typed: InkBlock[] = testeeJson96;
+const testeeJson96Typed: InkChunkNode = testeeJson96;
 console.assert(testeeJson96Typed);
 
 import testeeJson97 from '../data/chunks/greece_izmir_ferry.json';
-const testeeJson97Typed: InkBlock[] = testeeJson97;
+const testeeJson97Typed: InkChunkNode = testeeJson97;
 console.assert(testeeJson97Typed);
 
 import testeeJson98 from '../data/chunks/paris_train_departure.json';
-const testeeJson98Typed: InkBlock[] = testeeJson98;
+const testeeJson98Typed: InkChunkNode = testeeJson98;
 console.assert(testeeJson98Typed);
 
 import testeeJson99 from '../data/chunks/paris_train.json';
-const testeeJson99Typed: InkBlock[] = testeeJson99;
+const testeeJson99Typed: InkChunkNode = testeeJson99;
 console.assert(testeeJson99Typed);
 
 import testeeJson100 from '../data/chunks/amsterdam_to_copenhagen_depart.json';
-const testeeJson100Typed: InkBlock[] = testeeJson100;
+const testeeJson100Typed: InkChunkNode = testeeJson100;
 console.assert(testeeJson100Typed);
 
 import testeeJson101 from '../data/chunks/amsterdam_to_copenhagen.json';
-const testeeJson101Typed: InkBlock[] = testeeJson101;
+const testeeJson101Typed: InkChunkNode = testeeJson101;
 console.assert(testeeJson101Typed);
 
 import testeeJson102 from '../data/chunks/amsterdam_to_berlin_depart.json';
-const testeeJson102Typed: InkBlock[] = testeeJson102;
+const testeeJson102Typed: InkChunkNode = testeeJson102;
 console.assert(testeeJson102Typed);
 
 import testeeJson103 from '../data/chunks/amsterdam_to_berlin.json';
-const testeeJson103Typed: InkBlock[] = testeeJson103;
+const testeeJson103Typed: InkChunkNode = testeeJson103;
 console.assert(testeeJson103Typed);
 
 import testeeJson104 from '../data/chunks/drive_again_depart.json';
-const testeeJson104Typed: InkBlock[] = testeeJson104;
+const testeeJson104Typed: InkChunkNode = testeeJson104;
 console.assert(testeeJson104Typed);
 
 import testeeJson105 from '../data/chunks/drive_again.json';
-const testeeJson105Typed: InkBlock[] = testeeJson105;
+const testeeJson105Typed: InkChunkNode = testeeJson105;
 console.assert(testeeJson105Typed);
 
 import testeeJson106 from '../data/chunks/amsterdam_to_oslo.json';
-const testeeJson106Typed: InkBlock[] = testeeJson106;
+const testeeJson106Typed: InkChunkNode = testeeJson106;
 console.assert(testeeJson106Typed);
 
 import testeeJson107 from '../data/chunks/paris_to_munich_train.json';
-const testeeJson107Typed: InkBlock[] = testeeJson107;
+const testeeJson107Typed: InkChunkNode = testeeJson107;
 console.assert(testeeJson107Typed);
 
 import testeeJson108 from '../data/chunks/paris_to_vienna_train.json';
-const testeeJson108Typed: InkBlock[] = testeeJson108;
+const testeeJson108Typed: InkChunkNode = testeeJson108;
 console.assert(testeeJson108Typed);
 
 import testeeJson109 from '../data/chunks/paris_to_budapest.json';
-const testeeJson109Typed: InkBlock[] = testeeJson109;
+const testeeJson109Typed: InkChunkNode = testeeJson109;
 console.assert(testeeJson109Typed);
 
 import testeeJson110 from '../data/chunks/paris_to_bucharest.json';
-const testeeJson110Typed: InkBlock[] = testeeJson110;
+const testeeJson110Typed: InkChunkNode = testeeJson110;
 console.assert(testeeJson110Typed);
 
 import testeeJson111 from '../data/chunks/paristoistanbul_train.json';
-const testeeJson111Typed: InkBlock[] = testeeJson111;
+const testeeJson111Typed: InkChunkNode = testeeJson111;
 console.assert(testeeJson111Typed);
 
 import testeeJson112 from '../data/chunks/viennatobucharest_train.json';
-const testeeJson112Typed: InkBlock[] = testeeJson112;
+const testeeJson112Typed: InkChunkNode = testeeJson112;
 console.assert(testeeJson112Typed);
 
 import testeeJson113 from '../data/chunks/viennatoistanbul_train.json';
-const testeeJson113Typed: InkBlock[] = testeeJson113;
+const testeeJson113Typed: InkChunkNode = testeeJson113;
 console.assert(testeeJson113Typed);
 
 import testeeJson114 from '../data/chunks/oe_budapest_to_bucharest_depart.json';
-const testeeJson114Typed: InkBlock[] = testeeJson114;
+const testeeJson114Typed: InkChunkNode = testeeJson114;
 console.assert(testeeJson114Typed);
 
 import testeeJson115 from '../data/chunks/oe_budapest_to_istanbul_depart.json';
-const testeeJson115Typed: InkBlock[] = testeeJson115;
+const testeeJson115Typed: InkChunkNode = testeeJson115;
 console.assert(testeeJson115Typed);
 
 import testeeJson116 from '../data/chunks/oe_budapest_to_bucharest.json';
-const testeeJson116Typed: InkBlock[] = testeeJson116;
+const testeeJson116Typed: InkChunkNode = testeeJson116;
 console.assert(testeeJson116Typed);
 
 import testeeJson117 from '../data/chunks/oe_budapest_to_istanbul.json';
-const testeeJson117Typed: InkBlock[] = testeeJson117;
+const testeeJson117Typed: InkChunkNode = testeeJson117;
 console.assert(testeeJson117Typed);
 
 import testeeJson118 from '../data/chunks/oe_bucharest_to_istanbul_depart.json';
-const testeeJson118Typed: InkBlock[] = testeeJson118;
+const testeeJson118Typed: InkChunkNode = testeeJson118;
 console.assert(testeeJson118Typed);
 
 import testeeJson119 from '../data/chunks/oe_bucharest_to_istanbul.json';
-const testeeJson119Typed: InkBlock[] = testeeJson119;
+const testeeJson119Typed: InkChunkNode = testeeJson119;
 console.assert(testeeJson119Typed);
 
 import testeeJson120 from '../data/chunks/orientexpress_2_atBudapest_viaVienna.json';
@@ -485,315 +484,315 @@ const testeeJson120Typed: InkChunkNode = testeeJson120;
 console.assert(testeeJson120Typed);
 
 import testeeJson121 from '../data/chunks/warsaw_to_helsinki_via_stockholm.json';
-const testeeJson121Typed: InkBlock[] = testeeJson121;
+const testeeJson121Typed: InkChunkNode = testeeJson121;
 console.assert(testeeJson121Typed);
 
 import testeeJson122 from '../data/chunks/stockholm_to_stpetersburg.json';
-const testeeJson122Typed: InkBlock[] = testeeJson122;
+const testeeJson122Typed: InkChunkNode = testeeJson122;
 console.assert(testeeJson122Typed);
 
 import testeeJson123 from '../data/chunks/copenhagen_to_stockholm.json';
-const testeeJson123Typed: InkBlock[] = testeeJson123;
+const testeeJson123Typed: InkChunkNode = testeeJson123;
 console.assert(testeeJson123Typed);
 
 import testeeJson124 from '../data/chunks/paris_to_venice_oe.json';
-const testeeJson124Typed: InkBlock[] = testeeJson124;
+const testeeJson124Typed: InkChunkNode = testeeJson124;
 console.assert(testeeJson124Typed);
 
 import testeeJson125 from '../data/chunks/paris_to_sofia_oe.json';
-const testeeJson125Typed: InkBlock[] = testeeJson125;
+const testeeJson125Typed: InkChunkNode = testeeJson125;
 console.assert(testeeJson125Typed);
 
 import testeeJson126 from '../data/chunks/venice_to_sofia_oe.json';
-const testeeJson126Typed: InkBlock[] = testeeJson126;
+const testeeJson126Typed: InkChunkNode = testeeJson126;
 console.assert(testeeJson126Typed);
 
 import testeeJson127 from '../data/chunks/sofia_to_istanbul_oe.json';
-const testeeJson127Typed: InkBlock[] = testeeJson127;
+const testeeJson127Typed: InkChunkNode = testeeJson127;
 console.assert(testeeJson127Typed);
 
 import testeeJson128 from '../data/chunks/venice_to_istanbul_oe.json';
-const testeeJson128Typed: InkBlock[] = testeeJson128;
+const testeeJson128Typed: InkChunkNode = testeeJson128;
 console.assert(testeeJson128Typed);
 
 import testeeJson129 from '../data/chunks/orientexpress_southernroute_2_disembarking.json';
-const testeeJson129Typed: InkBlock[] = testeeJson129;
+const testeeJson129Typed: InkChunkNode = testeeJson129;
 console.assert(testeeJson129Typed);
 
 import testeeJson130 from '../data/chunks/orientexpress_southernroute_3_disembarking.json';
-const testeeJson130Typed: InkBlock[] = testeeJson130;
+const testeeJson130Typed: InkChunkNode = testeeJson130;
 console.assert(testeeJson130Typed);
 
 import testeeJson131 from '../data/chunks/berlin_to_munich_depart.json';
-const testeeJson131Typed: InkBlock[] = testeeJson131;
+const testeeJson131Typed: InkChunkNode = testeeJson131;
 console.assert(testeeJson131Typed);
 
 import testeeJson132 from '../data/chunks/munich_to_berlin_player.json';
-const testeeJson132Typed: InkBlock[] = testeeJson132;
+const testeeJson132Typed: InkChunkNode = testeeJson132;
 console.assert(testeeJson132Typed);
 
 import testeeJson133 from '../data/chunks/berlin_to_warsaw.json';
-const testeeJson133Typed: InkBlock[] = testeeJson133;
+const testeeJson133Typed: InkChunkNode = testeeJson133;
 console.assert(testeeJson133Typed);
 
 import testeeJson134 from '../data/chunks/berlin_to_stockholm.json';
-const testeeJson134Typed: InkBlock[] = testeeJson134;
+const testeeJson134Typed: InkChunkNode = testeeJson134;
 console.assert(testeeJson134Typed);
 
 import testeeJson135 from '../data/chunks/amsterdam_to_munich.json';
-const testeeJson135Typed: InkBlock[] = testeeJson135;
+const testeeJson135Typed: InkChunkNode = testeeJson135;
 console.assert(testeeJson135Typed);
 
 import testeeJson136 from '../data/chunks/copenhagen_to_berlin.json';
-const testeeJson136Typed: InkBlock[] = testeeJson136;
+const testeeJson136Typed: InkChunkNode = testeeJson136;
 console.assert(testeeJson136Typed);
 
 import testeeJson137 from '../data/chunks/warsaw_minsk.json';
-const testeeJson137Typed: InkBlock[] = testeeJson137;
+const testeeJson137Typed: InkChunkNode = testeeJson137;
 console.assert(testeeJson137Typed);
 
 import testeeJson138 from '../data/chunks/warsaw_moscow.json';
-const testeeJson138Typed: InkBlock[] = testeeJson138;
+const testeeJson138Typed: InkChunkNode = testeeJson138;
 console.assert(testeeJson138Typed);
 
 import testeeJson139 from '../data/chunks/minsk_moscow.json';
-const testeeJson139Typed: InkBlock[] = testeeJson139;
+const testeeJson139Typed: InkChunkNode = testeeJson139;
 console.assert(testeeJson139Typed);
 
 import testeeJson140 from '../data/chunks/stpetersburg_to_smeerenburg.json';
-const testeeJson140Typed: InkBlock[] = testeeJson140;
+const testeeJson140Typed: InkChunkNode = testeeJson140;
 console.assert(testeeJson140Typed);
 
 import testeeJson141 from '../data/chunks/tromso_to_smeerenburg.json';
-const testeeJson141Typed: InkBlock[] = testeeJson141;
+const testeeJson141Typed: InkChunkNode = testeeJson141;
 console.assert(testeeJson141Typed);
 
 import testeeJson142 from '../data/chunks/tromso_to_smeerenburg1.json';
-const testeeJson142Typed: InkBlock[] = testeeJson142;
+const testeeJson142Typed: InkChunkNode = testeeJson142;
 console.assert(testeeJson142Typed);
 
 import testeeJson143 from '../data/chunks/tromso_to_helsinki.json';
-const testeeJson143Typed: InkBlock[] = testeeJson143;
+const testeeJson143Typed: InkChunkNode = testeeJson143;
 console.assert(testeeJson143Typed);
 
 import testeeJson144 from '../data/chunks/helsinki_to_tromso.json';
-const testeeJson144Typed: InkBlock[] = testeeJson144;
+const testeeJson144Typed: InkChunkNode = testeeJson144;
 console.assert(testeeJson144Typed);
 
 import testeeJson145 from '../data/chunks/tromso_to_helsinki_depart.json';
-const testeeJson145Typed: InkBlock[] = testeeJson145;
+const testeeJson145Typed: InkChunkNode = testeeJson145;
 console.assert(testeeJson145Typed);
 
 import testeeJson146 from '../data/chunks/zurich_to_tunis.json';
-const testeeJson146Typed: InkBlock[] = testeeJson146;
+const testeeJson146Typed: InkChunkNode = testeeJson146;
 console.assert(testeeJson146Typed);
 
 import testeeJson147 from '../data/chunks/tunis_to_beirut_depart.json';
-const testeeJson147Typed: InkBlock[] = testeeJson147;
+const testeeJson147Typed: InkChunkNode = testeeJson147;
 console.assert(testeeJson147Typed);
 
 import testeeJson148 from '../data/chunks/tunis_to_beirut_or_luxor.json';
-const testeeJson148Typed: InkBlock[] = testeeJson148;
+const testeeJson148Typed: InkChunkNode = testeeJson148;
 console.assert(testeeJson148Typed);
 
 import testeeJson149 from '../data/chunks/dubrovnik_to_meteora.json';
-const testeeJson149Typed: InkBlock[] = testeeJson149;
+const testeeJson149Typed: InkChunkNode = testeeJson149;
 console.assert(testeeJson149Typed);
 
 import testeeJson150 from '../data/chunks/jeddah_to_khartoum_depart.json';
-const testeeJson150Typed: InkBlock[] = testeeJson150;
+const testeeJson150Typed: InkChunkNode = testeeJson150;
 console.assert(testeeJson150Typed);
 
 import testeeJson151 from '../data/chunks/khartoum_to_jeddah.json';
-const testeeJson151Typed: InkBlock[] = testeeJson151;
+const testeeJson151Typed: InkChunkNode = testeeJson151;
 console.assert(testeeJson151Typed);
 
 import testeeJson152 from '../data/chunks/batavia_to_port_moresby.json';
-const testeeJson152Typed: InkBlock[] = testeeJson152;
+const testeeJson152Typed: InkChunkNode = testeeJson152;
 console.assert(testeeJson152Typed);
 
 import testeeJson153 from '../data/chunks/port_moresby_to_auckland_depart.json';
-const testeeJson153Typed: InkBlock[] = testeeJson153;
+const testeeJson153Typed: InkChunkNode = testeeJson153;
 console.assert(testeeJson153Typed);
 
 import testeeJson154 from '../data/chunks/port_moresby_to_auckland.json';
-const testeeJson154Typed: InkBlock[] = testeeJson154;
+const testeeJson154Typed: InkChunkNode = testeeJson154;
 console.assert(testeeJson154Typed);
 
 import testeeJson155 from '../data/chunks/port_moresby_to_pitcairn.json';
-const testeeJson155Typed: InkBlock[] = testeeJson155;
+const testeeJson155Typed: InkChunkNode = testeeJson155;
 console.assert(testeeJson155Typed);
 
 import testeeJson156 from '../data/chunks/pitcairn_to_santiago.json';
-const testeeJson156Typed: InkBlock[] = testeeJson156;
+const testeeJson156Typed: InkChunkNode = testeeJson156;
 console.assert(testeeJson156Typed);
 
 import testeeJson157 from '../data/chunks/ottawa_to_quebec_depart.json';
-const testeeJson157Typed: InkBlock[] = testeeJson157;
+const testeeJson157Typed: InkChunkNode = testeeJson157;
 console.assert(testeeJson157Typed);
 
 import testeeJson158 from '../data/chunks/toronto_to_ottawa_depart.json';
-const testeeJson158Typed: InkBlock[] = testeeJson158;
+const testeeJson158Typed: InkChunkNode = testeeJson158;
 console.assert(testeeJson158Typed);
 
 import testeeJson159 from '../data/chunks/quebec_or_toronto_to_ottawa_and_back.json';
-const testeeJson159Typed: InkBlock[] = testeeJson159;
+const testeeJson159Typed: InkChunkNode = testeeJson159;
 console.assert(testeeJson159Typed);
 
 import testeeJson160 from '../data/chunks/quebec_to_ottawa_depart.json';
-const testeeJson160Typed: InkBlock[] = testeeJson160;
+const testeeJson160Typed: InkChunkNode = testeeJson160;
 console.assert(testeeJson160Typed);
 
 import testeeJson161 from '../data/chunks/quebec_to_reykjavik.json';
-const testeeJson161Typed: InkBlock[] = testeeJson161;
+const testeeJson161Typed: InkChunkNode = testeeJson161;
 console.assert(testeeJson161Typed);
 
 import testeeJson162 from '../data/chunks/gastown_to_calgary_depart.json';
-const testeeJson162Typed: InkBlock[] = testeeJson162;
+const testeeJson162Typed: InkChunkNode = testeeJson162;
 console.assert(testeeJson162Typed);
 
 import testeeJson163 from '../data/chunks/gastown_to_regina_depart.json';
-const testeeJson163Typed: InkBlock[] = testeeJson163;
+const testeeJson163Typed: InkChunkNode = testeeJson163;
 console.assert(testeeJson163Typed);
 
 import testeeJson164 from '../data/chunks/calgary_to_winnipeg_depart.json';
-const testeeJson164Typed: InkBlock[] = testeeJson164;
+const testeeJson164Typed: InkChunkNode = testeeJson164;
 console.assert(testeeJson164Typed);
 
 import testeeJson165 from '../data/chunks/gastown_to_winnipeg_depart.json';
-const testeeJson165Typed: InkBlock[] = testeeJson165;
+const testeeJson165Typed: InkChunkNode = testeeJson165;
 console.assert(testeeJson165Typed);
 
 import testeeJson166 from '../data/chunks/calgary_to_regina_depart.json';
-const testeeJson166Typed: InkBlock[] = testeeJson166;
+const testeeJson166Typed: InkChunkNode = testeeJson166;
 console.assert(testeeJson166Typed);
 
 import testeeJson167 from '../data/chunks/regina_to_winnipeg_depart.json';
-const testeeJson167Typed: InkBlock[] = testeeJson167;
+const testeeJson167Typed: InkChunkNode = testeeJson167;
 console.assert(testeeJson167Typed);
 
 import testeeJson168 from '../data/chunks/winnipeg_to_newyork_depart.json';
-const testeeJson168Typed: InkBlock[] = testeeJson168;
+const testeeJson168Typed: InkChunkNode = testeeJson168;
 console.assert(testeeJson168Typed);
 
 import testeeJson169 from '../data/chunks/newyork_to_winnipeg_depart.json';
-const testeeJson169Typed: InkBlock[] = testeeJson169;
+const testeeJson169Typed: InkChunkNode = testeeJson169;
 console.assert(testeeJson169Typed);
 
 import testeeJson170 from '../data/chunks/winnipeg_to_ottawa_depart.json';
-const testeeJson170Typed: InkBlock[] = testeeJson170;
+const testeeJson170Typed: InkChunkNode = testeeJson170;
 console.assert(testeeJson170Typed);
 
 import testeeJson171 from '../data/chunks/ottawa_to_winnipeg_depart.json';
-const testeeJson171Typed: InkBlock[] = testeeJson171;
+const testeeJson171Typed: InkChunkNode = testeeJson171;
 console.assert(testeeJson171Typed);
 
 import testeeJson172 from '../data/chunks/ottawa_to_newyork_depart.json';
-const testeeJson172Typed: InkBlock[] = testeeJson172;
+const testeeJson172Typed: InkChunkNode = testeeJson172;
 console.assert(testeeJson172Typed);
 
 import testeeJson173 from '../data/chunks/newyork_to_ottawa_depart.json';
-const testeeJson173Typed: InkBlock[] = testeeJson173;
+const testeeJson173Typed: InkChunkNode = testeeJson173;
 console.assert(testeeJson173Typed);
 
 import testeeJson174 from '../data/chunks/gastown_to_calgary.json';
-const testeeJson174Typed: InkBlock[] = testeeJson174;
+const testeeJson174Typed: InkChunkNode = testeeJson174;
 console.assert(testeeJson174Typed);
 
 import testeeJson175 from '../data/chunks/gastown_to_regina.json';
-const testeeJson175Typed: InkBlock[] = testeeJson175;
+const testeeJson175Typed: InkChunkNode = testeeJson175;
 console.assert(testeeJson175Typed);
 
 import testeeJson176 from '../data/chunks/gastown_to_winnipeg.json';
-const testeeJson176Typed: InkBlock[] = testeeJson176;
+const testeeJson176Typed: InkChunkNode = testeeJson176;
 console.assert(testeeJson176Typed);
 
 import testeeJson177 from '../data/chunks/calgary_to_winnipeg.json';
-const testeeJson177Typed: InkBlock[] = testeeJson177;
+const testeeJson177Typed: InkChunkNode = testeeJson177;
 console.assert(testeeJson177Typed);
 
 import testeeJson178 from '../data/chunks/calgary_to_regina.json';
-const testeeJson178Typed: InkBlock[] = testeeJson178;
+const testeeJson178Typed: InkChunkNode = testeeJson178;
 console.assert(testeeJson178Typed);
 
 import testeeJson179 from '../data/chunks/regina_to_winnipeg.json';
-const testeeJson179Typed: InkBlock[] = testeeJson179;
+const testeeJson179Typed: InkChunkNode = testeeJson179;
 console.assert(testeeJson179Typed);
 
 import testeeJson180 from '../data/chunks/canada_railway_one_day_hop.json';
-const testeeJson180Typed: InkBlock[] = testeeJson180;
+const testeeJson180Typed: InkChunkNode = testeeJson180;
 console.assert(testeeJson180Typed);
 
 import testeeJson181 from '../data/chunks/winnipeg_to_newyork.json';
-const testeeJson181Typed: InkBlock[] = testeeJson181;
+const testeeJson181Typed: InkChunkNode = testeeJson181;
 console.assert(testeeJson181Typed);
 
 import testeeJson182 from '../data/chunks/newyork_to_winnipeg.json';
-const testeeJson182Typed: InkBlock[] = testeeJson182;
+const testeeJson182Typed: InkChunkNode = testeeJson182;
 console.assert(testeeJson182Typed);
 
 import testeeJson183 from '../data/chunks/winnipeg_to_ottawa_or_back.json';
-const testeeJson183Typed: InkBlock[] = testeeJson183;
+const testeeJson183Typed: InkChunkNode = testeeJson183;
 console.assert(testeeJson183Typed);
 
 import testeeJson184 from '../data/chunks/ottawa_to_newyork_and_back.json';
-const testeeJson184Typed: InkBlock[] = testeeJson184;
+const testeeJson184Typed: InkChunkNode = testeeJson184;
 console.assert(testeeJson184Typed);
 
 import testeeJson185 from '../data/chunks/canadian_pacific_railway_depart.json';
-const testeeJson185Typed: InkBlock[] = testeeJson185;
+const testeeJson185Typed: InkChunkNode = testeeJson185;
 console.assert(testeeJson185Typed);
 
 import testeeJson186 from '../data/chunks/polar_expedition.json';
-const testeeJson186Typed: InkBlock[] = testeeJson186;
+const testeeJson186Typed: InkChunkNode = testeeJson186;
 console.assert(testeeJson186Typed);
 
 import testeeJson187 from '../data/chunks/qausuittuq_to_gastown_or_winnipeg.json';
-const testeeJson187Typed: InkBlock[] = testeeJson187;
+const testeeJson187Typed: InkChunkNode = testeeJson187;
 console.assert(testeeJson187Typed);
 
 import testeeJson188 from '../data/chunks/qausuittuq_to_winnipeg_depart.json';
-const testeeJson188Typed: InkBlock[] = testeeJson188;
+const testeeJson188Typed: InkChunkNode = testeeJson188;
 console.assert(testeeJson188Typed);
 
 import testeeJson189 from '../data/chunks/venice_to_budapest_car.json';
-const testeeJson189Typed: InkBlock[] = testeeJson189;
+const testeeJson189Typed: InkChunkNode = testeeJson189;
 console.assert(testeeJson189Typed);
 
 import testeeJson190 from '../data/chunks/venice_to_athens.json';
-const testeeJson190Typed: InkBlock[] = testeeJson190;
+const testeeJson190Typed: InkChunkNode = testeeJson190;
 console.assert(testeeJson190Typed);
 
 import testeeJson191 from '../data/chunks/nice_to_rome_depart.json';
-const testeeJson191Typed: InkBlock[] = testeeJson191;
+const testeeJson191Typed: InkChunkNode = testeeJson191;
 console.assert(testeeJson191Typed);
 
 import testeeJson192 from '../data/chunks/nice_to_tunis_depart.json';
-const testeeJson192Typed: InkBlock[] = testeeJson192;
+const testeeJson192Typed: InkChunkNode = testeeJson192;
 console.assert(testeeJson192Typed);
 
 import testeeJson193 from '../data/chunks/rome_to_tunis_depart.json';
-const testeeJson193Typed: InkBlock[] = testeeJson193;
+const testeeJson193Typed: InkChunkNode = testeeJson193;
 console.assert(testeeJson193Typed);
 
 import testeeJson194 from '../data/chunks/nice_rome_tunis.json';
-const testeeJson194Typed: InkBlock[] = testeeJson194;
+const testeeJson194Typed: InkChunkNode = testeeJson194;
 console.assert(testeeJson194Typed);
 
 import testeeJson195 from '../data/chunks/begun_journey_with_estelle.json';
-const testeeJson195Typed: InkBlock[] = testeeJson195;
+const testeeJson195Typed: InkChunkNode = testeeJson195;
 console.assert(testeeJson195Typed);
 
 import testeeJson196 from '../data/chunks/berlin_to_prague_car.json';
-const testeeJson196Typed: InkBlock[] = testeeJson196;
+const testeeJson196Typed: InkChunkNode = testeeJson196;
 console.assert(testeeJson196Typed);
 
 import testeeJson197 from '../data/chunks/berlin_to_budapest.json';
-const testeeJson197Typed: InkBlock[] = testeeJson197;
+const testeeJson197Typed: InkChunkNode = testeeJson197;
 console.assert(testeeJson197Typed);
 
 import testeeJson198 from '../data/chunks/berlin_to_bucharest_car.json';
-const testeeJson198Typed: InkBlock[] = testeeJson198;
+const testeeJson198Typed: InkChunkNode = testeeJson198;
 console.assert(testeeJson198Typed);
 
 import testeeJson199 from '../data/chunks/berlin_to_bucharest_car2_arriving.json';
@@ -801,47 +800,47 @@ const testeeJson199Typed: InkChunkNode = testeeJson199;
 console.assert(testeeJson199Typed);
 
 import testeeJson200 from '../data/chunks/prague_to_cairo_airship.json';
-const testeeJson200Typed: InkBlock[] = testeeJson200;
+const testeeJson200Typed: InkChunkNode = testeeJson200;
 console.assert(testeeJson200Typed);
 
 import testeeJson201 from '../data/chunks/prague_to_odesa_airship.json';
-const testeeJson201Typed: InkBlock[] = testeeJson201;
+const testeeJson201Typed: InkChunkNode = testeeJson201;
 console.assert(testeeJson201Typed);
 
 import testeeJson202 from '../data/chunks/budapest_to_thess.json';
-const testeeJson202Typed: InkBlock[] = testeeJson202;
+const testeeJson202Typed: InkChunkNode = testeeJson202;
 console.assert(testeeJson202Typed);
 
 import testeeJson203 from '../data/chunks/budapest_to_athens_via_thess.json';
-const testeeJson203Typed: InkBlock[] = testeeJson203;
+const testeeJson203Typed: InkChunkNode = testeeJson203;
 console.assert(testeeJson203Typed);
 
 import testeeJson204 from '../data/chunks/minsk_to_stpetersburg.json';
-const testeeJson204Typed: InkBlock[] = testeeJson204;
+const testeeJson204Typed: InkChunkNode = testeeJson204;
 console.assert(testeeJson204Typed);
 
 import testeeJson205 from '../data/chunks/stpetersburg_to_minsk.json';
-const testeeJson205Typed: InkBlock[] = testeeJson205;
+const testeeJson205Typed: InkChunkNode = testeeJson205;
 console.assert(testeeJson205Typed);
 
 import testeeJson206 from '../data/chunks/stpetersburg_to_minsk_depart.json';
-const testeeJson206Typed: InkBlock[] = testeeJson206;
+const testeeJson206Typed: InkChunkNode = testeeJson206;
 console.assert(testeeJson206Typed);
 
 import testeeJson207 from '../data/chunks/moscow_to_petersburg.json';
-const testeeJson207Typed: InkBlock[] = testeeJson207;
+const testeeJson207Typed: InkChunkNode = testeeJson207;
 console.assert(testeeJson207Typed);
 
 import testeeJson208 from '../data/chunks/petersburg_to_moscow.json';
-const testeeJson208Typed: InkBlock[] = testeeJson208;
+const testeeJson208Typed: InkChunkNode = testeeJson208;
 console.assert(testeeJson208Typed);
 
 import testeeJson209 from '../data/chunks/moscow_to_petersburg_depart.json';
-const testeeJson209Typed: InkBlock[] = testeeJson209;
+const testeeJson209Typed: InkChunkNode = testeeJson209;
 console.assert(testeeJson209Typed);
 
 import testeeJson210 from '../data/chunks/beirut_balloon.json';
-const testeeJson210Typed: InkBlock[] = testeeJson210;
+const testeeJson210Typed: InkChunkNode = testeeJson210;
 console.assert(testeeJson210Typed);
 
 import testeeJson211 from '../data/chunks/beirut_balloon_depart.json';
@@ -861,19 +860,19 @@ const testeeJson214Typed: InkChunkNode = testeeJson214;
 console.assert(testeeJson214Typed);
 
 import testeeJson215 from '../data/chunks/bucharest_to_odessa.json';
-const testeeJson215Typed: InkBlock[] = testeeJson215;
+const testeeJson215Typed: InkChunkNode = testeeJson215;
 console.assert(testeeJson215Typed);
 
 import testeeJson216 from '../data/chunks/minsk_to_odessa.json';
-const testeeJson216Typed: InkBlock[] = testeeJson216;
+const testeeJson216Typed: InkChunkNode = testeeJson216;
 console.assert(testeeJson216Typed);
 
 import testeeJson217 from '../data/chunks/odessa_to_moscow_train.json';
-const testeeJson217Typed: InkBlock[] = testeeJson217;
+const testeeJson217Typed: InkChunkNode = testeeJson217;
 console.assert(testeeJson217Typed);
 
 import testeeJson218 from '../data/chunks/odessa_to_moscow_train_depart.json';
-const testeeJson218Typed: InkBlock[] = testeeJson218;
+const testeeJson218Typed: InkChunkNode = testeeJson218;
 console.assert(testeeJson218Typed);
 
 import testeeJson219 from '../data/chunks/odessa_to_moscow_train2.json';
@@ -881,31 +880,31 @@ const testeeJson219Typed: InkChunkNode = testeeJson219;
 console.assert(testeeJson219Typed);
 
 import testeeJson220 from '../data/chunks/rome_to_izmir_airship.json';
-const testeeJson220Typed: InkBlock[] = testeeJson220;
+const testeeJson220Typed: InkChunkNode = testeeJson220;
 console.assert(testeeJson220Typed);
 
 import testeeJson221 from '../data/chunks/izmir_to_istanbul_depart.json';
-const testeeJson221Typed: InkBlock[] = testeeJson221;
+const testeeJson221Typed: InkChunkNode = testeeJson221;
 console.assert(testeeJson221Typed);
 
 import testeeJson222 from '../data/chunks/istanbul_to_antalya_depart.json';
-const testeeJson222Typed: InkBlock[] = testeeJson222;
+const testeeJson222Typed: InkChunkNode = testeeJson222;
 console.assert(testeeJson222Typed);
 
 import testeeJson223 from '../data/chunks/izmir_to_istanbul.json';
-const testeeJson223Typed: InkBlock[] = testeeJson223;
+const testeeJson223Typed: InkChunkNode = testeeJson223;
 console.assert(testeeJson223Typed);
 
 import testeeJson224 from '../data/chunks/istanbul_to_antalya.json';
-const testeeJson224Typed: InkBlock[] = testeeJson224;
+const testeeJson224Typed: InkChunkNode = testeeJson224;
 console.assert(testeeJson224Typed);
 
 import testeeJson225 from '../data/chunks/zurich_to_venice_depart.json';
-const testeeJson225Typed: InkBlock[] = testeeJson225;
+const testeeJson225Typed: InkChunkNode = testeeJson225;
 console.assert(testeeJson225Typed);
 
 import testeeJson226 from '../data/chunks/novorossiysk_steamboat.json';
-const testeeJson226Typed: InkBlock[] = testeeJson226;
+const testeeJson226Typed: InkChunkNode = testeeJson226;
 console.assert(testeeJson226Typed);
 
 import testeeJson227 from '../data/chunks/novorossiysk_steamboat_1.json';
@@ -917,7 +916,7 @@ const testeeJson228Typed: InkChunkNode = testeeJson228;
 console.assert(testeeJson228Typed);
 
 import testeeJson229 from '../data/chunks/dont_know_who_fehime_is.json';
-const testeeJson229Typed: InkBlock[] = testeeJson229;
+const testeeJson229Typed: InkChunkNode = testeeJson229;
 console.assert(testeeJson229Typed);
 
 import testeeJson230 from '../data/chunks/novorossiysk_steamboat_3.json';
@@ -953,11 +952,11 @@ const testeeJson237Typed: InkChunkNode = testeeJson237;
 console.assert(testeeJson237Typed);
 
 import testeeJson238 from '../data/chunks/odessa_to_novorossiysk.json';
-const testeeJson238Typed: InkBlock[] = testeeJson238;
+const testeeJson238Typed: InkChunkNode = testeeJson238;
 console.assert(testeeJson238Typed);
 
 import testeeJson239 from '../data/chunks/tehran_train.json';
-const testeeJson239Typed: InkBlock[] = testeeJson239;
+const testeeJson239Typed: InkChunkNode = testeeJson239;
 console.assert(testeeJson239Typed);
 
 import testeeJson240 from '../data/chunks/tehran_train_2.json';
@@ -969,279 +968,279 @@ const testeeJson241Typed: InkChunkNode = testeeJson241;
 console.assert(testeeJson241Typed);
 
 import testeeJson242 from '../data/chunks/nov_to_tehran_airship.json';
-const testeeJson242Typed: InkBlock[] = testeeJson242;
+const testeeJson242Typed: InkChunkNode = testeeJson242;
 console.assert(testeeJson242Typed);
 
 import testeeJson243 from '../data/chunks/beirut_to_hail_airship_depart.json';
-const testeeJson243Typed: InkBlock[] = testeeJson243;
+const testeeJson243Typed: InkChunkNode = testeeJson243;
 console.assert(testeeJson243Typed);
 
 import testeeJson244 from '../data/chunks/cairo_to_hail_airship_depart.json';
-const testeeJson244Typed: InkBlock[] = testeeJson244;
+const testeeJson244Typed: InkChunkNode = testeeJson244;
 console.assert(testeeJson244Typed);
 
 import testeeJson245 from '../data/chunks/hail_to_cairo_airship_depart.json';
-const testeeJson245Typed: InkBlock[] = testeeJson245;
+const testeeJson245Typed: InkChunkNode = testeeJson245;
 console.assert(testeeJson245Typed);
 
 import testeeJson246 from '../data/chunks/beirut_to_hail_airship.json';
-const testeeJson246Typed: InkBlock[] = testeeJson246;
+const testeeJson246Typed: InkChunkNode = testeeJson246;
 console.assert(testeeJson246Typed);
 
 import testeeJson247 from '../data/chunks/cairo_to_hail_airship.json';
-const testeeJson247Typed: InkBlock[] = testeeJson247;
+const testeeJson247Typed: InkChunkNode = testeeJson247;
 console.assert(testeeJson247Typed);
 
 import testeeJson248 from '../data/chunks/hail_to_cairo_airship.json';
-const testeeJson248Typed: InkBlock[] = testeeJson248;
+const testeeJson248Typed: InkChunkNode = testeeJson248;
 console.assert(testeeJson248Typed);
 
 import testeeJson249 from '../data/chunks/hail_airship_main.json';
-const testeeJson249Typed: InkBlock[] = testeeJson249;
+const testeeJson249Typed: InkChunkNode = testeeJson249;
 console.assert(testeeJson249Typed);
 
 import testeeJson250 from '../data/chunks/istanbul_to_izmir.json';
-const testeeJson250Typed: InkBlock[] = testeeJson250;
+const testeeJson250Typed: InkChunkNode = testeeJson250;
 console.assert(testeeJson250Typed);
 
 import testeeJson251 from '../data/chunks/rome_to_athens_airship.json';
-const testeeJson251Typed: InkBlock[] = testeeJson251;
+const testeeJson251Typed: InkChunkNode = testeeJson251;
 console.assert(testeeJson251Typed);
 
 import testeeJson252 from '../data/chunks/thessaloniki_to_bucharest.json';
-const testeeJson252Typed: InkBlock[] = testeeJson252;
+const testeeJson252Typed: InkChunkNode = testeeJson252;
 console.assert(testeeJson252Typed);
 
 import testeeJson253 from '../data/chunks/bucharest_to_thessaloniki.json';
-const testeeJson253Typed: InkBlock[] = testeeJson253;
+const testeeJson253Typed: InkChunkNode = testeeJson253;
 console.assert(testeeJson253Typed);
 
 import testeeJson254 from '../data/chunks/izmir_to_antalya.json';
-const testeeJson254Typed: InkBlock[] = testeeJson254;
+const testeeJson254Typed: InkChunkNode = testeeJson254;
 console.assert(testeeJson254Typed);
 
 import testeeJson255 from '../data/chunks/antalya_to_beirut.json';
-const testeeJson255Typed: InkBlock[] = testeeJson255;
+const testeeJson255Typed: InkChunkNode = testeeJson255;
 console.assert(testeeJson255Typed);
 
 import testeeJson256 from '../data/chunks/beirut_to_cairo_alex.json';
-const testeeJson256Typed: InkBlock[] = testeeJson256;
+const testeeJson256Typed: InkChunkNode = testeeJson256;
 console.assert(testeeJson256Typed);
 
 import testeeJson257 from '../data/chunks/beirut_to_cairo.json';
-const testeeJson257Typed: InkBlock[] = testeeJson257;
+const testeeJson257Typed: InkChunkNode = testeeJson257;
 console.assert(testeeJson257Typed);
 
 import testeeJson258 from '../data/chunks/antalya_to_cairo_alex.json';
-const testeeJson258Typed: InkBlock[] = testeeJson258;
+const testeeJson258Typed: InkChunkNode = testeeJson258;
 console.assert(testeeJson258Typed);
 
 import testeeJson259 from '../data/chunks/antalya_to_cairo.json';
-const testeeJson259Typed: InkBlock[] = testeeJson259;
+const testeeJson259Typed: InkChunkNode = testeeJson259;
 console.assert(testeeJson259Typed);
 
 import testeeJson260 from '../data/chunks/cairo_to_suez_depart.json';
-const testeeJson260Typed: InkBlock[] = testeeJson260;
+const testeeJson260Typed: InkChunkNode = testeeJson260;
 console.assert(testeeJson260Typed);
 
 import testeeJson261 from '../data/chunks/cairo_to_suez.json';
-const testeeJson261Typed: InkBlock[] = testeeJson261;
+const testeeJson261Typed: InkChunkNode = testeeJson261;
 console.assert(testeeJson261Typed);
 
 import testeeJson262 from '../data/chunks/alexandria_to_suez_boat.json';
-const testeeJson262Typed: InkBlock[] = testeeJson262;
+const testeeJson262Typed: InkChunkNode = testeeJson262;
 console.assert(testeeJson262Typed);
 
 import testeeJson263 from '../data/chunks/suez_to_aden.json';
-const testeeJson263Typed: InkBlock[] = testeeJson263;
+const testeeJson263Typed: InkChunkNode = testeeJson263;
 console.assert(testeeJson263Typed);
 
 import testeeJson264 from '../data/chunks/suez_to_bombay.json';
-const testeeJson264Typed: InkBlock[] = testeeJson264;
+const testeeJson264Typed: InkChunkNode = testeeJson264;
 console.assert(testeeJson264Typed);
 
 import testeeJson265 from '../data/chunks/aden_to_bombay.json';
-const testeeJson265Typed: InkBlock[] = testeeJson265;
+const testeeJson265Typed: InkChunkNode = testeeJson265;
 console.assert(testeeJson265Typed);
 
 import testeeJson266 from '../data/chunks/luxor_manama_airship.json';
-const testeeJson266Typed: InkBlock[] = testeeJson266;
+const testeeJson266Typed: InkChunkNode = testeeJson266;
 console.assert(testeeJson266Typed);
 
 import testeeJson267 from '../data/chunks/luxor_manama_airship2.json';
-const testeeJson267Typed: InkBlock[] = testeeJson267;
+const testeeJson267Typed: InkChunkNode = testeeJson267;
 console.assert(testeeJson267Typed);
 
 import testeeJson268 from '../data/chunks/luxor_manama_airship3.json';
-const testeeJson268Typed: InkBlock[] = testeeJson268;
+const testeeJson268Typed: InkChunkNode = testeeJson268;
 console.assert(testeeJson268Typed);
 
 import testeeJson269 from '../data/chunks/aswan_to_wadihalfa.json';
-const testeeJson269Typed: InkBlock[] = testeeJson269;
+const testeeJson269Typed: InkChunkNode = testeeJson269;
 console.assert(testeeJson269Typed);
 
 import testeeJson270 from '../data/chunks/wadihalfa_to_khartoum.json';
-const testeeJson270Typed: InkBlock[] = testeeJson270;
+const testeeJson270Typed: InkChunkNode = testeeJson270;
 console.assert(testeeJson270Typed);
 
 import testeeJson271 from '../data/chunks/nsenga_bordercrossing.json';
-const testeeJson271Typed: InkBlock[] = testeeJson271;
+const testeeJson271Typed: InkChunkNode = testeeJson271;
 console.assert(testeeJson271Typed);
 
 import testeeJson272 from '../data/chunks/khartoum_to_ujiji.json';
-const testeeJson272Typed: InkBlock[] = testeeJson272;
+const testeeJson272Typed: InkChunkNode = testeeJson272;
 console.assert(testeeJson272Typed);
 
 import testeeJson273 from '../data/chunks/khartoum_to_stonetown.json';
-const testeeJson273Typed: InkBlock[] = testeeJson273;
+const testeeJson273Typed: InkChunkNode = testeeJson273;
 console.assert(testeeJson273Typed);
 
 import testeeJson274 from '../data/chunks/khartoum_to_aden.json';
-const testeeJson274Typed: InkBlock[] = testeeJson274;
+const testeeJson274Typed: InkChunkNode = testeeJson274;
 console.assert(testeeJson274Typed);
 
 import testeeJson275 from '../data/chunks/stonetown_to_aden.json';
-const testeeJson275Typed: InkBlock[] = testeeJson275;
+const testeeJson275Typed: InkChunkNode = testeeJson275;
 console.assert(testeeJson275Typed);
 
 import testeeJson276 from '../data/chunks/aden_to_stonetown.json';
-const testeeJson276Typed: InkBlock[] = testeeJson276;
+const testeeJson276Typed: InkChunkNode = testeeJson276;
 console.assert(testeeJson276Typed);
 
 import testeeJson277 from '../data/chunks/stonetown_to_aden_depart.json';
-const testeeJson277Typed: InkBlock[] = testeeJson277;
+const testeeJson277Typed: InkChunkNode = testeeJson277;
 console.assert(testeeJson277Typed);
 
 import testeeJson278 from '../data/chunks/suez_to_khartoum.json';
-const testeeJson278Typed: InkBlock[] = testeeJson278;
+const testeeJson278Typed: InkChunkNode = testeeJson278;
 console.assert(testeeJson278Typed);
 
 import testeeJson279 from '../data/chunks/suez_to_jeddah.json';
-const testeeJson279Typed: InkBlock[] = testeeJson279;
+const testeeJson279Typed: InkChunkNode = testeeJson279;
 console.assert(testeeJson279Typed);
 
 import testeeJson280 from '../data/chunks/jeddah_to_aden_depart.json';
-const testeeJson280Typed: InkBlock[] = testeeJson280;
+const testeeJson280Typed: InkChunkNode = testeeJson280;
 console.assert(testeeJson280Typed);
 
 import testeeJson281 from '../data/chunks/jeddah_to_aden.json';
-const testeeJson281Typed: InkBlock[] = testeeJson281;
+const testeeJson281Typed: InkChunkNode = testeeJson281;
 console.assert(testeeJson281Typed);
 
 import testeeJson282 from '../data/chunks/jeddah_to_riyadh.json';
-const testeeJson282Typed: InkBlock[] = testeeJson282;
+const testeeJson282Typed: InkChunkNode = testeeJson282;
 console.assert(testeeJson282Typed);
 
 import testeeJson283 from '../data/chunks/ujiji_to_stonetown.json';
-const testeeJson283Typed: InkBlock[] = testeeJson283;
+const testeeJson283Typed: InkChunkNode = testeeJson283;
 console.assert(testeeJson283Typed);
 
 import testeeJson284 from '../data/chunks/stonetown_to_ujiji.json';
-const testeeJson284Typed: InkBlock[] = testeeJson284;
+const testeeJson284Typed: InkChunkNode = testeeJson284;
 console.assert(testeeJson284Typed);
 
 import testeeJson285 from '../data/chunks/nsenga_to_quelimane.json';
-const testeeJson285Typed: InkBlock[] = testeeJson285;
+const testeeJson285Typed: InkChunkNode = testeeJson285;
 console.assert(testeeJson285Typed);
 
 import testeeJson286 from '../data/chunks/quelimane_to_bloemfontein.json';
-const testeeJson286Typed: InkBlock[] = testeeJson286;
+const testeeJson286Typed: InkChunkNode = testeeJson286;
 console.assert(testeeJson286Typed);
 
 import testeeJson287 from '../data/chunks/quelimane_to_ulundi.json';
-const testeeJson287Typed: InkBlock[] = testeeJson287;
+const testeeJson287Typed: InkChunkNode = testeeJson287;
 console.assert(testeeJson287Typed);
 
 import testeeJson288 from '../data/chunks/ujiji_to_quelimane.json';
-const testeeJson288Typed: InkBlock[] = testeeJson288;
+const testeeJson288Typed: InkChunkNode = testeeJson288;
 console.assert(testeeJson288Typed);
 
 import testeeJson289 from '../data/chunks/ujiji_to_nsenga.json';
-const testeeJson289Typed: InkBlock[] = testeeJson289;
+const testeeJson289Typed: InkChunkNode = testeeJson289;
 console.assert(testeeJson289Typed);
 
 import testeeJson290 from '../data/chunks/stonetown_to_quelimane.json';
-const testeeJson290Typed: InkBlock[] = testeeJson290;
+const testeeJson290Typed: InkChunkNode = testeeJson290;
 console.assert(testeeJson290Typed);
 
 import testeeJson291 from '../data/chunks/bloemfontein_to_bhayi.json';
-const testeeJson291Typed: InkBlock[] = testeeJson291;
+const testeeJson291Typed: InkChunkNode = testeeJson291;
 console.assert(testeeJson291Typed);
 
 import testeeJson292 from '../data/chunks/bhayi_to_antananarivo.json';
-const testeeJson292Typed: InkBlock[] = testeeJson292;
+const testeeJson292Typed: InkChunkNode = testeeJson292;
 console.assert(testeeJson292Typed);
 
 import testeeJson293 from '../data/chunks/ulundi_to_antananarivo_depart.json';
-const testeeJson293Typed: InkBlock[] = testeeJson293;
+const testeeJson293Typed: InkChunkNode = testeeJson293;
 console.assert(testeeJson293Typed);
 
 import testeeJson294 from '../data/chunks/ulundi_to_antananarivo.json';
-const testeeJson294Typed: InkBlock[] = testeeJson294;
+const testeeJson294Typed: InkChunkNode = testeeJson294;
 console.assert(testeeJson294Typed);
 
 import testeeJson295 from '../data/chunks/ulundi_to_bhayi.json';
-const testeeJson295Typed: InkBlock[] = testeeJson295;
+const testeeJson295Typed: InkChunkNode = testeeJson295;
 console.assert(testeeJson295Typed);
 
 import testeeJson296 from '../data/chunks/antananarivo_to_colombo.json';
-const testeeJson296Typed: InkBlock[] = testeeJson296;
+const testeeJson296Typed: InkChunkNode = testeeJson296;
 console.assert(testeeJson296Typed);
 
 import testeeJson297 from '../data/chunks/antananarivo_to_madras.json';
-const testeeJson297Typed: InkBlock[] = testeeJson297;
+const testeeJson297Typed: InkChunkNode = testeeJson297;
 console.assert(testeeJson297Typed);
 
 import testeeJson298 from '../data/chunks/antananarivo_to_colombo_4.json';
-const testeeJson298Typed: InkBlock[] = testeeJson298;
+const testeeJson298Typed: InkChunkNode = testeeJson298;
 console.assert(testeeJson298Typed);
 
 import testeeJson299 from '../data/chunks/colombo_conclusion.json';
-const testeeJson299Typed: InkBlock[] = testeeJson299;
+const testeeJson299Typed: InkChunkNode = testeeJson299;
 console.assert(testeeJson299Typed);
 
 import testeeJson300 from '../data/chunks/antananarivo_to_rangoon.json';
-const testeeJson300Typed: InkBlock[] = testeeJson300;
+const testeeJson300Typed: InkChunkNode = testeeJson300;
 console.assert(testeeJson300Typed);
 
 import testeeJson301 from '../data/chunks/bhayi_to_saintdenis.json';
-const testeeJson301Typed: InkBlock[] = testeeJson301;
+const testeeJson301Typed: InkChunkNode = testeeJson301;
 console.assert(testeeJson301Typed);
 
 import testeeJson302 from '../data/chunks/baghdad_to_manama.json';
-const testeeJson302Typed: InkBlock[] = testeeJson302;
+const testeeJson302Typed: InkChunkNode = testeeJson302;
 console.assert(testeeJson302Typed);
 
 import testeeJson303 from '../data/chunks/baghdad_tehran_balloon.json';
-const testeeJson303Typed: InkBlock[] = testeeJson303;
+const testeeJson303Typed: InkChunkNode = testeeJson303;
 console.assert(testeeJson303Typed);
 
 import testeeJson304 from '../data/chunks/aden_to_muscat.json';
-const testeeJson304Typed: InkBlock[] = testeeJson304;
+const testeeJson304Typed: InkChunkNode = testeeJson304;
 console.assert(testeeJson304Typed);
 
 import testeeJson305 from '../data/chunks/boat_rome_bucharest.json';
-const testeeJson305Typed: InkBlock[] = testeeJson305;
+const testeeJson305Typed: InkChunkNode = testeeJson305;
 console.assert(testeeJson305Typed);
 
 import testeeJson306 from '../data/chunks/rome_to_thessaloniki.json';
-const testeeJson306Typed: InkBlock[] = testeeJson306;
+const testeeJson306Typed: InkChunkNode = testeeJson306;
 console.assert(testeeJson306Typed);
 
 import testeeJson307 from '../data/chunks/rome_to_dubrovnik.json';
-const testeeJson307Typed: InkBlock[] = testeeJson307;
+const testeeJson307Typed: InkChunkNode = testeeJson307;
 console.assert(testeeJson307Typed);
 
 import testeeJson308 from '../data/chunks/riyadh_camel.json';
-const testeeJson308Typed: InkBlock[] = testeeJson308;
+const testeeJson308Typed: InkChunkNode = testeeJson308;
 console.assert(testeeJson308Typed);
 
 import testeeJson309 from '../data/chunks/riyadh_camel_return.json';
-const testeeJson309Typed: InkBlock[] = testeeJson309;
+const testeeJson309Typed: InkChunkNode = testeeJson309;
 console.assert(testeeJson309Typed);
 
 import testeeJson310 from '../data/chunks/riyadh_camel_depart.json';
-const testeeJson310Typed: InkBlock[] = testeeJson310;
+const testeeJson310Typed: InkChunkNode = testeeJson310;
 console.assert(testeeJson310Typed);
 
 import testeeJson311 from '../data/chunks/riyadh_camel_1.json';
@@ -1269,11 +1268,11 @@ const testeeJson316Typed: InkChunkNode = testeeJson316;
 console.assert(testeeJson316Typed);
 
 import testeeJson317 from '../data/chunks/rubalkhali_sled.json';
-const testeeJson317Typed: InkBlock[] = testeeJson317;
+const testeeJson317Typed: InkChunkNode = testeeJson317;
 console.assert(testeeJson317Typed);
 
 import testeeJson318 from '../data/chunks/rubalkhali_sled_depart.json';
-const testeeJson318Typed: InkBlock[] = testeeJson318;
+const testeeJson318Typed: InkChunkNode = testeeJson318;
 console.assert(testeeJson318Typed);
 
 import testeeJson319 from '../data/chunks/rubalkhali_sled_1.json';
@@ -1317,7 +1316,7 @@ const testeeJson328Typed: InkChunkNode = testeeJson328;
 console.assert(testeeJson328Typed);
 
 import testeeJson329 from '../data/chunks/dvarka_airship.json';
-const testeeJson329Typed: InkBlock[] = testeeJson329;
+const testeeJson329Typed: InkChunkNode = testeeJson329;
 console.assert(testeeJson329Typed);
 
 import testeeJson330 from '../data/chunks/dvarka_airship_2.json';
@@ -1325,163 +1324,163 @@ const testeeJson330Typed: InkChunkNode = testeeJson330;
 console.assert(testeeJson330Typed);
 
 import testeeJson331 from '../data/chunks/manama_to_riyadh.json';
-const testeeJson331Typed: InkBlock[] = testeeJson331;
+const testeeJson331Typed: InkChunkNode = testeeJson331;
 console.assert(testeeJson331Typed);
 
 import testeeJson332 from '../data/chunks/riyadh_to_manama_depart.json';
-const testeeJson332Typed: InkBlock[] = testeeJson332;
+const testeeJson332Typed: InkChunkNode = testeeJson332;
 console.assert(testeeJson332Typed);
 
 import testeeJson333 from '../data/chunks/riyadh_to_manama.json';
-const testeeJson333Typed: InkBlock[] = testeeJson333;
+const testeeJson333Typed: InkChunkNode = testeeJson333;
 console.assert(testeeJson333Typed);
 
 import testeeJson334 from '../data/chunks/manama_to_muscat.json';
-const testeeJson334Typed: InkBlock[] = testeeJson334;
+const testeeJson334Typed: InkChunkNode = testeeJson334;
 console.assert(testeeJson334Typed);
 
 import testeeJson335 from '../data/chunks/manama_to_dubai.json';
-const testeeJson335Typed: InkBlock[] = testeeJson335;
+const testeeJson335Typed: InkChunkNode = testeeJson335;
 console.assert(testeeJson335Typed);
 
 import testeeJson336 from '../data/chunks/manama_to_dubai_depart.json';
-const testeeJson336Typed: InkBlock[] = testeeJson336;
+const testeeJson336Typed: InkChunkNode = testeeJson336;
 console.assert(testeeJson336Typed);
 
 import testeeJson337 from '../data/chunks/muscat_to_karachi.json';
-const testeeJson337Typed: InkBlock[] = testeeJson337;
+const testeeJson337Typed: InkChunkNode = testeeJson337;
 console.assert(testeeJson337Typed);
 
 import testeeJson338 from '../data/chunks/karachi_to_bombay.json';
-const testeeJson338Typed: InkBlock[] = testeeJson338;
+const testeeJson338Typed: InkChunkNode = testeeJson338;
 console.assert(testeeJson338Typed);
 
 import testeeJson339 from '../data/chunks/dvarka_to_karachi.json';
-const testeeJson339Typed: InkBlock[] = testeeJson339;
+const testeeJson339Typed: InkChunkNode = testeeJson339;
 console.assert(testeeJson339Typed);
 
 import testeeJson340 from '../data/chunks/karachi_to_delhi.json';
-const testeeJson340Typed: InkBlock[] = testeeJson340;
+const testeeJson340Typed: InkChunkNode = testeeJson340;
 console.assert(testeeJson340Typed);
 
 import testeeJson341 from '../data/chunks/dvarka_to_karachi_depart.json';
-const testeeJson341Typed: InkBlock[] = testeeJson341;
+const testeeJson341Typed: InkChunkNode = testeeJson341;
 console.assert(testeeJson341Typed);
 
 import testeeJson342 from '../data/chunks/karachi_to_delhi_depart.json';
-const testeeJson342Typed: InkBlock[] = testeeJson342;
+const testeeJson342Typed: InkChunkNode = testeeJson342;
 console.assert(testeeJson342Typed);
 
 import testeeJson343 from '../data/chunks/amulya_depart.json';
-const testeeJson343Typed: InkBlock[] = testeeJson343;
+const testeeJson343Typed: InkChunkNode = testeeJson343;
 console.assert(testeeJson343Typed);
 
 import testeeJson344 from '../data/chunks/quetta_to_karachi.json';
-const testeeJson344Typed: InkBlock[] = testeeJson344;
+const testeeJson344Typed: InkChunkNode = testeeJson344;
 console.assert(testeeJson344Typed);
 
 import testeeJson345 from '../data/chunks/karachi_to_quetta.json';
-const testeeJson345Typed: InkBlock[] = testeeJson345;
+const testeeJson345Typed: InkChunkNode = testeeJson345;
 console.assert(testeeJson345Typed);
 
 import testeeJson346 from '../data/chunks/bandar_to_karachi.json';
-const testeeJson346Typed: InkBlock[] = testeeJson346;
+const testeeJson346Typed: InkChunkNode = testeeJson346;
 console.assert(testeeJson346Typed);
 
 import testeeJson347 from '../data/chunks/hail_to_baghdad.json';
-const testeeJson347Typed: InkBlock[] = testeeJson347;
+const testeeJson347Typed: InkChunkNode = testeeJson347;
 console.assert(testeeJson347Typed);
 
 import testeeJson348 from '../data/chunks/beirut_to_baghdad.json';
-const testeeJson348Typed: InkBlock[] = testeeJson348;
+const testeeJson348Typed: InkChunkNode = testeeJson348;
 console.assert(testeeJson348Typed);
 
 import testeeJson349 from '../data/chunks/bombay_yacht.json';
-const testeeJson349Typed: InkBlock[] = testeeJson349;
+const testeeJson349Typed: InkChunkNode = testeeJson349;
 console.assert(testeeJson349Typed);
 
 import testeeJson350 from '../data/chunks/bombay_to_bangalore.json';
-const testeeJson350Typed: InkBlock[] = testeeJson350;
+const testeeJson350Typed: InkChunkNode = testeeJson350;
 console.assert(testeeJson350Typed);
 
 import testeeJson351 from '../data/chunks/bombay_to_madras.json';
-const testeeJson351Typed: InkBlock[] = testeeJson351;
+const testeeJson351Typed: InkChunkNode = testeeJson351;
 console.assert(testeeJson351Typed);
 
 import testeeJson352 from '../data/chunks/bombay_to_bangalore_depart.json';
-const testeeJson352Typed: InkBlock[] = testeeJson352;
+const testeeJson352Typed: InkChunkNode = testeeJson352;
 console.assert(testeeJson352Typed);
 
 import testeeJson353 from '../data/chunks/benares_to_waltair.json';
-const testeeJson353Typed: InkBlock[] = testeeJson353;
+const testeeJson353Typed: InkChunkNode = testeeJson353;
 console.assert(testeeJson353Typed);
 
 import testeeJson354 from '../data/chunks/waltair_to_rangoon.json';
-const testeeJson354Typed: InkBlock[] = testeeJson354;
+const testeeJson354Typed: InkChunkNode = testeeJson354;
 console.assert(testeeJson354Typed);
 
 import testeeJson355 from '../data/chunks/yadanabon_to_pangsaupass.json';
-const testeeJson355Typed: InkBlock[] = testeeJson355;
+const testeeJson355Typed: InkChunkNode = testeeJson355;
 console.assert(testeeJson355Typed);
 
 import testeeJson356 from '../data/chunks/yadanabon_to_rangoon_depart.json';
-const testeeJson356Typed: InkBlock[] = testeeJson356;
+const testeeJson356Typed: InkChunkNode = testeeJson356;
 console.assert(testeeJson356Typed);
 
 import testeeJson357 from '../data/chunks/rangoon_to_yadanabon.json';
-const testeeJson357Typed: InkBlock[] = testeeJson357;
+const testeeJson357Typed: InkChunkNode = testeeJson357;
 console.assert(testeeJson357Typed);
 
 import testeeJson358 from '../data/chunks/rangoon_to_batavia.json';
-const testeeJson358Typed: InkBlock[] = testeeJson358;
+const testeeJson358Typed: InkChunkNode = testeeJson358;
 console.assert(testeeJson358Typed);
 
 import testeeJson359 from '../data/chunks/batavia_to_brisbane.json';
-const testeeJson359Typed: InkBlock[] = testeeJson359;
+const testeeJson359Typed: InkChunkNode = testeeJson359;
 console.assert(testeeJson359Typed);
 
 import testeeJson360 from '../data/chunks/manila_to_batavia_depart.json';
-const testeeJson360Typed: InkBlock[] = testeeJson360;
+const testeeJson360Typed: InkChunkNode = testeeJson360;
 console.assert(testeeJson360Typed);
 
 import testeeJson361 from '../data/chunks/manila_to_batavia.json';
-const testeeJson361Typed: InkBlock[] = testeeJson361;
+const testeeJson361Typed: InkChunkNode = testeeJson361;
 console.assert(testeeJson361Typed);
 
 import testeeJson362 from '../data/chunks/batavia_to_manila.json';
-const testeeJson362Typed: InkBlock[] = testeeJson362;
+const testeeJson362Typed: InkChunkNode = testeeJson362;
 console.assert(testeeJson362Typed);
 
 import testeeJson363 from '../data/chunks/brisbane_to_lima.json';
-const testeeJson363Typed: InkBlock[] = testeeJson363;
+const testeeJson363Typed: InkChunkNode = testeeJson363;
 console.assert(testeeJson363Typed);
 
 import testeeJson364 from '../data/chunks/brisbane_to_auckland.json';
-const testeeJson364Typed: InkBlock[] = testeeJson364;
+const testeeJson364Typed: InkChunkNode = testeeJson364;
 console.assert(testeeJson364Typed);
 
 import testeeJson365 from '../data/chunks/auckland_to_pitcairn.json';
-const testeeJson365Typed: InkBlock[] = testeeJson365;
+const testeeJson365Typed: InkChunkNode = testeeJson365;
 console.assert(testeeJson365Typed);
 
 import testeeJson366 from '../data/chunks/auckland_to_lima.json';
-const testeeJson366Typed: InkBlock[] = testeeJson366;
+const testeeJson366Typed: InkChunkNode = testeeJson366;
 console.assert(testeeJson366Typed);
 
 import testeeJson367 from '../data/chunks/novagoa_to_colombo.json';
-const testeeJson367Typed: InkBlock[] = testeeJson367;
+const testeeJson367Typed: InkChunkNode = testeeJson367;
 console.assert(testeeJson367Typed);
 
 import testeeJson368 from '../data/chunks/madras_to_colombo_airship.json';
-const testeeJson368Typed: InkBlock[] = testeeJson368;
+const testeeJson368Typed: InkChunkNode = testeeJson368;
 console.assert(testeeJson368Typed);
 
 import testeeJson369 from '../data/chunks/madras_to_colombo_airship_depart.json';
-const testeeJson369Typed: InkBlock[] = testeeJson369;
+const testeeJson369Typed: InkChunkNode = testeeJson369;
 console.assert(testeeJson369Typed);
 
 import testeeJson370 from '../data/chunks/muscat_phaeton.json';
-const testeeJson370Typed: InkBlock[] = testeeJson370;
+const testeeJson370Typed: InkChunkNode = testeeJson370;
 console.assert(testeeJson370Typed);
 
 import testeeJson371 from '../data/chunks/muscat_phaeton_3.json';
@@ -1493,39 +1492,39 @@ const testeeJson372Typed: InkChunkNode = testeeJson372;
 console.assert(testeeJson372Typed);
 
 import testeeJson373 from '../data/chunks/kabul_to_omsk.json';
-const testeeJson373Typed: InkBlock[] = testeeJson373;
+const testeeJson373Typed: InkChunkNode = testeeJson373;
 console.assert(testeeJson373Typed);
 
 import testeeJson374 from '../data/chunks/omsk_to_kabul.json';
-const testeeJson374Typed: InkBlock[] = testeeJson374;
+const testeeJson374Typed: InkChunkNode = testeeJson374;
 console.assert(testeeJson374Typed);
 
 import testeeJson375 from '../data/chunks/delhi_to_hongkong.json';
-const testeeJson375Typed: InkBlock[] = testeeJson375;
+const testeeJson375Typed: InkChunkNode = testeeJson375;
 console.assert(testeeJson375Typed);
 
 import testeeJson376 from '../data/chunks/moscow_to_ekaterinburg.json';
-const testeeJson376Typed: InkBlock[] = testeeJson376;
+const testeeJson376Typed: InkChunkNode = testeeJson376;
 console.assert(testeeJson376Typed);
 
 import testeeJson377 from '../data/chunks/ekaterinburg_to_omsk.json';
-const testeeJson377Typed: InkBlock[] = testeeJson377;
+const testeeJson377Typed: InkChunkNode = testeeJson377;
 console.assert(testeeJson377Typed);
 
 import testeeJson378 from '../data/chunks/ekaterinburg_to_lakebaikal.json';
-const testeeJson378Typed: InkBlock[] = testeeJson378;
+const testeeJson378Typed: InkChunkNode = testeeJson378;
 console.assert(testeeJson378Typed);
 
 import testeeJson379 from '../data/chunks/ekaterinburg_to_karimskaya.json';
-const testeeJson379Typed: InkBlock[] = testeeJson379;
+const testeeJson379Typed: InkChunkNode = testeeJson379;
 console.assert(testeeJson379Typed);
 
 import testeeJson380 from '../data/chunks/ekaterinburg_to_ussuriysk.json';
-const testeeJson380Typed: InkBlock[] = testeeJson380;
+const testeeJson380Typed: InkChunkNode = testeeJson380;
 console.assert(testeeJson380Typed);
 
 import testeeJson381 from '../data/chunks/ekaterinburg_to_vladivostok.json';
-const testeeJson381Typed: InkBlock[] = testeeJson381;
+const testeeJson381Typed: InkChunkNode = testeeJson381;
 console.assert(testeeJson381Typed);
 
 import testeeJson382 from '../data/chunks/moscow_to_omsk.json';
@@ -1533,19 +1532,19 @@ const testeeJson382Typed: InkChunkNode = testeeJson382;
 console.assert(testeeJson382Typed);
 
 import testeeJson383 from '../data/chunks/omsk_to_lakebaikal.json';
-const testeeJson383Typed: InkBlock[] = testeeJson383;
+const testeeJson383Typed: InkChunkNode = testeeJson383;
 console.assert(testeeJson383Typed);
 
 import testeeJson384 from '../data/chunks/omsk_to_karimskaya.json';
-const testeeJson384Typed: InkBlock[] = testeeJson384;
+const testeeJson384Typed: InkChunkNode = testeeJson384;
 console.assert(testeeJson384Typed);
 
 import testeeJson385 from '../data/chunks/omsk_to_ussuriysk.json';
-const testeeJson385Typed: InkBlock[] = testeeJson385;
+const testeeJson385Typed: InkChunkNode = testeeJson385;
 console.assert(testeeJson385Typed);
 
 import testeeJson386 from '../data/chunks/omsk_to_vladivostok.json';
-const testeeJson386Typed: InkBlock[] = testeeJson386;
+const testeeJson386Typed: InkChunkNode = testeeJson386;
 console.assert(testeeJson386Typed);
 
 import testeeJson387 from '../data/chunks/transsiberian_to_lakebaikal.json';
@@ -1565,11 +1564,11 @@ const testeeJson390Typed: InkChunkNode = testeeJson390;
 console.assert(testeeJson390Typed);
 
 import testeeJson391 from '../data/chunks/transsiberian_karimskaya_to_ussuriysk.json';
-const testeeJson391Typed: InkBlock[] = testeeJson391;
+const testeeJson391Typed: InkChunkNode = testeeJson391;
 console.assert(testeeJson391Typed);
 
 import testeeJson392 from '../data/chunks/transsiberian_karimskaya_to_vladivostok.json';
-const testeeJson392Typed: InkBlock[] = testeeJson392;
+const testeeJson392Typed: InkChunkNode = testeeJson392;
 console.assert(testeeJson392Typed);
 
 import testeeJson393 from '../data/chunks/transsiberian_6.json';
@@ -1585,7 +1584,7 @@ const testeeJson395Typed: InkChunkNode = testeeJson395;
 console.assert(testeeJson395Typed);
 
 import testeeJson396 from '../data/chunks/vladivostok_fishingboat.json';
-const testeeJson396Typed: InkBlock[] = testeeJson396;
+const testeeJson396Typed: InkChunkNode = testeeJson396;
 console.assert(testeeJson396Typed);
 
 import testeeJson397 from '../data/chunks/to_g_horn.json';
@@ -1593,275 +1592,275 @@ const testeeJson397Typed: InkChunkNode = testeeJson397;
 console.assert(testeeJson397Typed);
 
 import testeeJson398 from '../data/chunks/beijing_train.json';
-const testeeJson398Typed: InkBlock[] = testeeJson398;
+const testeeJson398Typed: InkChunkNode = testeeJson398;
 console.assert(testeeJson398Typed);
 
 import testeeJson399 from '../data/chunks/pyongyang_train.json';
-const testeeJson399Typed: InkBlock[] = testeeJson399;
+const testeeJson399Typed: InkChunkNode = testeeJson399;
 console.assert(testeeJson399Typed);
 
 import testeeJson400 from '../data/chunks/baikal_to_urga.json';
-const testeeJson400Typed: InkBlock[] = testeeJson400;
+const testeeJson400Typed: InkChunkNode = testeeJson400;
 console.assert(testeeJson400Typed);
 
 import testeeJson401 from '../data/chunks/irkutsk_to_beijing.json';
-const testeeJson401Typed: InkBlock[] = testeeJson401;
+const testeeJson401Typed: InkChunkNode = testeeJson401;
 console.assert(testeeJson401Typed);
 
 import testeeJson402 from '../data/chunks/urga_to_hongkong_via_beijing.json';
-const testeeJson402Typed: InkBlock[] = testeeJson402;
+const testeeJson402Typed: InkChunkNode = testeeJson402;
 console.assert(testeeJson402Typed);
 
 import testeeJson403 from '../data/chunks/urga_to_beijing.json';
-const testeeJson403Typed: InkBlock[] = testeeJson403;
+const testeeJson403Typed: InkChunkNode = testeeJson403;
 console.assert(testeeJson403Typed);
 
 import testeeJson404 from '../data/chunks/hongkong_to_beijing.json';
-const testeeJson404Typed: InkBlock[] = testeeJson404;
+const testeeJson404Typed: InkChunkNode = testeeJson404;
 console.assert(testeeJson404Typed);
 
 import testeeJson405 from '../data/chunks/beijing_to_hongkong_depart.json';
-const testeeJson405Typed: InkBlock[] = testeeJson405;
+const testeeJson405Typed: InkChunkNode = testeeJson405;
 console.assert(testeeJson405Typed);
 
 import testeeJson406 from '../data/chunks/beijing_to_hongkong.json';
-const testeeJson406Typed: InkBlock[] = testeeJson406;
+const testeeJson406Typed: InkChunkNode = testeeJson406;
 console.assert(testeeJson406Typed);
 
 import testeeJson407 from '../data/chunks/khodunki_tsaritsyn.json';
-const testeeJson407Typed: InkBlock[] = testeeJson407;
+const testeeJson407Typed: InkChunkNode = testeeJson407;
 console.assert(testeeJson407Typed);
 
 import testeeJson408 from '../data/chunks/moscow_to_tsaritsyn.json';
-const testeeJson408Typed: InkBlock[] = testeeJson408;
+const testeeJson408Typed: InkChunkNode = testeeJson408;
 console.assert(testeeJson408Typed);
 
 import testeeJson409 from '../data/chunks/moscow_to_astrakhan.json';
-const testeeJson409Typed: InkBlock[] = testeeJson409;
+const testeeJson409Typed: InkChunkNode = testeeJson409;
 console.assert(testeeJson409Typed);
 
 import testeeJson410 from '../data/chunks/tsaritsyn_to_astrakhan.json';
-const testeeJson410Typed: InkBlock[] = testeeJson410;
+const testeeJson410Typed: InkChunkNode = testeeJson410;
 console.assert(testeeJson410Typed);
 
 import testeeJson411 from '../data/chunks/tsaritsyn_to_moscow.json';
-const testeeJson411Typed: InkBlock[] = testeeJson411;
+const testeeJson411Typed: InkChunkNode = testeeJson411;
 console.assert(testeeJson411Typed);
 
 import testeeJson412 from '../data/chunks/tsaritsyn_to_moscow_depart.json';
-const testeeJson412Typed: InkBlock[] = testeeJson412;
+const testeeJson412Typed: InkChunkNode = testeeJson412;
 console.assert(testeeJson412Typed);
 
 import testeeJson413 from '../data/chunks/moscow_to_astrakhan_depart.json';
-const testeeJson413Typed: InkBlock[] = testeeJson413;
+const testeeJson413Typed: InkChunkNode = testeeJson413;
 console.assert(testeeJson413Typed);
 
 import testeeJson414 from '../data/chunks/ekaterinburg_to_krasnovodsk.json';
-const testeeJson414Typed: InkBlock[] = testeeJson414;
+const testeeJson414Typed: InkChunkNode = testeeJson414;
 console.assert(testeeJson414Typed);
 
 import testeeJson415 from '../data/chunks/krasnovodsk_to_ekaterinburg.json';
-const testeeJson415Typed: InkBlock[] = testeeJson415;
+const testeeJson415Typed: InkChunkNode = testeeJson415;
 console.assert(testeeJson415Typed);
 
 import testeeJson416 from '../data/chunks/tehran_to_baku.json';
-const testeeJson416Typed: InkBlock[] = testeeJson416;
+const testeeJson416Typed: InkChunkNode = testeeJson416;
 console.assert(testeeJson416Typed);
 
 import testeeJson417 from '../data/chunks/baku_to_tehran.json';
-const testeeJson417Typed: InkBlock[] = testeeJson417;
+const testeeJson417Typed: InkChunkNode = testeeJson417;
 console.assert(testeeJson417Typed);
 
 import testeeJson418 from '../data/chunks/astrakhan_to_baku.json';
-const testeeJson418Typed: InkBlock[] = testeeJson418;
+const testeeJson418Typed: InkChunkNode = testeeJson418;
 console.assert(testeeJson418Typed);
 
 import testeeJson419 from '../data/chunks/astrakhan_to_tehran.json';
-const testeeJson419Typed: InkBlock[] = testeeJson419;
+const testeeJson419Typed: InkChunkNode = testeeJson419;
 console.assert(testeeJson419Typed);
 
 import testeeJson420 from '../data/chunks/astrakhan_to_ekaterinburg.json';
-const testeeJson420Typed: InkBlock[] = testeeJson420;
+const testeeJson420Typed: InkChunkNode = testeeJson420;
 console.assert(testeeJson420Typed);
 
 import testeeJson421 from '../data/chunks/ekaterinburg_to_astrakhan.json';
-const testeeJson421Typed: InkBlock[] = testeeJson421;
+const testeeJson421Typed: InkChunkNode = testeeJson421;
 console.assert(testeeJson421Typed);
 
 import testeeJson422 from '../data/chunks/ekaterinburg_to_astrakhan_depart.json';
-const testeeJson422Typed: InkBlock[] = testeeJson422;
+const testeeJson422Typed: InkChunkNode = testeeJson422;
 console.assert(testeeJson422Typed);
 
 import testeeJson423 from '../data/chunks/krasnovodsk_to_merv_actually_herat.json';
-const testeeJson423Typed: InkBlock[] = testeeJson423;
+const testeeJson423Typed: InkChunkNode = testeeJson423;
 console.assert(testeeJson423Typed);
 
 import testeeJson424 from '../data/chunks/bangalore_to_goa_depart.json';
-const testeeJson424Typed: InkBlock[] = testeeJson424;
+const testeeJson424Typed: InkChunkNode = testeeJson424;
 console.assert(testeeJson424Typed);
 
 import testeeJson425 from '../data/chunks/calcutta_train.json';
-const testeeJson425Typed: InkBlock[] = testeeJson425;
+const testeeJson425Typed: InkChunkNode = testeeJson425;
 console.assert(testeeJson425Typed);
 
 import testeeJson426 from '../data/chunks/calcutta_to_allahabad_depart.json';
-const testeeJson426Typed: InkBlock[] = testeeJson426;
+const testeeJson426Typed: InkChunkNode = testeeJson426;
 console.assert(testeeJson426Typed);
 
 import testeeJson427 from '../data/chunks/calcutta_to_allahabad_train.json';
-const testeeJson427Typed: InkBlock[] = testeeJson427;
+const testeeJson427Typed: InkChunkNode = testeeJson427;
 console.assert(testeeJson427Typed);
 
 import testeeJson428 from '../data/chunks/calcutta_journey_interrupted.json';
-const testeeJson428Typed: InkBlock[] = testeeJson428;
+const testeeJson428Typed: InkChunkNode = testeeJson428;
 console.assert(testeeJson428Typed);
 
 import testeeJson429 from '../data/chunks/calcutta_cart.json';
-const testeeJson429Typed: InkBlock[] = testeeJson429;
+const testeeJson429Typed: InkChunkNode = testeeJson429;
 console.assert(testeeJson429Typed);
 
 import testeeJson430 from '../data/chunks/urga_to_yokohama_depart.json';
-const testeeJson430Typed: InkBlock[] = testeeJson430;
+const testeeJson430Typed: InkChunkNode = testeeJson430;
 console.assert(testeeJson430Typed);
 
 import testeeJson431 from '../data/chunks/urga_to_yokohama.json';
-const testeeJson431Typed: InkBlock[] = testeeJson431;
+const testeeJson431Typed: InkChunkNode = testeeJson431;
 console.assert(testeeJson431Typed);
 
 import testeeJson432 from '../data/chunks/pangsaupass_to_canton.json';
-const testeeJson432Typed: InkBlock[] = testeeJson432;
+const testeeJson432Typed: InkChunkNode = testeeJson432;
 console.assert(testeeJson432Typed);
 
 import testeeJson433 from '../data/chunks/yokohama_airship_with_fogg.json';
-const testeeJson433Typed: InkBlock[] = testeeJson433;
+const testeeJson433Typed: InkChunkNode = testeeJson433;
 console.assert(testeeJson433Typed);
 
 import testeeJson434 from '../data/chunks/yokohama_airship_without_fogg.json';
-const testeeJson434Typed: InkBlock[] = testeeJson434;
+const testeeJson434Typed: InkChunkNode = testeeJson434;
 console.assert(testeeJson434Typed);
 
 import testeeJson435 from '../data/chunks/yokohama_steamship.json';
-const testeeJson435Typed: InkBlock[] = testeeJson435;
+const testeeJson435Typed: InkChunkNode = testeeJson435;
 console.assert(testeeJson435Typed);
 
 import testeeJson436 from '../data/chunks/pyongyang_yokohama_steamship.json';
-const testeeJson436Typed: InkBlock[] = testeeJson436;
+const testeeJson436Typed: InkChunkNode = testeeJson436;
 console.assert(testeeJson436Typed);
 
 import testeeJson437 from '../data/chunks/pyongyang_yokohama_steamship_depart.json';
-const testeeJson437Typed: InkBlock[] = testeeJson437;
+const testeeJson437Typed: InkChunkNode = testeeJson437;
 console.assert(testeeJson437Typed);
 
 import testeeJson438 from '../data/chunks/calcutta_agra.json';
-const testeeJson438Typed: InkBlock[] = testeeJson438;
+const testeeJson438Typed: InkChunkNode = testeeJson438;
 console.assert(testeeJson438Typed);
 
 import testeeJson439 from '../data/chunks/madras_to_calcutta.json';
-const testeeJson439Typed: InkBlock[] = testeeJson439;
+const testeeJson439Typed: InkChunkNode = testeeJson439;
 console.assert(testeeJson439Typed);
 
 import testeeJson440 from '../data/chunks/madras_to_waltair.json';
-const testeeJson440Typed: InkBlock[] = testeeJson440;
+const testeeJson440Typed: InkChunkNode = testeeJson440;
 console.assert(testeeJson440Typed);
 
 import testeeJson441 from '../data/chunks/waltair_to_madras.json';
-const testeeJson441Typed: InkBlock[] = testeeJson441;
+const testeeJson441Typed: InkChunkNode = testeeJson441;
 console.assert(testeeJson441Typed);
 
 import testeeJson442 from '../data/chunks/waltair_to_madras1.json';
-const testeeJson442Typed: InkBlock[] = testeeJson442;
+const testeeJson442Typed: InkChunkNode = testeeJson442;
 console.assert(testeeJson442Typed);
 
 import testeeJson443 from '../data/chunks/waltair_to_madras2.json';
-const testeeJson443Typed: InkBlock[] = testeeJson443;
+const testeeJson443Typed: InkChunkNode = testeeJson443;
 console.assert(testeeJson443Typed);
 
 import testeeJson444 from '../data/chunks/herat_to_quetta_depart.json';
-const testeeJson444Typed: InkBlock[] = testeeJson444;
+const testeeJson444Typed: InkChunkNode = testeeJson444;
 console.assert(testeeJson444Typed);
 
 import testeeJson445 from '../data/chunks/herat_to_quetta.json';
-const testeeJson445Typed: InkBlock[] = testeeJson445;
+const testeeJson445Typed: InkChunkNode = testeeJson445;
 console.assert(testeeJson445Typed);
 
 import testeeJson446 from '../data/chunks/herat_to_lahore_depart.json';
-const testeeJson446Typed: InkBlock[] = testeeJson446;
+const testeeJson446Typed: InkChunkNode = testeeJson446;
 console.assert(testeeJson446Typed);
 
 import testeeJson447 from '../data/chunks/herat_to_lahore.json';
-const testeeJson447Typed: InkBlock[] = testeeJson447;
+const testeeJson447Typed: InkChunkNode = testeeJson447;
 console.assert(testeeJson447Typed);
 
 import testeeJson448 from '../data/chunks/quetta_to_lahore_depart.json';
-const testeeJson448Typed: InkBlock[] = testeeJson448;
+const testeeJson448Typed: InkChunkNode = testeeJson448;
 console.assert(testeeJson448Typed);
 
 import testeeJson449 from '../data/chunks/quetta_to_lahore.json';
-const testeeJson449Typed: InkBlock[] = testeeJson449;
+const testeeJson449Typed: InkChunkNode = testeeJson449;
 console.assert(testeeJson449Typed);
 
 import testeeJson450 from '../data/chunks/herat_to_waltair_walker.json';
-const testeeJson450Typed: InkBlock[] = testeeJson450;
+const testeeJson450Typed: InkChunkNode = testeeJson450;
 console.assert(testeeJson450Typed);
 
 import testeeJson451 from '../data/chunks/lahore_to_benares.json';
-const testeeJson451Typed: InkBlock[] = testeeJson451;
+const testeeJson451Typed: InkChunkNode = testeeJson451;
 console.assert(testeeJson451Typed);
 
 import testeeJson452 from '../data/chunks/delhi_to_madras.json';
-const testeeJson452Typed: InkBlock[] = testeeJson452;
+const testeeJson452Typed: InkChunkNode = testeeJson452;
 console.assert(testeeJson452Typed);
 
 import testeeJson453 from '../data/chunks/tehran_to_kabul.json';
-const testeeJson453Typed: InkBlock[] = testeeJson453;
+const testeeJson453Typed: InkChunkNode = testeeJson453;
 console.assert(testeeJson453Typed);
 
 import testeeJson454 from '../data/chunks/tehran_to_herat.json';
-const testeeJson454Typed: InkBlock[] = testeeJson454;
+const testeeJson454Typed: InkChunkNode = testeeJson454;
 console.assert(testeeJson454Typed);
 
 import testeeJson455 from '../data/chunks/herat_to_kabul.json';
-const testeeJson455Typed: InkBlock[] = testeeJson455;
+const testeeJson455Typed: InkChunkNode = testeeJson455;
 console.assert(testeeJson455Typed);
 
 import testeeJson456 from '../data/chunks/herat_to_kabul_depart.json';
-const testeeJson456Typed: InkBlock[] = testeeJson456;
+const testeeJson456Typed: InkChunkNode = testeeJson456;
 console.assert(testeeJson456Typed);
 
 import testeeJson457 from '../data/chunks/grand_trunk_depart.json';
-const testeeJson457Typed: InkBlock[] = testeeJson457;
+const testeeJson457Typed: InkChunkNode = testeeJson457;
 console.assert(testeeJson457Typed);
 
 import testeeJson458 from '../data/chunks/kabul_to_lahore.json';
-const testeeJson458Typed: InkBlock[] = testeeJson458;
+const testeeJson458Typed: InkChunkNode = testeeJson458;
 console.assert(testeeJson458Typed);
 
 import testeeJson459 from '../data/chunks/lahore_to_delhi.json';
-const testeeJson459Typed: InkBlock[] = testeeJson459;
+const testeeJson459Typed: InkChunkNode = testeeJson459;
 console.assert(testeeJson459Typed);
 
 import testeeJson460 from '../data/chunks/delhi_to_agra.json';
-const testeeJson460Typed: InkBlock[] = testeeJson460;
+const testeeJson460Typed: InkChunkNode = testeeJson460;
 console.assert(testeeJson460Typed);
 
 import testeeJson461 from '../data/chunks/kabul_to_agra.json';
-const testeeJson461Typed: InkBlock[] = testeeJson461;
+const testeeJson461Typed: InkChunkNode = testeeJson461;
 console.assert(testeeJson461Typed);
 
 import testeeJson462 from '../data/chunks/kabul_to_delhi.json';
-const testeeJson462Typed: InkBlock[] = testeeJson462;
+const testeeJson462Typed: InkChunkNode = testeeJson462;
 console.assert(testeeJson462Typed);
 
 import testeeJson463 from '../data/chunks/lahore_to_agra.json';
-const testeeJson463Typed: InkBlock[] = testeeJson463;
+const testeeJson463Typed: InkChunkNode = testeeJson463;
 console.assert(testeeJson463Typed);
 
 import testeeJson464 from '../data/chunks/calcutta_elephant_from_benares.json';
-const testeeJson464Typed: InkBlock[] = testeeJson464;
+const testeeJson464Typed: InkChunkNode = testeeJson464;
 console.assert(testeeJson464Typed);
 
 import testeeJson465 from '../data/chunks/calcutta_elephant.json';
-const testeeJson465Typed: InkBlock[] = testeeJson465;
+const testeeJson465Typed: InkChunkNode = testeeJson465;
 console.assert(testeeJson465Typed);
 
 import testeeJson466 from '../data/chunks/calcutta_elephant_2.json';
@@ -1869,51 +1868,51 @@ const testeeJson466Typed: InkChunkNode = testeeJson466;
 console.assert(testeeJson466Typed);
 
 import testeeJson467 from '../data/chunks/chittagong_to_imphal.json';
-const testeeJson467Typed: InkBlock[] = testeeJson467;
+const testeeJson467Typed: InkChunkNode = testeeJson467;
 console.assert(testeeJson467Typed);
 
 import testeeJson468 from '../data/chunks/chittagong_to_rangoon.json';
-const testeeJson468Typed: InkBlock[] = testeeJson468;
+const testeeJson468Typed: InkChunkNode = testeeJson468;
 console.assert(testeeJson468Typed);
 
 import testeeJson469 from '../data/chunks/imphal_to_pangsaupass.json';
-const testeeJson469Typed: InkBlock[] = testeeJson469;
+const testeeJson469Typed: InkChunkNode = testeeJson469;
 console.assert(testeeJson469Typed);
 
 import testeeJson470 from '../data/chunks/Guwahati_to_pangsaupass_depart.json';
-const testeeJson470Typed: InkBlock[] = testeeJson470;
+const testeeJson470Typed: InkChunkNode = testeeJson470;
 console.assert(testeeJson470Typed);
 
 import testeeJson471 from '../data/chunks/Guwahati_to_pangsaupass.json';
-const testeeJson471Typed: InkBlock[] = testeeJson471;
+const testeeJson471Typed: InkChunkNode = testeeJson471;
 console.assert(testeeJson471Typed);
 
 import testeeJson472 from '../data/chunks/hongkong_steamship_to_singapore_only.json';
-const testeeJson472Typed: InkBlock[] = testeeJson472;
+const testeeJson472Typed: InkChunkNode = testeeJson472;
 console.assert(testeeJson472Typed);
 
 import testeeJson473 from '../data/chunks/hongkong_steamship_to_singapore_only_from_chittagong.json';
-const testeeJson473Typed: InkBlock[] = testeeJson473;
+const testeeJson473Typed: InkChunkNode = testeeJson473;
 console.assert(testeeJson473Typed);
 
 import testeeJson474 from '../data/chunks/hongkong_steamship_from_chittagong.json';
-const testeeJson474Typed: InkBlock[] = testeeJson474;
+const testeeJson474Typed: InkChunkNode = testeeJson474;
 console.assert(testeeJson474Typed);
 
 import testeeJson475 from '../data/chunks/hongkong_steamship.json';
-const testeeJson475Typed: InkBlock[] = testeeJson475;
+const testeeJson475Typed: InkChunkNode = testeeJson475;
 console.assert(testeeJson475Typed);
 
 import testeeJson476 from '../data/chunks/hongkong_steamship_calcutta_to_chittagong.json';
-const testeeJson476Typed: InkBlock[] = testeeJson476;
+const testeeJson476Typed: InkChunkNode = testeeJson476;
 console.assert(testeeJson476Typed);
 
 import testeeJson477 from '../data/chunks/hongkong_steamship_to_singapore_only_depart.json';
-const testeeJson477Typed: InkBlock[] = testeeJson477;
+const testeeJson477Typed: InkChunkNode = testeeJson477;
 console.assert(testeeJson477Typed);
 
 import testeeJson478 from '../data/chunks/hongkong_steamship_5_off.json';
-const testeeJson478Typed: InkBlock[] = testeeJson478;
+const testeeJson478Typed: InkChunkNode = testeeJson478;
 console.assert(testeeJson478Typed);
 
 import testeeJson479 from '../data/chunks/hongkong_steamship_10.json';
@@ -1921,279 +1920,279 @@ const testeeJson479Typed: InkChunkNode = testeeJson479;
 console.assert(testeeJson479Typed);
 
 import testeeJson480 from '../data/chunks/beijing_to_vladivostok.json';
-const testeeJson480Typed: InkBlock[] = testeeJson480;
+const testeeJson480Typed: InkChunkNode = testeeJson480;
 console.assert(testeeJson480Typed);
 
 import testeeJson481 from '../data/chunks/vladivostok_to_beijing_depart.json';
-const testeeJson481Typed: InkBlock[] = testeeJson481;
+const testeeJson481Typed: InkChunkNode = testeeJson481;
 console.assert(testeeJson481Typed);
 
 import testeeJson482 from '../data/chunks/panama_to_portauprince.json';
-const testeeJson482Typed: InkBlock[] = testeeJson482;
+const testeeJson482Typed: InkChunkNode = testeeJson482;
 console.assert(testeeJson482Typed);
 
 import testeeJson483 from '../data/chunks/lima_to_panama_depart.json';
-const testeeJson483Typed: InkBlock[] = testeeJson483;
+const testeeJson483Typed: InkChunkNode = testeeJson483;
 console.assert(testeeJson483Typed);
 
 import testeeJson484 from '../data/chunks/panama_to_lima_and_back.json';
-const testeeJson484Typed: InkBlock[] = testeeJson484;
+const testeeJson484Typed: InkChunkNode = testeeJson484;
 console.assert(testeeJson484Typed);
 
 import testeeJson485 from '../data/chunks/portauprince_to_portroyal_depart.json';
-const testeeJson485Typed: InkBlock[] = testeeJson485;
+const testeeJson485Typed: InkChunkNode = testeeJson485;
 console.assert(testeeJson485Typed);
 
 import testeeJson486 from '../data/chunks/portroyal_to_portauprince_depart.json';
-const testeeJson486Typed: InkBlock[] = testeeJson486;
+const testeeJson486Typed: InkChunkNode = testeeJson486;
 console.assert(testeeJson486Typed);
 
 import testeeJson487 from '../data/chunks/portroyal_to_havana_depart.json';
-const testeeJson487Typed: InkBlock[] = testeeJson487;
+const testeeJson487Typed: InkChunkNode = testeeJson487;
 console.assert(testeeJson487Typed);
 
 import testeeJson488 from '../data/chunks/havana_to_portroyal_depart.json';
-const testeeJson488Typed: InkBlock[] = testeeJson488;
+const testeeJson488Typed: InkChunkNode = testeeJson488;
 console.assert(testeeJson488Typed);
 
 import testeeJson489 from '../data/chunks/hispaniola_depart.json';
-const testeeJson489Typed: InkBlock[] = testeeJson489;
+const testeeJson489Typed: InkChunkNode = testeeJson489;
 console.assert(testeeJson489Typed);
 
 import testeeJson490 from '../data/chunks/portroyal_to_portauprince.json';
-const testeeJson490Typed: InkBlock[] = testeeJson490;
+const testeeJson490Typed: InkChunkNode = testeeJson490;
 console.assert(testeeJson490Typed);
 
 import testeeJson491 from '../data/chunks/portroyal_to_havana_or_reverse.json';
-const testeeJson491Typed: InkBlock[] = testeeJson491;
+const testeeJson491Typed: InkChunkNode = testeeJson491;
 console.assert(testeeJson491Typed);
 
 import testeeJson492 from '../data/chunks/hispaniola_la_minette.json';
-const testeeJson492Typed: InkBlock[] = testeeJson492;
+const testeeJson492Typed: InkChunkNode = testeeJson492;
 console.assert(testeeJson492Typed);
 
 import testeeJson493 from '../data/chunks/portauprince_to_pontadelgada.json';
-const testeeJson493Typed: InkBlock[] = testeeJson493;
+const testeeJson493Typed: InkChunkNode = testeeJson493;
 console.assert(testeeJson493Typed);
 
 import testeeJson494 from '../data/chunks/portauprince_to_washington.json';
-const testeeJson494Typed: InkBlock[] = testeeJson494;
+const testeeJson494Typed: InkChunkNode = testeeJson494;
 console.assert(testeeJson494Typed);
 
 import testeeJson495 from '../data/chunks/panama_to_tabatinga.json';
-const testeeJson495Typed: InkBlock[] = testeeJson495;
+const testeeJson495Typed: InkChunkNode = testeeJson495;
 console.assert(testeeJson495Typed);
 
 import testeeJson496 from '../data/chunks/panama_to_bogota.json';
-const testeeJson496Typed: InkBlock[] = testeeJson496;
+const testeeJson496Typed: InkChunkNode = testeeJson496;
 console.assert(testeeJson496Typed);
 
 import testeeJson497 from '../data/chunks/acapulco_to_houston_depart.json';
-const testeeJson497Typed: InkBlock[] = testeeJson497;
+const testeeJson497Typed: InkChunkNode = testeeJson497;
 console.assert(testeeJson497Typed);
 
 import testeeJson498 from '../data/chunks/acapulco_to_houston.json';
-const testeeJson498Typed: InkBlock[] = testeeJson498;
+const testeeJson498Typed: InkChunkNode = testeeJson498;
 console.assert(testeeJson498Typed);
 
 import testeeJson499 from '../data/chunks/acapulco_to_neworleans.json';
-const testeeJson499Typed: InkBlock[] = testeeJson499;
+const testeeJson499Typed: InkChunkNode = testeeJson499;
 console.assert(testeeJson499Typed);
 
 import testeeJson500 from '../data/chunks/colombo_to_singapore.json';
-const testeeJson500Typed: InkBlock[] = testeeJson500;
+const testeeJson500Typed: InkChunkNode = testeeJson500;
 console.assert(testeeJson500Typed);
 
 import testeeJson501 from '../data/chunks/colombo_to_chittagong.json';
-const testeeJson501Typed: InkBlock[] = testeeJson501;
+const testeeJson501Typed: InkChunkNode = testeeJson501;
 console.assert(testeeJson501Typed);
 
 import testeeJson502 from '../data/chunks/batavia_to_singapore.json';
-const testeeJson502Typed: InkBlock[] = testeeJson502;
+const testeeJson502Typed: InkChunkNode = testeeJson502;
 console.assert(testeeJson502Typed);
 
 import testeeJson503 from '../data/chunks/singapore_to_batavia.json';
-const testeeJson503Typed: InkBlock[] = testeeJson503;
+const testeeJson503Typed: InkChunkNode = testeeJson503;
 console.assert(testeeJson503Typed);
 
 import testeeJson504 from '../data/chunks/batavia_to_singapore_depart.json';
-const testeeJson504Typed: InkBlock[] = testeeJson504;
+const testeeJson504Typed: InkChunkNode = testeeJson504;
 console.assert(testeeJson504Typed);
 
 import testeeJson505 from '../data/chunks/manila_to_singapore.json';
-const testeeJson505Typed: InkBlock[] = testeeJson505;
+const testeeJson505Typed: InkChunkNode = testeeJson505;
 console.assert(testeeJson505Typed);
 
 import testeeJson506 from '../data/chunks/singapore_to_manila.json';
-const testeeJson506Typed: InkBlock[] = testeeJson506;
+const testeeJson506Typed: InkChunkNode = testeeJson506;
 console.assert(testeeJson506Typed);
 
 import testeeJson507 from '../data/chunks/manila_to_singapore_depart.json';
-const testeeJson507Typed: InkBlock[] = testeeJson507;
+const testeeJson507Typed: InkChunkNode = testeeJson507;
 console.assert(testeeJson507Typed);
 
 import testeeJson508 from '../data/chunks/hongkong_to_manila.json';
-const testeeJson508Typed: InkBlock[] = testeeJson508;
+const testeeJson508Typed: InkChunkNode = testeeJson508;
 console.assert(testeeJson508Typed);
 
 import testeeJson509 from '../data/chunks/manila_to_hongkong_depart.json';
-const testeeJson509Typed: InkBlock[] = testeeJson509;
+const testeeJson509Typed: InkChunkNode = testeeJson509;
 console.assert(testeeJson509Typed);
 
 import testeeJson510 from '../data/chunks/vlad_to_pyongyang_depart.json';
-const testeeJson510Typed: InkBlock[] = testeeJson510;
+const testeeJson510Typed: InkChunkNode = testeeJson510;
 console.assert(testeeJson510Typed);
 
 import testeeJson511 from '../data/chunks/vlad_to_pyongyang.json';
-const testeeJson511Typed: InkBlock[] = testeeJson511;
+const testeeJson511Typed: InkChunkNode = testeeJson511;
 console.assert(testeeJson511Typed);
 
 import testeeJson512 from '../data/chunks/pyongyang_to_vlad.json';
-const testeeJson512Typed: InkBlock[] = testeeJson512;
+const testeeJson512Typed: InkChunkNode = testeeJson512;
 console.assert(testeeJson512Typed);
 
 import testeeJson513 from '../data/chunks/pyongyang_to_manila.json';
-const testeeJson513Typed: InkBlock[] = testeeJson513;
+const testeeJson513Typed: InkChunkNode = testeeJson513;
 console.assert(testeeJson513Typed);
 
 import testeeJson514 from '../data/chunks/manila_to_pyongyang_depart.json';
-const testeeJson514Typed: InkBlock[] = testeeJson514;
+const testeeJson514Typed: InkChunkNode = testeeJson514;
 console.assert(testeeJson514Typed);
 
 import testeeJson515 from '../data/chunks/sanfrancisco_steamer.json';
-const testeeJson515Typed: InkBlock[] = testeeJson515;
+const testeeJson515Typed: InkChunkNode = testeeJson515;
 console.assert(testeeJson515Typed);
 
 import testeeJson516 from '../data/chunks/sanfrancisco_journey_interrupted.json';
-const testeeJson516Typed: InkBlock[] = testeeJson516;
+const testeeJson516Typed: InkChunkNode = testeeJson516;
 console.assert(testeeJson516Typed);
 
 import testeeJson517 from '../data/chunks/burlington_to_neworleans.json';
-const testeeJson517Typed: InkBlock[] = testeeJson517;
+const testeeJson517Typed: InkChunkNode = testeeJson517;
 console.assert(testeeJson517Typed);
 
 import testeeJson518 from '../data/chunks/neworleans_to_havana.json';
-const testeeJson518Typed: InkBlock[] = testeeJson518;
+const testeeJson518Typed: InkChunkNode = testeeJson518;
 console.assert(testeeJson518Typed);
 
 import testeeJson519 from '../data/chunks/neworleans_to_portauprince.json';
-const testeeJson519Typed: InkBlock[] = testeeJson519;
+const testeeJson519Typed: InkChunkNode = testeeJson519;
 console.assert(testeeJson519Typed);
 
 import testeeJson520 from '../data/chunks/gastown_to_sanfrancisco.json';
-const testeeJson520Typed: InkBlock[] = testeeJson520;
+const testeeJson520Typed: InkChunkNode = testeeJson520;
 console.assert(testeeJson520Typed);
 
 import testeeJson521 from '../data/chunks/sanfrancisco_to_gastown_depart.json';
-const testeeJson521Typed: InkBlock[] = testeeJson521;
+const testeeJson521Typed: InkChunkNode = testeeJson521;
 console.assert(testeeJson521Typed);
 
 import testeeJson522 from '../data/chunks/sanfrancisco_to_gastown.json';
-const testeeJson522Typed: InkBlock[] = testeeJson522;
+const testeeJson522Typed: InkChunkNode = testeeJson522;
 console.assert(testeeJson522Typed);
 
 import testeeJson523 from '../data/chunks/leave_gs_sf.json';
-const testeeJson523Typed: InkBlock[] = testeeJson523;
+const testeeJson523Typed: InkChunkNode = testeeJson523;
 console.assert(testeeJson523Typed);
 
 import testeeJson524 from '../data/chunks/yokohama_to_manila.json';
-const testeeJson524Typed: InkBlock[] = testeeJson524;
+const testeeJson524Typed: InkChunkNode = testeeJson524;
 console.assert(testeeJson524Typed);
 
 import testeeJson525 from '../data/chunks/manila_to_yokohama.json';
-const testeeJson525Typed: InkBlock[] = testeeJson525;
+const testeeJson525Typed: InkChunkNode = testeeJson525;
 console.assert(testeeJson525Typed);
 
 import testeeJson526 from '../data/chunks/manila_to_honolulu.json';
-const testeeJson526Typed: InkBlock[] = testeeJson526;
+const testeeJson526Typed: InkChunkNode = testeeJson526;
 console.assert(testeeJson526Typed);
 
 import testeeJson527 from '../data/chunks/manila_to_acapulco.json';
-const testeeJson527Typed: InkBlock[] = testeeJson527;
+const testeeJson527Typed: InkChunkNode = testeeJson527;
 console.assert(testeeJson527Typed);
 
 import testeeJson528 from '../data/chunks/honolulu_to_acapulco.json';
-const testeeJson528Typed: InkBlock[] = testeeJson528;
+const testeeJson528Typed: InkChunkNode = testeeJson528;
 console.assert(testeeJson528Typed);
 
 import testeeJson529 from '../data/chunks/honolulu_to_panama.json';
-const testeeJson529Typed: InkBlock[] = testeeJson529;
+const testeeJson529Typed: InkChunkNode = testeeJson529;
 console.assert(testeeJson529Typed);
 
 import testeeJson530 from '../data/chunks/honolulu_to_sanfrancisco.json';
-const testeeJson530Typed: InkBlock[] = testeeJson530;
+const testeeJson530Typed: InkChunkNode = testeeJson530;
 console.assert(testeeJson530Typed);
 
 import testeeJson531 from '../data/chunks/acapulco_to_sanpedro_depart.json';
-const testeeJson531Typed: InkBlock[] = testeeJson531;
+const testeeJson531Typed: InkChunkNode = testeeJson531;
 console.assert(testeeJson531Typed);
 
 import testeeJson532 from '../data/chunks/sanpedro_to_acapulco_depart.json';
-const testeeJson532Typed: InkBlock[] = testeeJson532;
+const testeeJson532Typed: InkChunkNode = testeeJson532;
 console.assert(testeeJson532Typed);
 
 import testeeJson533 from '../data/chunks/acapulco_to_sanfrancisco_depart.json';
-const testeeJson533Typed: InkBlock[] = testeeJson533;
+const testeeJson533Typed: InkChunkNode = testeeJson533;
 console.assert(testeeJson533Typed);
 
 import testeeJson534 from '../data/chunks/sanfrancisco_to_acapulco_depart.json';
-const testeeJson534Typed: InkBlock[] = testeeJson534;
+const testeeJson534Typed: InkChunkNode = testeeJson534;
 console.assert(testeeJson534Typed);
 
 import testeeJson535 from '../data/chunks/sanpedro_to_acapulco.json';
-const testeeJson535Typed: InkBlock[] = testeeJson535;
+const testeeJson535Typed: InkChunkNode = testeeJson535;
 console.assert(testeeJson535Typed);
 
 import testeeJson536 from '../data/chunks/acapulco_to_sanpedro.json';
-const testeeJson536Typed: InkBlock[] = testeeJson536;
+const testeeJson536Typed: InkChunkNode = testeeJson536;
 console.assert(testeeJson536Typed);
 
 import testeeJson537 from '../data/chunks/acapulco_to_sanfrancisco.json';
-const testeeJson537Typed: InkBlock[] = testeeJson537;
+const testeeJson537Typed: InkChunkNode = testeeJson537;
 console.assert(testeeJson537Typed);
 
 import testeeJson538 from '../data/chunks/sanfrancisco_to_acapulco.json';
-const testeeJson538Typed: InkBlock[] = testeeJson538;
+const testeeJson538Typed: InkChunkNode = testeeJson538;
 console.assert(testeeJson538Typed);
 
 import testeeJson539 from '../data/chunks/neworleans_to_newyork_train.json';
-const testeeJson539Typed: InkBlock[] = testeeJson539;
+const testeeJson539Typed: InkChunkNode = testeeJson539;
 console.assert(testeeJson539Typed);
 
 import testeeJson540 from '../data/chunks/neworleans_to_washington_train.json';
-const testeeJson540Typed: InkBlock[] = testeeJson540;
+const testeeJson540Typed: InkChunkNode = testeeJson540;
 console.assert(testeeJson540Typed);
 
 import testeeJson541 from '../data/chunks/newyork_to_washington_train_depart.json';
-const testeeJson541Typed: InkBlock[] = testeeJson541;
+const testeeJson541Typed: InkChunkNode = testeeJson541;
 console.assert(testeeJson541Typed);
 
 import testeeJson542 from '../data/chunks/newyork_to_washington_train.json';
-const testeeJson542Typed: InkBlock[] = testeeJson542;
+const testeeJson542Typed: InkChunkNode = testeeJson542;
 console.assert(testeeJson542Typed);
 
 import testeeJson543 from '../data/chunks/atlanta_to_washington_depart.json';
-const testeeJson543Typed: InkBlock[] = testeeJson543;
+const testeeJson543Typed: InkChunkNode = testeeJson543;
 console.assert(testeeJson543Typed);
 
 import testeeJson544 from '../data/chunks/newyork_to_atlanta_depart.json';
-const testeeJson544Typed: InkBlock[] = testeeJson544;
+const testeeJson544Typed: InkChunkNode = testeeJson544;
 console.assert(testeeJson544Typed);
 
 import testeeJson545 from '../data/chunks/atlanta_to_newyork.json';
-const testeeJson545Typed: InkBlock[] = testeeJson545;
+const testeeJson545Typed: InkChunkNode = testeeJson545;
 console.assert(testeeJson545Typed);
 
 import testeeJson546 from '../data/chunks/piedmont_airline_depart_to_atlanta.json';
-const testeeJson546Typed: InkBlock[] = testeeJson546;
+const testeeJson546Typed: InkChunkNode = testeeJson546;
 console.assert(testeeJson546Typed);
 
 import testeeJson547 from '../data/chunks/neworleans_to_atlanta_train.json';
-const testeeJson547Typed: InkBlock[] = testeeJson547;
+const testeeJson547Typed: InkChunkNode = testeeJson547;
 console.assert(testeeJson547Typed);
 
 import testeeJson548 from '../data/chunks/neworleans_to_newyork_train2_disembark.json';
-const testeeJson548Typed: InkBlock[] = testeeJson548;
+const testeeJson548Typed: InkChunkNode = testeeJson548;
 console.assert(testeeJson548Typed);
 
 import testeeJson549 from '../data/chunks/doboxing.json';
@@ -2205,447 +2204,447 @@ const testeeJson550Typed: InkChunkNode = testeeJson550;
 console.assert(testeeJson550Typed);
 
 import testeeJson551 from '../data/chunks/washington_to_pontadelgada.json';
-const testeeJson551Typed: InkBlock[] = testeeJson551;
+const testeeJson551Typed: InkChunkNode = testeeJson551;
 console.assert(testeeJson551Typed);
 
 import testeeJson552 from '../data/chunks/newyork_train.json';
-const testeeJson552Typed: InkBlock[] = testeeJson552;
+const testeeJson552Typed: InkChunkNode = testeeJson552;
 console.assert(testeeJson552Typed);
 
 import testeeJson553 from '../data/chunks/newyork_train_to_saltlake.json';
-const testeeJson553Typed: InkBlock[] = testeeJson553;
+const testeeJson553Typed: InkChunkNode = testeeJson553;
 console.assert(testeeJson553Typed);
 
 import testeeJson554 from '../data/chunks/newyork_train_to_cheyenne.json';
-const testeeJson554Typed: InkBlock[] = testeeJson554;
+const testeeJson554Typed: InkChunkNode = testeeJson554;
 console.assert(testeeJson554Typed);
 
 import testeeJson555 from '../data/chunks/newyork_train_to_omaha.json';
-const testeeJson555Typed: InkBlock[] = testeeJson555;
+const testeeJson555Typed: InkChunkNode = testeeJson555;
 console.assert(testeeJson555Typed);
 
 import testeeJson556 from '../data/chunks/newyork_train_to_burlington.json';
-const testeeJson556Typed: InkBlock[] = testeeJson556;
+const testeeJson556Typed: InkChunkNode = testeeJson556;
 console.assert(testeeJson556Typed);
 
 import testeeJson557 from '../data/chunks/san_fran_to_chicago.json';
-const testeeJson557Typed: InkBlock[] = testeeJson557;
+const testeeJson557Typed: InkChunkNode = testeeJson557;
 console.assert(testeeJson557Typed);
 
 import testeeJson558 from '../data/chunks/salt_lake_city_to_cheyenne_depart.json';
-const testeeJson558Typed: InkBlock[] = testeeJson558;
+const testeeJson558Typed: InkChunkNode = testeeJson558;
 console.assert(testeeJson558Typed);
 
 import testeeJson559 from '../data/chunks/salt_lake_city_to_omaha_depart.json';
-const testeeJson559Typed: InkBlock[] = testeeJson559;
+const testeeJson559Typed: InkChunkNode = testeeJson559;
 console.assert(testeeJson559Typed);
 
 import testeeJson560 from '../data/chunks/salt_lake_city_to_burlington_depart.json';
-const testeeJson560Typed: InkBlock[] = testeeJson560;
+const testeeJson560Typed: InkChunkNode = testeeJson560;
 console.assert(testeeJson560Typed);
 
 import testeeJson561 from '../data/chunks/salt_lake_city_to_chicago_depart.json';
-const testeeJson561Typed: InkBlock[] = testeeJson561;
+const testeeJson561Typed: InkChunkNode = testeeJson561;
 console.assert(testeeJson561Typed);
 
 import testeeJson562 from '../data/chunks/salt_lake_city_to_newyork_depart.json';
-const testeeJson562Typed: InkBlock[] = testeeJson562;
+const testeeJson562Typed: InkChunkNode = testeeJson562;
 console.assert(testeeJson562Typed);
 
 import testeeJson563 from '../data/chunks/salt_lake_city_to.json';
-const testeeJson563Typed: InkBlock[] = testeeJson563;
+const testeeJson563Typed: InkChunkNode = testeeJson563;
 console.assert(testeeJson563Typed);
 
 import testeeJson564 from '../data/chunks/burlington_to_chicago_depart.json';
-const testeeJson564Typed: InkBlock[] = testeeJson564;
+const testeeJson564Typed: InkChunkNode = testeeJson564;
 console.assert(testeeJson564Typed);
 
 import testeeJson565 from '../data/chunks/burlington_to_chicago.json';
-const testeeJson565Typed: InkBlock[] = testeeJson565;
+const testeeJson565Typed: InkChunkNode = testeeJson565;
 console.assert(testeeJson565Typed);
 
 import testeeJson566 from '../data/chunks/burlington_to_newyork.json';
-const testeeJson566Typed: InkBlock[] = testeeJson566;
+const testeeJson566Typed: InkChunkNode = testeeJson566;
 console.assert(testeeJson566Typed);
 
 import testeeJson567 from '../data/chunks/newyork_train_depart_to_cheyenne.json';
-const testeeJson567Typed: InkBlock[] = testeeJson567;
+const testeeJson567Typed: InkChunkNode = testeeJson567;
 console.assert(testeeJson567Typed);
 
 import testeeJson568 from '../data/chunks/newyork_train_depart_to_saltlake.json';
-const testeeJson568Typed: InkBlock[] = testeeJson568;
+const testeeJson568Typed: InkChunkNode = testeeJson568;
 console.assert(testeeJson568Typed);
 
 import testeeJson569 from '../data/chunks/san_fran_to_omaha_depart.json';
-const testeeJson569Typed: InkBlock[] = testeeJson569;
+const testeeJson569Typed: InkChunkNode = testeeJson569;
 console.assert(testeeJson569Typed);
 
 import testeeJson570 from '../data/chunks/san_fran_to_chicago_depart.json';
-const testeeJson570Typed: InkBlock[] = testeeJson570;
+const testeeJson570Typed: InkChunkNode = testeeJson570;
 console.assert(testeeJson570Typed);
 
 import testeeJson571 from '../data/chunks/newyork_train_depart_to_burlington.json';
-const testeeJson571Typed: InkBlock[] = testeeJson571;
+const testeeJson571Typed: InkChunkNode = testeeJson571;
 console.assert(testeeJson571Typed);
 
 import testeeJson572 from '../data/chunks/chicago_to_newyork.json';
-const testeeJson572Typed: InkBlock[] = testeeJson572;
+const testeeJson572Typed: InkChunkNode = testeeJson572;
 console.assert(testeeJson572Typed);
 
 import testeeJson573 from '../data/chunks/newyork_train_2_arrive_saltlake.json';
-const testeeJson573Typed: InkBlock[] = testeeJson573;
+const testeeJson573Typed: InkChunkNode = testeeJson573;
 console.assert(testeeJson573Typed);
 
 import testeeJson574 from '../data/chunks/newyork_train_6_depart.json';
-const testeeJson574Typed: InkBlock[] = testeeJson574;
+const testeeJson574Typed: InkChunkNode = testeeJson574;
 console.assert(testeeJson574Typed);
 
 import testeeJson575 from '../data/chunks/machu_picchu_sleepy.json';
-const testeeJson575Typed: InkBlock[] = testeeJson575;
+const testeeJson575Typed: InkChunkNode = testeeJson575;
 console.assert(testeeJson575Typed);
 
 import testeeJson576 from '../data/chunks/machu_picchu_to_tabatinga_depart.json';
-const testeeJson576Typed: InkBlock[] = testeeJson576;
+const testeeJson576Typed: InkChunkNode = testeeJson576;
 console.assert(testeeJson576Typed);
 
 import testeeJson577 from '../data/chunks/machu_picchu_to_tabatinga.json';
-const testeeJson577Typed: InkBlock[] = testeeJson577;
+const testeeJson577Typed: InkChunkNode = testeeJson577;
 console.assert(testeeJson577Typed);
 
 import testeeJson578 from '../data/chunks/machu_picchu_to_lima_depart.json';
-const testeeJson578Typed: InkBlock[] = testeeJson578;
+const testeeJson578Typed: InkChunkNode = testeeJson578;
 console.assert(testeeJson578Typed);
 
 import testeeJson579 from '../data/chunks/machu_picchu_to_lima.json';
-const testeeJson579Typed: InkBlock[] = testeeJson579;
+const testeeJson579Typed: InkChunkNode = testeeJson579;
 console.assert(testeeJson579Typed);
 
 import testeeJson580 from '../data/chunks/lima_to_tabatinga.json';
-const testeeJson580Typed: InkBlock[] = testeeJson580;
+const testeeJson580Typed: InkChunkNode = testeeJson580;
 console.assert(testeeJson580Typed);
 
 import testeeJson581 from '../data/chunks/tabatinga_to_bogota.json';
-const testeeJson581Typed: InkBlock[] = testeeJson581;
+const testeeJson581Typed: InkChunkNode = testeeJson581;
 console.assert(testeeJson581Typed);
 
 import testeeJson582 from '../data/chunks/tabatinga_to_belem.json';
-const testeeJson582Typed: InkBlock[] = testeeJson582;
+const testeeJson582Typed: InkChunkNode = testeeJson582;
 console.assert(testeeJson582Typed);
 
 import testeeJson583 from '../data/chunks/bogota_to_caracas_and_back.json';
-const testeeJson583Typed: InkBlock[] = testeeJson583;
+const testeeJson583Typed: InkChunkNode = testeeJson583;
 console.assert(testeeJson583Typed);
 
 import testeeJson584 from '../data/chunks/bogota_to_belem.json';
-const testeeJson584Typed: InkBlock[] = testeeJson584;
+const testeeJson584Typed: InkChunkNode = testeeJson584;
 console.assert(testeeJson584Typed);
 
 import testeeJson585 from '../data/chunks/panamacity_to_acapulco.json';
-const testeeJson585Typed: InkBlock[] = testeeJson585;
+const testeeJson585Typed: InkChunkNode = testeeJson585;
 console.assert(testeeJson585Typed);
 
 import testeeJson586 from '../data/chunks/acapulco_to_panamacity.json';
-const testeeJson586Typed: InkBlock[] = testeeJson586;
+const testeeJson586Typed: InkChunkNode = testeeJson586;
 console.assert(testeeJson586Typed);
 
 import testeeJson587 from '../data/chunks/belem_to_portonovo.json';
-const testeeJson587Typed: InkBlock[] = testeeJson587;
+const testeeJson587Typed: InkChunkNode = testeeJson587;
 console.assert(testeeJson587Typed);
 
 import testeeJson588 from '../data/chunks/belem_to_dakar.json';
-const testeeJson588Typed: InkBlock[] = testeeJson588;
+const testeeJson588Typed: InkChunkNode = testeeJson588;
 console.assert(testeeJson588Typed);
 
 import testeeJson589 from '../data/chunks/belem_to_freetown.json';
-const testeeJson589Typed: InkBlock[] = testeeJson589;
+const testeeJson589Typed: InkChunkNode = testeeJson589;
 console.assert(testeeJson589Typed);
 
 import testeeJson590 from '../data/chunks/caracas_to_freetown.json';
-const testeeJson590Typed: InkBlock[] = testeeJson590;
+const testeeJson590Typed: InkChunkNode = testeeJson590;
 console.assert(testeeJson590Typed);
 
 import testeeJson591 from '../data/chunks/caracas_to_portauprince.json';
-const testeeJson591Typed: InkBlock[] = testeeJson591;
+const testeeJson591Typed: InkChunkNode = testeeJson591;
 console.assert(testeeJson591Typed);
 
 import testeeJson592 from '../data/chunks/portauprince_to_caracas_depart.json';
-const testeeJson592Typed: InkBlock[] = testeeJson592;
+const testeeJson592Typed: InkChunkNode = testeeJson592;
 console.assert(testeeJson592Typed);
 
 import testeeJson593 from '../data/chunks/portauprince_to_caracas.json';
-const testeeJson593Typed: InkBlock[] = testeeJson593;
+const testeeJson593Typed: InkChunkNode = testeeJson593;
 console.assert(testeeJson593Typed);
 
 import testeeJson594 from '../data/chunks/miami_to_havana_depart.json';
-const testeeJson594Typed: InkBlock[] = testeeJson594;
+const testeeJson594Typed: InkChunkNode = testeeJson594;
 console.assert(testeeJson594Typed);
 
 import testeeJson595 from '../data/chunks/asuncion_to_rio.json';
-const testeeJson595Typed: InkBlock[] = testeeJson595;
+const testeeJson595Typed: InkChunkNode = testeeJson595;
 console.assert(testeeJson595Typed);
 
 import testeeJson596 from '../data/chunks/asuncion_to_salvador.json';
-const testeeJson596Typed: InkBlock[] = testeeJson596;
+const testeeJson596Typed: InkChunkNode = testeeJson596;
 console.assert(testeeJson596Typed);
 
 import testeeJson597 from '../data/chunks/lima_or_santiago_to_asuncion.json';
-const testeeJson597Typed: InkBlock[] = testeeJson597;
+const testeeJson597Typed: InkChunkNode = testeeJson597;
 console.assert(testeeJson597Typed);
 
 import testeeJson598 from '../data/chunks/santiago_to_asuncion_depart.json';
-const testeeJson598Typed: InkBlock[] = testeeJson598;
+const testeeJson598Typed: InkChunkNode = testeeJson598;
 console.assert(testeeJson598Typed);
 
 import testeeJson599 from '../data/chunks/asuncion_to_buenos_aires.json';
-const testeeJson599Typed: InkBlock[] = testeeJson599;
+const testeeJson599Typed: InkChunkNode = testeeJson599;
 console.assert(testeeJson599Typed);
 
 import testeeJson600 from '../data/chunks/houston_to_havana_and_reverse.json';
-const testeeJson600Typed: InkBlock[] = testeeJson600;
+const testeeJson600Typed: InkChunkNode = testeeJson600;
 console.assert(testeeJson600Typed);
 
 import testeeJson601 from '../data/chunks/havana_to_houston_depart.json';
-const testeeJson601Typed: InkBlock[] = testeeJson601;
+const testeeJson601Typed: InkChunkNode = testeeJson601;
 console.assert(testeeJson601Typed);
 
 import testeeJson602 from '../data/chunks/riodejaneiro_to_buenosaires.json';
-const testeeJson602Typed: InkBlock[] = testeeJson602;
+const testeeJson602Typed: InkChunkNode = testeeJson602;
 console.assert(testeeJson602Typed);
 
 import testeeJson603 from '../data/chunks/san_pedro_to_san_fran_depart.json';
-const testeeJson603Typed: InkBlock[] = testeeJson603;
+const testeeJson603Typed: InkChunkNode = testeeJson603;
 console.assert(testeeJson603Typed);
 
 import testeeJson604 from '../data/chunks/san_fran_to_san_pedro_reverse.json';
-const testeeJson604Typed: InkBlock[] = testeeJson604;
+const testeeJson604Typed: InkChunkNode = testeeJson604;
 console.assert(testeeJson604Typed);
 
 import testeeJson605 from '../data/chunks/cheyenne_to_dallas_depart.json';
-const testeeJson605Typed: InkBlock[] = testeeJson605;
+const testeeJson605Typed: InkChunkNode = testeeJson605;
 console.assert(testeeJson605Typed);
 
 import testeeJson606 from '../data/chunks/cheyenne_to_dallas.json';
-const testeeJson606Typed: InkBlock[] = testeeJson606;
+const testeeJson606Typed: InkChunkNode = testeeJson606;
 console.assert(testeeJson606Typed);
 
 import testeeJson607 from '../data/chunks/cheyenne_to_houston.json';
-const testeeJson607Typed: InkBlock[] = testeeJson607;
+const testeeJson607Typed: InkChunkNode = testeeJson607;
 console.assert(testeeJson607Typed);
 
 import testeeJson608 from '../data/chunks/san_pedro_to_albuquerque_depart.json';
-const testeeJson608Typed: InkBlock[] = testeeJson608;
+const testeeJson608Typed: InkChunkNode = testeeJson608;
 console.assert(testeeJson608Typed);
 
 import testeeJson609 from '../data/chunks/san_pedro_to_dallas_depart.json';
-const testeeJson609Typed: InkBlock[] = testeeJson609;
+const testeeJson609Typed: InkChunkNode = testeeJson609;
 console.assert(testeeJson609Typed);
 
 import testeeJson610 from '../data/chunks/san_pedro_to_new_orleans_depart.json';
-const testeeJson610Typed: InkBlock[] = testeeJson610;
+const testeeJson610Typed: InkChunkNode = testeeJson610;
 console.assert(testeeJson610Typed);
 
 import testeeJson611 from '../data/chunks/albuquerque_to_dallas_depart.json';
-const testeeJson611Typed: InkBlock[] = testeeJson611;
+const testeeJson611Typed: InkChunkNode = testeeJson611;
 console.assert(testeeJson611Typed);
 
 import testeeJson612 from '../data/chunks/albuquerque_to_neworleans_depart.json';
-const testeeJson612Typed: InkBlock[] = testeeJson612;
+const testeeJson612Typed: InkChunkNode = testeeJson612;
 console.assert(testeeJson612Typed);
 
 import testeeJson613 from '../data/chunks/dallas_to_neworleans_depart.json';
-const testeeJson613Typed: InkBlock[] = testeeJson613;
+const testeeJson613Typed: InkChunkNode = testeeJson613;
 console.assert(testeeJson613Typed);
 
 import testeeJson614 from '../data/chunks/texas_and_pacific_railway_depart.json';
-const testeeJson614Typed: InkBlock[] = testeeJson614;
+const testeeJson614Typed: InkChunkNode = testeeJson614;
 console.assert(testeeJson614Typed);
 
 import testeeJson615 from '../data/chunks/san_pedro_to_new_orleans.json';
-const testeeJson615Typed: InkBlock[] = testeeJson615;
+const testeeJson615Typed: InkChunkNode = testeeJson615;
 console.assert(testeeJson615Typed);
 
 import testeeJson616 from '../data/chunks/san_pedro_to_albuquerque.json';
-const testeeJson616Typed: InkBlock[] = testeeJson616;
+const testeeJson616Typed: InkChunkNode = testeeJson616;
 console.assert(testeeJson616Typed);
 
 import testeeJson617 from '../data/chunks/san_pedro_to_dallas.json';
-const testeeJson617Typed: InkBlock[] = testeeJson617;
+const testeeJson617Typed: InkChunkNode = testeeJson617;
 console.assert(testeeJson617Typed);
 
 import testeeJson618 from '../data/chunks/albuquerque_to_dallas.json';
-const testeeJson618Typed: InkBlock[] = testeeJson618;
+const testeeJson618Typed: InkChunkNode = testeeJson618;
 console.assert(testeeJson618Typed);
 
 import testeeJson619 from '../data/chunks/albuquerque_to_neworleans.json';
-const testeeJson619Typed: InkBlock[] = testeeJson619;
+const testeeJson619Typed: InkChunkNode = testeeJson619;
 console.assert(testeeJson619Typed);
 
 import testeeJson620 from '../data/chunks/dallas_to_neworleans.json';
-const testeeJson620Typed: InkBlock[] = testeeJson620;
+const testeeJson620Typed: InkChunkNode = testeeJson620;
 console.assert(testeeJson620Typed);
 
 import testeeJson621 from '../data/chunks/saltlake_to_sanpedro_depart.json';
-const testeeJson621Typed: InkBlock[] = testeeJson621;
+const testeeJson621Typed: InkChunkNode = testeeJson621;
 console.assert(testeeJson621Typed);
 
 import testeeJson622 from '../data/chunks/saltlake_to_sanpedro_and_reverse.json';
-const testeeJson622Typed: InkBlock[] = testeeJson622;
+const testeeJson622Typed: InkChunkNode = testeeJson622;
 console.assert(testeeJson622Typed);
 
 import testeeJson623 from '../data/chunks/atlanta_to_chicago_depart.json';
-const testeeJson623Typed: InkBlock[] = testeeJson623;
+const testeeJson623Typed: InkChunkNode = testeeJson623;
 console.assert(testeeJson623Typed);
 
 import testeeJson624 from '../data/chunks/chicago_to_atlanta.json';
-const testeeJson624Typed: InkBlock[] = testeeJson624;
+const testeeJson624Typed: InkChunkNode = testeeJson624;
 console.assert(testeeJson624Typed);
 
 import testeeJson625 from '../data/chunks/american_caleche_depart.json';
-const testeeJson625Typed: InkBlock[] = testeeJson625;
+const testeeJson625Typed: InkChunkNode = testeeJson625;
 console.assert(testeeJson625Typed);
 
 import testeeJson626 from '../data/chunks/cheyenne_to_omaha.json';
-const testeeJson626Typed: InkBlock[] = testeeJson626;
+const testeeJson626Typed: InkChunkNode = testeeJson626;
 console.assert(testeeJson626Typed);
 
 import testeeJson627 from '../data/chunks/omaha_to_chicago.json';
-const testeeJson627Typed: InkBlock[] = testeeJson627;
+const testeeJson627Typed: InkChunkNode = testeeJson627;
 console.assert(testeeJson627Typed);
 
 import testeeJson628 from '../data/chunks/american_caleche.json';
-const testeeJson628Typed: InkBlock[] = testeeJson628;
+const testeeJson628Typed: InkChunkNode = testeeJson628;
 console.assert(testeeJson628Typed);
 
 import testeeJson629 from '../data/chunks/american_caleche4.json';
-const testeeJson629Typed: InkBlock[] = testeeJson629;
+const testeeJson629Typed: InkChunkNode = testeeJson629;
 console.assert(testeeJson629Typed);
 
 import testeeJson630 from '../data/chunks/miami_to_atlanta_depart.json';
-const testeeJson630Typed: InkBlock[] = testeeJson630;
+const testeeJson630Typed: InkChunkNode = testeeJson630;
 console.assert(testeeJson630Typed);
 
 import testeeJson631 from '../data/chunks/atlanta_to_miami_or_reverse.json';
-const testeeJson631Typed: InkBlock[] = testeeJson631;
+const testeeJson631Typed: InkChunkNode = testeeJson631;
 console.assert(testeeJson631Typed);
 
 import testeeJson632 from '../data/chunks/salt_lake_city_to_albuquerque.json';
-const testeeJson632Typed: InkBlock[] = testeeJson632;
+const testeeJson632Typed: InkChunkNode = testeeJson632;
 console.assert(testeeJson632Typed);
 
 import testeeJson633 from '../data/chunks/santiago_to_buenosaires.json';
-const testeeJson633Typed: InkBlock[] = testeeJson633;
+const testeeJson633Typed: InkChunkNode = testeeJson633;
 console.assert(testeeJson633Typed);
 
 import testeeJson634 from '../data/chunks/santiago_to_lima_depart.json';
-const testeeJson634Typed: InkBlock[] = testeeJson634;
+const testeeJson634Typed: InkChunkNode = testeeJson634;
 console.assert(testeeJson634Typed);
 
 import testeeJson635 from '../data/chunks/lima_to_santiago_or_reverse.json';
-const testeeJson635Typed: InkBlock[] = testeeJson635;
+const testeeJson635Typed: InkChunkNode = testeeJson635;
 console.assert(testeeJson635Typed);
 
 import testeeJson636 from '../data/chunks/salvador_to_belem.json';
-const testeeJson636Typed: InkBlock[] = testeeJson636;
+const testeeJson636Typed: InkChunkNode = testeeJson636;
 console.assert(testeeJson636Typed);
 
 import testeeJson637 from '../data/chunks/belem_to_salvador_depart.json';
-const testeeJson637Typed: InkBlock[] = testeeJson637;
+const testeeJson637Typed: InkChunkNode = testeeJson637;
 console.assert(testeeJson637Typed);
 
 import testeeJson638 from '../data/chunks/salvador_to_portonovo.json';
-const testeeJson638Typed: InkBlock[] = testeeJson638;
+const testeeJson638Typed: InkChunkNode = testeeJson638;
 console.assert(testeeJson638Typed);
 
 import testeeJson639 from '../data/chunks/buenosaires_to_rio.json';
-const testeeJson639Typed: InkBlock[] = testeeJson639;
+const testeeJson639Typed: InkChunkNode = testeeJson639;
 console.assert(testeeJson639Typed);
 
 import testeeJson640 from '../data/chunks/rio_to_salvador_depart.json';
-const testeeJson640Typed: InkBlock[] = testeeJson640;
+const testeeJson640Typed: InkChunkNode = testeeJson640;
 console.assert(testeeJson640Typed);
 
 import testeeJson641 from '../data/chunks/gold_boat.json';
-const testeeJson641Typed: InkBlock[] = testeeJson641;
+const testeeJson641Typed: InkChunkNode = testeeJson641;
 console.assert(testeeJson641Typed);
 
 import testeeJson642 from '../data/chunks/rose_trapped_and_gone.json';
-const testeeJson642Typed: InkBlock[] = testeeJson642;
+const testeeJson642Typed: InkChunkNode = testeeJson642;
 console.assert(testeeJson642Typed);
 
 import testeeJson643 from '../data/chunks/cue_the_vault.json';
-const testeeJson643Typed: InkBlock[] = testeeJson643;
+const testeeJson643Typed: InkChunkNode = testeeJson643;
 console.assert(testeeJson643Typed);
 
 import testeeJson644 from '../data/chunks/left_with_rose.json';
-const testeeJson644Typed: InkBlock[] = testeeJson644;
+const testeeJson644Typed: InkChunkNode = testeeJson644;
 console.assert(testeeJson644Typed);
 
 import testeeJson645 from '../data/chunks/dakar_with_rose.json';
-const testeeJson645Typed: InkBlock[] = testeeJson645;
+const testeeJson645Typed: InkChunkNode = testeeJson645;
 console.assert(testeeJson645Typed);
 
 import testeeJson646 from '../data/chunks/riodejaneiro_to_freetown_via_atlantis.json';
-const testeeJson646Typed: InkBlock[] = testeeJson646;
+const testeeJson646Typed: InkChunkNode = testeeJson646;
 console.assert(testeeJson646Typed);
 
 import testeeJson647 from '../data/chunks/miami_to_moon.json';
-const testeeJson647Typed: InkBlock[] = testeeJson647;
+const testeeJson647Typed: InkChunkNode = testeeJson647;
 console.assert(testeeJson647Typed);
 
 import testeeJson648 from '../data/chunks/nassau_to_ponta_alone.json';
-const testeeJson648Typed: InkBlock[] = testeeJson648;
+const testeeJson648Typed: InkChunkNode = testeeJson648;
 console.assert(testeeJson648Typed);
 
 import testeeJson649 from '../data/chunks/ponta_to_london_alone.json';
-const testeeJson649Typed: InkBlock[] = testeeJson649;
+const testeeJson649Typed: InkChunkNode = testeeJson649;
 console.assert(testeeJson649Typed);
 
 import testeeJson650 from '../data/chunks/regina_or_calgary_to_toronto.json';
-const testeeJson650Typed: InkBlock[] = testeeJson650;
+const testeeJson650Typed: InkChunkNode = testeeJson650;
 console.assert(testeeJson650Typed);
 
 import testeeJson651 from '../data/chunks/airship_to_reservation.json';
-const testeeJson651Typed: InkBlock[] = testeeJson651;
+const testeeJson651Typed: InkChunkNode = testeeJson651;
 console.assert(testeeJson651Typed);
 
 import testeeJson652 from '../data/chunks/calgary_to_toronto_depart.json';
-const testeeJson652Typed: InkBlock[] = testeeJson652;
+const testeeJson652Typed: InkChunkNode = testeeJson652;
 console.assert(testeeJson652Typed);
 
 import testeeJson653 from '../data/chunks/floating_reservation.json';
-const testeeJson653Typed: InkBlock[] = testeeJson653;
+const testeeJson653Typed: InkChunkNode = testeeJson653;
 console.assert(testeeJson653Typed);
 
 import testeeJson654 from '../data/chunks/barrel_over_niagara.json';
-const testeeJson654Typed: InkBlock[] = testeeJson654;
+const testeeJson654Typed: InkChunkNode = testeeJson654;
 console.assert(testeeJson654Typed);
 
 import testeeJson655 from '../data/chunks/divert_to_newyork.json';
-const testeeJson655Typed: InkBlock[] = testeeJson655;
+const testeeJson655Typed: InkChunkNode = testeeJson655;
 console.assert(testeeJson655Typed);
 
 import testeeJson656 from '../data/chunks/chicago_to_winnipeg.json';
-const testeeJson656Typed: InkBlock[] = testeeJson656;
+const testeeJson656Typed: InkChunkNode = testeeJson656;
 console.assert(testeeJson656Typed);
 
 import testeeJson657 from '../data/chunks/winnipeg_to_chicago.json';
-const testeeJson657Typed: InkBlock[] = testeeJson657;
+const testeeJson657Typed: InkChunkNode = testeeJson657;
 console.assert(testeeJson657Typed);
 
 import testeeJson658 from '../data/chunks/winnipeg_to_ivujivik.json';
-const testeeJson658Typed: InkBlock[] = testeeJson658;
+const testeeJson658Typed: InkChunkNode = testeeJson658;
 console.assert(testeeJson658Typed);
 
 import testeeJson659 from '../data/chunks/quebec_to_greenland.json';
-const testeeJson659Typed: InkBlock[] = testeeJson659;
+const testeeJson659Typed: InkChunkNode = testeeJson659;
 console.assert(testeeJson659Typed);
 
 import testeeJson660 from '../data/chunks/ivujivik_to_greenland.json';
-const testeeJson660Typed: InkBlock[] = testeeJson660;
+const testeeJson660Typed: InkChunkNode = testeeJson660;
 console.assert(testeeJson660Typed);
 
 import testeeJson661 from '../data/chunks/greenland_to_reykjavik.json';
-const testeeJson661Typed: InkBlock[] = testeeJson661;
+const testeeJson661Typed: InkChunkNode = testeeJson661;
 console.assert(testeeJson661Typed);
 
 import testeeJson662 from '../data/chunks/greenlandoutpost_to_reykjavik_depart.json';
@@ -2653,91 +2652,91 @@ const testeeJson662Typed: InkChunkNode = testeeJson662;
 console.assert(testeeJson662Typed);
 
 import testeeJson663 from '../data/chunks/portonovo_to_timbuktu.json';
-const testeeJson663Typed: InkBlock[] = testeeJson663;
+const testeeJson663Typed: InkChunkNode = testeeJson663;
 console.assert(testeeJson663Typed);
 
 import testeeJson664 from '../data/chunks/portonovo_to_freetown.json';
-const testeeJson664Typed: InkBlock[] = testeeJson664;
+const testeeJson664Typed: InkChunkNode = testeeJson664;
 console.assert(testeeJson664Typed);
 
 import testeeJson665 from '../data/chunks/portonovo_to_dakar_depart.json';
-const testeeJson665Typed: InkBlock[] = testeeJson665;
+const testeeJson665Typed: InkChunkNode = testeeJson665;
 console.assert(testeeJson665Typed);
 
 import testeeJson666 from '../data/chunks/portonovo_to_dakar.json';
-const testeeJson666Typed: InkBlock[] = testeeJson666;
+const testeeJson666Typed: InkChunkNode = testeeJson666;
 console.assert(testeeJson666Typed);
 
 import testeeJson667 from '../data/chunks/freetown_to_dakar.json';
-const testeeJson667Typed: InkBlock[] = testeeJson667;
+const testeeJson667Typed: InkChunkNode = testeeJson667;
 console.assert(testeeJson667Typed);
 
 import testeeJson668 from '../data/chunks/freetown_to_timbuktu.json';
-const testeeJson668Typed: InkBlock[] = testeeJson668;
+const testeeJson668Typed: InkChunkNode = testeeJson668;
 console.assert(testeeJson668Typed);
 
 import testeeJson669 from '../data/chunks/dakar_to_timbuktu.json';
-const testeeJson669Typed: InkBlock[] = testeeJson669;
+const testeeJson669Typed: InkChunkNode = testeeJson669;
 console.assert(testeeJson669Typed);
 
 import testeeJson670 from '../data/chunks/delayed_copter.json';
-const testeeJson670Typed: InkBlock[] = testeeJson670;
+const testeeJson670Typed: InkChunkNode = testeeJson670;
 console.assert(testeeJson670Typed);
 
 import testeeJson671 from '../data/chunks/timbuktu_to_marrakesh.json';
-const testeeJson671Typed: InkBlock[] = testeeJson671;
+const testeeJson671Typed: InkChunkNode = testeeJson671;
 console.assert(testeeJson671Typed);
 
 import testeeJson672 from '../data/chunks/dakar_to_marrakesh.json';
-const testeeJson672Typed: InkBlock[] = testeeJson672;
+const testeeJson672Typed: InkChunkNode = testeeJson672;
 console.assert(testeeJson672Typed);
 
 import testeeJson673 from '../data/chunks/freetown_to_marrakesh.json';
-const testeeJson673Typed: InkBlock[] = testeeJson673;
+const testeeJson673Typed: InkChunkNode = testeeJson673;
 console.assert(testeeJson673Typed);
 
 import testeeJson674 from '../data/chunks/marrakesh_to_tangier.json';
-const testeeJson674Typed: InkBlock[] = testeeJson674;
+const testeeJson674Typed: InkChunkNode = testeeJson674;
 console.assert(testeeJson674Typed);
 
 import testeeJson675 from '../data/chunks/tangier_to_lisbon.json';
-const testeeJson675Typed: InkBlock[] = testeeJson675;
+const testeeJson675Typed: InkChunkNode = testeeJson675;
 console.assert(testeeJson675Typed);
 
 import testeeJson676 from '../data/chunks/dakar_to_tangier.json';
-const testeeJson676Typed: InkBlock[] = testeeJson676;
+const testeeJson676Typed: InkChunkNode = testeeJson676;
 console.assert(testeeJson676Typed);
 
 import testeeJson677 from '../data/chunks/divert_to_lisbon.json';
-const testeeJson677Typed: InkBlock[] = testeeJson677;
+const testeeJson677Typed: InkChunkNode = testeeJson677;
 console.assert(testeeJson677Typed);
 
 import testeeJson678 from '../data/chunks/pontadelgada_to_lisbon.json';
-const testeeJson678Typed: InkBlock[] = testeeJson678;
+const testeeJson678Typed: InkChunkNode = testeeJson678;
 console.assert(testeeJson678Typed);
 
 import testeeJson679 from '../data/chunks/newyork_to_reyjavik.json';
-const testeeJson679Typed: InkBlock[] = testeeJson679;
+const testeeJson679Typed: InkChunkNode = testeeJson679;
 console.assert(testeeJson679Typed);
 
 import testeeJson680 from '../data/chunks/ponta_to_london.json';
-const testeeJson680Typed: InkBlock[] = testeeJson680;
+const testeeJson680Typed: InkChunkNode = testeeJson680;
 console.assert(testeeJson680Typed);
 
 import testeeJson681 from '../data/chunks/lisbon_to_london.json';
-const testeeJson681Typed: InkBlock[] = testeeJson681;
+const testeeJson681Typed: InkChunkNode = testeeJson681;
 console.assert(testeeJson681Typed);
 
 import testeeJson682 from '../data/chunks/tangier_to_london.json';
-const testeeJson682Typed: InkBlock[] = testeeJson682;
+const testeeJson682Typed: InkChunkNode = testeeJson682;
 console.assert(testeeJson682Typed);
 
 import testeeJson683 from '../data/chunks/reykjavik_to_london.json';
-const testeeJson683Typed: InkBlock[] = testeeJson683;
+const testeeJson683Typed: InkChunkNode = testeeJson683;
 console.assert(testeeJson683Typed);
 
 import testeeJson684 from '../data/chunks/newyork_to_london.json';
-const testeeJson684Typed: InkBlock[] = testeeJson684;
+const testeeJson684Typed: InkChunkNode = testeeJson684;
 console.assert(testeeJson684Typed);
 
 import testeeJson685 from '../data/chunks/insert_thief_into_generic_content.json';
@@ -2745,11 +2744,11 @@ const testeeJson685Typed: InkChunkNode = testeeJson685;
 console.assert(testeeJson685Typed);
 
 import testeeJson686 from '../data/chunks/thief_generic_content.json';
-const testeeJson686Typed: InkBlock[] = testeeJson686;
+const testeeJson686Typed: InkChunkNode = testeeJson686;
 console.assert(testeeJson686Typed);
 
 import testeeJson687 from '../data/chunks/meeting_the_black_rose.json';
-const testeeJson687Typed: InkBlock[] = testeeJson687;
+const testeeJson687Typed: InkChunkNode = testeeJson687;
 console.assert(testeeJson687Typed);
 
 import testeeJson688 from '../data/chunks/thief_already_met_generic_content.json';
@@ -2761,7 +2760,7 @@ const testeeJson689Typed: InkChunkNode = testeeJson689;
 console.assert(testeeJson689Typed);
 
 import testeeJson690 from '../data/chunks/ending_rose_ditched_her.json';
-const testeeJson690Typed: InkBlock[] = testeeJson690;
+const testeeJson690Typed: InkChunkNode = testeeJson690;
 console.assert(testeeJson690Typed);
 
 import testeeJson691 from '../data/chunks/thief_headlines.json';
@@ -2769,11 +2768,11 @@ const testeeJson691Typed: InkChunkNode = testeeJson691;
 console.assert(testeeJson691Typed);
 
 import testeeJson692 from '../data/chunks/ending_text.json';
-const testeeJson692Typed: InkBlock[] = testeeJson692;
+const testeeJson692Typed: InkChunkNode = testeeJson692;
 console.assert(testeeJson692Typed);
 
 import testeeJson693 from '../data/chunks/gameEnd.json';
-const testeeJson693Typed: InkBlock[] = testeeJson693;
+const testeeJson693Typed: InkChunkNode = testeeJson693;
 console.assert(testeeJson693Typed);
 
 import testeeJson694 from '../data/chunks/read_newspaper.json';
@@ -2785,99 +2784,99 @@ const testeeJson695Typed: InkChunkNode = testeeJson695;
 console.assert(testeeJson695Typed);
 
 import testeeJson696 from '../data/chunks/read_dead_newspaper.json';
-const testeeJson696Typed: InkBlock[] = testeeJson696;
+const testeeJson696Typed: InkChunkNode = testeeJson696;
 console.assert(testeeJson696Typed);
 
 import testeeJson697 from '../data/chunks/aaaaaaaaaaaaaaa.json';
-const testeeJson697Typed: InkBlock[] = testeeJson697;
+const testeeJson697Typed: InkChunkNode = testeeJson697;
 console.assert(testeeJson697Typed);
 
 import testeeJson698 from '../data/chunks/fill_posh.json';
-const testeeJson698Typed: InkBlock[] = testeeJson698;
+const testeeJson698Typed: InkChunkNode = testeeJson698;
 console.assert(testeeJson698Typed);
 
 import testeeJson699 from '../data/chunks/fill_luxurious.json';
-const testeeJson699Typed: InkBlock[] = testeeJson699;
+const testeeJson699Typed: InkChunkNode = testeeJson699;
 console.assert(testeeJson699Typed);
 
 import testeeJson700 from '../data/chunks/fill_tough.json';
-const testeeJson700Typed: InkBlock[] = testeeJson700;
+const testeeJson700Typed: InkChunkNode = testeeJson700;
 console.assert(testeeJson700Typed);
 
 import testeeJson701 from '../data/chunks/fill_stalwart.json';
-const testeeJson701Typed: InkBlock[] = testeeJson701;
+const testeeJson701Typed: InkChunkNode = testeeJson701;
 console.assert(testeeJson701Typed);
 
 import testeeJson702 from '../data/chunks/fill_excitable.json';
-const testeeJson702Typed: InkBlock[] = testeeJson702;
+const testeeJson702Typed: InkChunkNode = testeeJson702;
 console.assert(testeeJson702Typed);
 
 import testeeJson703 from '../data/chunks/fill_prim.json';
-const testeeJson703Typed: InkBlock[] = testeeJson703;
+const testeeJson703Typed: InkChunkNode = testeeJson703;
 console.assert(testeeJson703Typed);
 
 import testeeJson704 from '../data/chunks/fill_earnest.json';
-const testeeJson704Typed: InkBlock[] = testeeJson704;
+const testeeJson704Typed: InkChunkNode = testeeJson704;
 console.assert(testeeJson704Typed);
 
 import testeeJson705 from '../data/chunks/fill_official.json';
-const testeeJson705Typed: InkBlock[] = testeeJson705;
+const testeeJson705Typed: InkChunkNode = testeeJson705;
 console.assert(testeeJson705Typed);
 
 import testeeJson706 from '../data/chunks/fill_soldier.json';
-const testeeJson706Typed: InkBlock[] = testeeJson706;
+const testeeJson706Typed: InkChunkNode = testeeJson706;
 console.assert(testeeJson706Typed);
 
 import testeeJson707 from '../data/chunks/fill_foreign.json';
-const testeeJson707Typed: InkBlock[] = testeeJson707;
+const testeeJson707Typed: InkChunkNode = testeeJson707;
 console.assert(testeeJson707Typed);
 
 import testeeJson708 from '../data/chunks/fill_poor.json';
-const testeeJson708Typed: InkBlock[] = testeeJson708;
+const testeeJson708Typed: InkChunkNode = testeeJson708;
 console.assert(testeeJson708Typed);
 
 import testeeJson709 from '../data/chunks/fill_wistful.json';
-const testeeJson709Typed: InkBlock[] = testeeJson709;
+const testeeJson709Typed: InkChunkNode = testeeJson709;
 console.assert(testeeJson709Typed);
 
 import testeeJson710 from '../data/chunks/fill_feminine.json';
-const testeeJson710Typed: InkBlock[] = testeeJson710;
+const testeeJson710Typed: InkChunkNode = testeeJson710;
 console.assert(testeeJson710Typed);
 
 import testeeJson711 from '../data/chunks/fill_seadog.json';
-const testeeJson711Typed: InkBlock[] = testeeJson711;
+const testeeJson711Typed: InkChunkNode = testeeJson711;
 console.assert(testeeJson711Typed);
 
 import testeeJson712 from '../data/chunks/fill_sour.json';
-const testeeJson712Typed: InkBlock[] = testeeJson712;
+const testeeJson712Typed: InkChunkNode = testeeJson712;
 console.assert(testeeJson712Typed);
 
 import testeeJson713 from '../data/chunks/fill_stubborn.json';
-const testeeJson713Typed: InkBlock[] = testeeJson713;
+const testeeJson713Typed: InkChunkNode = testeeJson713;
 console.assert(testeeJson713Typed);
 
 import testeeJson714 from '../data/chunks/fill_wild.json';
-const testeeJson714Typed: InkBlock[] = testeeJson714;
+const testeeJson714Typed: InkChunkNode = testeeJson714;
 console.assert(testeeJson714Typed);
 
 import testeeJson715 from '../data/chunks/fill_humorous.json';
-const testeeJson715Typed: InkBlock[] = testeeJson715;
+const testeeJson715Typed: InkChunkNode = testeeJson715;
 console.assert(testeeJson715Typed);
 
 import testeeJson716 from '../data/chunks/fill_suspicious.json';
-const testeeJson716Typed: InkBlock[] = testeeJson716;
+const testeeJson716Typed: InkChunkNode = testeeJson716;
 console.assert(testeeJson716Typed);
 
 import testeeJson717 from '../data/chunks/fill_automaton.json';
-const testeeJson717Typed: InkBlock[] = testeeJson717;
+const testeeJson717Typed: InkChunkNode = testeeJson717;
 console.assert(testeeJson717Typed);
 
 import testeeJson718 from '../data/chunks/fill_American.json';
-const testeeJson718Typed: InkBlock[] = testeeJson718;
+const testeeJson718Typed: InkChunkNode = testeeJson718;
 console.assert(testeeJson718Typed);
 
 import testeeJson719 from '../data/chunks/fillsDone.json';
-const testeeJson719Typed: InkBlock[] = testeeJson719;
+const testeeJson719Typed: InkChunkNode = testeeJson719;
 console.assert(testeeJson719Typed);
 
 import testeeJson720 from '../data/chunks/fogg_jokes_journeys.json';
@@ -2905,11 +2904,11 @@ const testeeJson725Typed: InkChunkNode = testeeJson725;
 console.assert(testeeJson725Typed);
 
 import testeeJson726 from '../data/chunks/tickerDone.json';
-const testeeJson726Typed: InkBlock[] = testeeJson726;
+const testeeJson726Typed: InkChunkNode = testeeJson726;
 console.assert(testeeJson726Typed);
 
 import testeeJson727 from '../data/chunks/fogg_route_cant_be_bribed.json';
-const testeeJson727Typed: InkBlock[] = testeeJson727;
+const testeeJson727Typed: InkChunkNode = testeeJson727;
 console.assert(testeeJson727Typed);
 
 import testeeJson728 from '../data/chunks/attend_to_fogg.json';
@@ -2921,19 +2920,19 @@ const testeeJson729Typed: InkChunkNode = testeeJson729;
 console.assert(testeeJson729Typed);
 
 import testeeJson730 from '../data/chunks/fogg_quite_ill.json';
-const testeeJson730Typed: InkBlock[] = testeeJson730;
+const testeeJson730Typed: InkChunkNode = testeeJson730;
 console.assert(testeeJson730Typed);
 
 import testeeJson731 from '../data/chunks/fogg_greeting_tense.json';
-const testeeJson731Typed: InkBlock[] = testeeJson731;
+const testeeJson731Typed: InkChunkNode = testeeJson731;
 console.assert(testeeJson731Typed);
 
 import testeeJson732 from '../data/chunks/fogg_greeting_mellow.json';
-const testeeJson732Typed: InkBlock[] = testeeJson732;
+const testeeJson732Typed: InkChunkNode = testeeJson732;
 console.assert(testeeJson732Typed);
 
 import testeeJson733 from '../data/chunks/fogg_greeting_kind.json';
-const testeeJson733Typed: InkBlock[] = testeeJson733;
+const testeeJson733Typed: InkChunkNode = testeeJson733;
 console.assert(testeeJson733Typed);
 
 import testeeJson734 from '../data/chunks/fogg_journey.json';
@@ -2949,11 +2948,11 @@ const testeeJson736Typed: InkChunkNode = testeeJson736;
 console.assert(testeeJson736Typed);
 
 import testeeJson737 from '../data/chunks/fogg_city_question.json';
-const testeeJson737Typed: InkBlock[] = testeeJson737;
+const testeeJson737Typed: InkChunkNode = testeeJson737;
 console.assert(testeeJson737Typed);
 
 import testeeJson738 from '../data/chunks/fill_fogg.json';
-const testeeJson738Typed: InkBlock[] = testeeJson738;
+const testeeJson738Typed: InkChunkNode = testeeJson738;
 console.assert(testeeJson738Typed);
 
 import testeeJson739 from '../data/chunks/use_airsicknesspills.json';
@@ -3073,7 +3072,7 @@ const testeeJson767Typed: InkChunkNode = testeeJson767;
 console.assert(testeeJson767Typed);
 
 import testeeJson768 from '../data/chunks/aaaafastbuck.json';
-const testeeJson768Typed: InkBlock[] = testeeJson768;
+const testeeJson768Typed: InkChunkNode = testeeJson768;
 console.assert(testeeJson768Typed);
 
 import testeeJson769 from '../data/chunks/for_testing_only.json';
@@ -3081,7 +3080,7 @@ const testeeJson769Typed: InkChunkNode = testeeJson769;
 console.assert(testeeJson769Typed);
 
 import testeeJson770 from '../data/chunks/report_tension_change.json';
-const testeeJson770Typed: InkBlock[] = testeeJson770;
+const testeeJson770Typed: InkChunkNode = testeeJson770;
 console.assert(testeeJson770Typed);
 
 import testeeJson771 from '../data/chunks/DONE.json';
@@ -3097,12 +3096,16 @@ const testeeJson773Typed: InkChunkNode = testeeJson773;
 console.assert(testeeJson773Typed);
 
 import testeeJson774 from '../data/chunks/character_string.json';
-const testeeJson774Typed: InkBlock[] = testeeJson774;
+const testeeJson774Typed: InkChunkNode = testeeJson774;
 console.assert(testeeJson774Typed);
 
 import testeeJson775 from '../data/chunks/report_changes.json';
 const testeeJson775Typed: InkChunkNode = testeeJson775;
 console.assert(testeeJson775Typed);
+
+import testeeJson776 from '../data/chunks/ENDFLOW.json';
+const testeeJson776Typed: InkChunkNode = testeeJson776;
+console.assert(testeeJson776Typed);
 
 import testeeJson777 from '../data/chunks/character_levels.json';
 const testeeJson777Typed: InkChunkNode = testeeJson777;
@@ -5801,7 +5804,7 @@ const testeeJson1450Typed: InkChunkNode = testeeJson1450;
 console.assert(testeeJson1450Typed);
 
 import testeeJson1451 from '../data/chunks/venice_to_dubrovnik.json';
-const testeeJson1451Typed: InkBlock[] = testeeJson1451;
+const testeeJson1451Typed: InkChunkNode = testeeJson1451;
 console.assert(testeeJson1451Typed);
 
 import testeeJson1452 from '../data/chunks/venice_to_vienna.json';
@@ -5997,7 +6000,7 @@ const testeeJson1499Typed: InkChunkNode = testeeJson1499;
 console.assert(testeeJson1499Typed);
 
 import testeeJson1500 from '../data/chunks/thessaloniki_to_bucharest_depart.json';
-const testeeJson1500Typed: InkBlock[] = testeeJson1500;
+const testeeJson1500Typed: InkChunkNode = testeeJson1500;
 console.assert(testeeJson1500Typed);
 
 import testeeJson1501 from '../data/chunks/bucharest_to_thessaloniki_depart.json';
@@ -6041,7 +6044,7 @@ const testeeJson1510Typed: InkChunkNode = testeeJson1510;
 console.assert(testeeJson1510Typed);
 
 import testeeJson1511 from '../data/chunks/beirut_to_cairo_or_alex_depart.json';
-const testeeJson1511Typed: InkBlock[] = testeeJson1511;
+const testeeJson1511Typed: InkChunkNode = testeeJson1511;
 console.assert(testeeJson1511Typed);
 
 import testeeJson1512 from '../data/chunks/antalya_to_cairo_depart.json';
@@ -6705,7 +6708,7 @@ const testeeJson1676Typed: InkChunkNode = testeeJson1676;
 console.assert(testeeJson1676Typed);
 
 import testeeJson1677 from '../data/chunks/rome_to_dubrovnik_depart.json';
-const testeeJson1677Typed: InkBlock[] = testeeJson1677;
+const testeeJson1677Typed: InkChunkNode = testeeJson1677;
 console.assert(testeeJson1677Typed);
 
 import testeeJson1678 from '../data/chunks/dubrovnik_to_thessaloniki_depart.json';
@@ -6917,7 +6920,7 @@ const testeeJson1729Typed: InkChunkNode = testeeJson1729;
 console.assert(testeeJson1729Typed);
 
 import testeeJson1730 from '../data/chunks/hail_to_baghdad_depart.json';
-const testeeJson1730Typed: InkBlock[] = testeeJson1730;
+const testeeJson1730Typed: InkChunkNode = testeeJson1730;
 console.assert(testeeJson1730Typed);
 
 import testeeJson1731 from '../data/chunks/beirut_to_baghdad_depart.json';
@@ -7169,7 +7172,7 @@ const testeeJson1792Typed: InkChunkNode = testeeJson1792;
 console.assert(testeeJson1792Typed);
 
 import testeeJson1793 from '../data/chunks/auckland_to_pitcairn_depart.json';
-const testeeJson1793Typed: InkBlock[] = testeeJson1793;
+const testeeJson1793Typed: InkChunkNode = testeeJson1793;
 console.assert(testeeJson1793Typed);
 
 import testeeJson1794 from '../data/chunks/auckland_to_lima_depart.json';
@@ -7537,7 +7540,7 @@ const testeeJson1884Typed: InkChunkNode = testeeJson1884;
 console.assert(testeeJson1884Typed);
 
 import testeeJson1885 from '../data/chunks/hongkong_to_beijing2.json';
-const testeeJson1885Typed: InkBlock[] = testeeJson1885;
+const testeeJson1885Typed: InkChunkNode = testeeJson1885;
 console.assert(testeeJson1885Typed);
 
 import testeeJson1886 from '../data/chunks/khodunki_tsaritsyn_depart.json';
@@ -7577,7 +7580,7 @@ const testeeJson1894Typed: InkChunkNode = testeeJson1894;
 console.assert(testeeJson1894Typed);
 
 import testeeJson1895 from '../data/chunks/krasnovodsk_to_ekaterinburg_depart.json';
-const testeeJson1895Typed: InkBlock[] = testeeJson1895;
+const testeeJson1895Typed: InkChunkNode = testeeJson1895;
 console.assert(testeeJson1895Typed);
 
 import testeeJson1896 from '../data/chunks/ekaterinburg_to_krasnovodsk_depart.json';
@@ -9005,7 +9008,7 @@ const testeeJson2251Typed: InkChunkNode = testeeJson2251;
 console.assert(testeeJson2251Typed);
 
 import testeeJson2252 from '../data/chunks/caracas_to_bogota_depart.json';
-const testeeJson2252Typed: InkBlock[] = testeeJson2252;
+const testeeJson2252Typed: InkChunkNode = testeeJson2252;
 console.assert(testeeJson2252Typed);
 
 import testeeJson2253 from '../data/chunks/bogota_to_caracas_depart.json';
@@ -9045,7 +9048,7 @@ const testeeJson2261Typed: InkChunkNode = testeeJson2261;
 console.assert(testeeJson2261Typed);
 
 import testeeJson2262 from '../data/chunks/panamacity_to_acapulco_depart.json';
-const testeeJson2262Typed: InkBlock[] = testeeJson2262;
+const testeeJson2262Typed: InkChunkNode = testeeJson2262;
 console.assert(testeeJson2262Typed);
 
 import testeeJson2263 from '../data/chunks/acapulco_to_panamacity_depart.json';
@@ -9341,11 +9344,11 @@ const testeeJson2335Typed: InkChunkNode = testeeJson2335;
 console.assert(testeeJson2335Typed);
 
 import testeeJson2336 from '../data/chunks/omaha_to_chicago_depart.json';
-const testeeJson2336Typed: InkBlock[] = testeeJson2336;
+const testeeJson2336Typed: InkChunkNode = testeeJson2336;
 console.assert(testeeJson2336Typed);
 
 import testeeJson2337 from '../data/chunks/cheyenne_to_omaha_depart.json';
-const testeeJson2337Typed: InkBlock[] = testeeJson2337;
+const testeeJson2337Typed: InkChunkNode = testeeJson2337;
 console.assert(testeeJson2337Typed);
 
 import testeeJson2338 from '../data/chunks/american_caleche_depart1.json';
@@ -9589,7 +9592,7 @@ const testeeJson2397Typed: InkChunkNode = testeeJson2397;
 console.assert(testeeJson2397Typed);
 
 import testeeJson2398 from '../data/chunks/depart_dakar_with_rose_boat.json';
-const testeeJson2398Typed: InkBlock[] = testeeJson2398;
+const testeeJson2398Typed: InkChunkNode = testeeJson2398;
 console.assert(testeeJson2398Typed);
 
 import testeeJson2399 from '../data/chunks/depart_dakar_with_rose.json';
@@ -9949,7 +9952,7 @@ const testeeJson2487Typed: InkChunkNode = testeeJson2487;
 console.assert(testeeJson2487Typed);
 
 import testeeJson2488 from '../data/chunks/timbuktu_to_marrakesh_6.json';
-const testeeJson2488Typed: InkBlock[] = testeeJson2488;
+const testeeJson2488Typed: InkChunkNode = testeeJson2488;
 console.assert(testeeJson2488Typed);
 
 import testeeJson2489 from '../data/chunks/diallo_confronts_you.json';
@@ -10109,7 +10112,7 @@ const testeeJson2527Typed: InkChunkNode = testeeJson2527;
 console.assert(testeeJson2527Typed);
 
 import testeeJson2528 from '../data/chunks/one_day_to_london.json';
-const testeeJson2528Typed: InkBlock[] = testeeJson2528;
+const testeeJson2528Typed: InkChunkNode = testeeJson2528;
 console.assert(testeeJson2528Typed);
 
 import testeeJson2529 from '../data/chunks/approach_london_2.json';
@@ -10285,7 +10288,7 @@ const testeeJson2571Typed: InkChunkNode = testeeJson2571;
 console.assert(testeeJson2571Typed);
 
 import testeeJson2572 from '../data/chunks/__auto_return_block.json';
-const testeeJson2572Typed: InkBlock[] = testeeJson2572;
+const testeeJson2572Typed: InkChunkNode = testeeJson2572;
 console.assert(testeeJson2572Typed);
 
 import testeeJson2573 from '../data/chunks/__auto_return_replacement_block.json';

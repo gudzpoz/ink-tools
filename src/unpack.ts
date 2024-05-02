@@ -17,10 +17,7 @@ async function splitChunks() {
   const indexedContent = index['indexed-content'];
   const content = await fs.readFile('./data/80days.inkcontent.txt');
   await fs.mkdir('./data/chunks', { recursive: true });
-  const typeCheckers = [
-    `import { InkBlock } from './types';`,
-    `import { InkChunkNode } from './types';`,
-  ];
+  const typeCheckers = [`import { InkChunkNode } from './types';`];
   const chunks: Record<string, any> = {};
   await Promise.all(Object.entries(indexedContent.ranges).map(([key, value], i) => {
     const filename = `${key}.json`;
@@ -29,20 +26,17 @@ async function splitChunks() {
     const length = parseInt(lengthS, 10);
     const chunk = JSON.parse(content.subarray(start, start + length).toString('utf-8'));
     const pretty = JSON.stringify(chunk, null, 2);
-    // ENDFLOW 文件内容只有 {}，会报错。
-    if (key !== 'ENDFLOW') {
-      typeCheckers.push(`import testeeJson${i} from '../data/chunks/${filename}';`);
-      // 其余可以分为两类，一个是有 initial 字段的，按 InkChunkNode 类型来处理。否则就是 InkBlock[]。
-      if (pretty.indexOf('"initial"') === -1) {
-        chunks[key] = { chunk };
-        typeCheckers.push(`const testeeJson${i}Typed: InkBlock[] = testeeJson${i};`);
-      } else {
-        Object.entries(chunk.stitches).forEach(([stitche, content]) => {
-          chunks[`${key}.${stitche}`] = content;
-        });
-        typeCheckers.push(`const testeeJson${i}Typed: InkChunkNode = testeeJson${i};`);
-      }
-      typeCheckers.push(`console.assert(testeeJson${i}Typed);\n`);
+    typeCheckers.push(`import testeeJson${i} from '../data/chunks/${filename}';
+const testeeJson${i}Typed: InkChunkNode = testeeJson${i};
+console.assert(testeeJson${i}Typed);
+`);
+    // 除 ENDFLOW 外可以分为两类，一个是有 initial 字段的，按 InkChunkNode 类型来处理。否则就是 InkBlock[]。
+    if (pretty.indexOf('"initial"') === -1) {
+      chunks[key] = { chunk };
+    } else {
+      Object.entries(chunk.stitches).forEach(([stitche, content]) => {
+        chunks[`${key}.${stitche}`] = content;
+      });
     }
     return fs.writeFile(`./data/chunks/${filename}`, pretty);
   }));
@@ -56,6 +50,13 @@ const chunksPromise = splitChunks();
 const { buildingBlocks } = index;
 
 /**
+ * 并集统计出所有可能的 field，交集统计出必须有的 field。
+ */
+type FieldStats = {
+  union: Set<string>,
+  intersect?: Set<string>,
+};
+/**
  * `Record<field 名, 类型信息>`。
  * 其中 `field 名` 可能是 `A` 或是 `A[]` 格式的，后者指的是数组。
  */
@@ -68,6 +69,14 @@ type Info = Record<string, {
    * 如果某一个 field 是一个对象，那么记录下这个对象所有可能的 field 名称。
    */
   nestedValues: Set<string>,
+  /**
+   * 记录下和某一个 field 相关的所有其它 field，以便推理出对象的类型。
+   */
+  keysTogether: Record<string, FieldStats>,
+  /**
+   * 记录下某一个 field 可能的值。如果这个 field 对应的是枚举的话会方便理解很多。
+   */
+  valueEnumeration: Set<string>,
 }>;
 
 function collectStructures(
@@ -83,35 +92,55 @@ function collectStructures(
     info[key] = {
       values: new Set(),
       nestedValues: new Set(),
+      keysTogether: {},
+      valueEnumeration: new Set(),
     };
   }
   if (typeof block !== 'object') {
     info[key].values.add(typeof block);
+    if (typeof block === 'string') {
+      info[key].valueEnumeration.add(block);
+    }
     return JSON.stringify(block);
   }
   Object.entries(block).forEach(([key, value]) => {
     collectStructures(key, value, info);
   });
   const keys = Object.keys(block).sort();
-  keys.forEach((k) => info[key].nestedValues.add(k));
+  // 有些 field 是空的 {}，特殊处理。
+  if (keys.length === 0) {
+    info[key].values.add('{}');
+    return '{}';
+  }
+  // 统计交集和各 field 同时出现的其它 field 的交集并集。
+  keys.forEach((k) => {
+    const data = info[key];
+    data.nestedValues.add(k);
+    if (data.keysTogether[k] === undefined) {
+      data.keysTogether[k] = {
+        union: new Set(),
+      };
+    }
+    const meta = data.keysTogether[k];
+    keys.forEach((ki) => meta.union.add(ki));
+    meta.intersect = (meta.intersect === undefined
+      ? new Set(keys)
+      : new Set([...meta.intersect].filter((i) => keys.includes(i))));
+  });
   return `{${keys.join(',')}}`;
 }
 
 /**
  * 收集 buildingBlocks 的结构信息到 Info 中。
  */
-function collectInfoFromFile(blocks: typeof buildingBlocks, info: Info, root: Set<string>) {
+function collectInfoFromFile(blocks: typeof buildingBlocks, info: Info) {
   Object.values(blocks).forEach((block) => {
-    block.forEach((step: any | string) => {
-      if (typeof step === 'string') {
-        return;
-      }
-      root.add(Object.keys(step).sort().join(','));
-      Object.entries(step)
-        .map(([k, v]) => {
-          collectStructures(k, v as any, info);
-        });
-    });
+    if (!Array.isArray(block) && Object.keys(block).length === 0) {
+      return;
+    }
+    // 我们认为主要节点就是 then 数组里的元素。
+    // 所以把根数组里的也算在 then 里。
+    collectStructures('then', block, info);
   });
 }
 
@@ -125,9 +154,10 @@ class TypeGenerator {
     this.info = info;
   }
 
-  innerForType(nestedValues: Set<string>): string {
-    return Array.from(nestedValues).sort()
-      .map((k) => `  ${k}?: Type_${k},`).join('\n');
+  innerForType(stats: FieldStats): string {
+    return Array.from(stats.union).sort()
+      // 在一大堆同时出现的 field 里，永远出现的（交集）为必须值，其余可空。
+      .map((k) => `  ${k}${stats.intersect?.has(k) ? '' : '?'}: Type_${k},`).join('\n');
   }
 
   typeFor(name: string): string[] {
@@ -137,15 +167,57 @@ class TypeGenerator {
       default:
         break;
     }
-    const { values, nestedValues } = this.info[name];
+    const { values, nestedValues, keysTogether } = this.info[name];
     const types: string[] = Array.from(values);
     if (nestedValues.size !== 0) {
-      types.push(`{\n${this.innerForType(nestedValues)}\n}`);
+      this.groupFields(keysTogether).forEach((group) => {
+        types.push(`{\n${this.innerForType(group)}\n}`);
+      });
     }
     if (types.length === 0) {
       return ['{}'];
     }
     return types;
+  }
+
+  /**
+   * 将 field 分组。
+   *
+   * 例如 `Type_then` 里面，`{ cycle: Type_cycle }` 和 `{ sequence: Type_sequence }`
+   * 都有出现，但是 `cycle` 和 `sequence` 从来没有同时出现，此时我们即可推断
+   * 它们分属两种类型。
+   *
+   * 这里顺便把分组之后组内必定出现的一些元素给统计出来了，
+   * 这在 `nnerForType` 里面用来判断 field 是否可空。
+   *
+   * @param keysTogether 统计信息
+   * @returns 分组信息
+   */
+  groupFields(keysTogether: Info[string]['keysTogether']): FieldStats[] {
+    let sets = Object.values(keysTogether).map((s) => s.union);
+    let unmerged: Set<string>[] = [];
+    const merged: FieldStats[] = [];
+    while (sets.length !== 0) {
+      unmerged = [];
+      const group = sets.reduce((prev, current) => {
+        const intersects = [...prev].filter((i) => current.has(i)).length !== 0;
+        if (intersects || current.size === 0 || prev.size === 0) {
+          return new Set([...prev, ...current]);
+        } else {
+          unmerged.push(current);
+          return prev;
+        }
+      });
+      if (group.size !== 0) {
+        merged.push({
+          union: group,
+          intersect: [...group].map((key) => keysTogether[key].intersect || new Set<string>())
+            .reduce((prev, current) => new Set([...prev].filter((i) => current.has(i)))),
+        });
+      }
+      sets = unmerged;
+    }
+    return merged;
   }
 
   generate(): string {
@@ -166,9 +238,11 @@ class TypeGenerator {
         mergedTypes[name] = [];
       }
       mergedTypes[name].push(`(${v.join(' | ')})${suffix}`);
+      mergedTypes[name] = mergedTypes[name].filter((v) => v.indexOf('__bb') === -1);
       if (name === 'Type_params') {
-        mergedTypes[name] = mergedTypes[name].filter((v) => v.indexOf('__bb') === -1);
+        if (name === 'Type_params') {
         mergedTypes[name].push('{ [key: `__bb${string}`]: Type_return | undefined }');
+        }
       }
     });
     return Object.entries(mergedTypes)
@@ -177,31 +251,30 @@ class TypeGenerator {
   }
 }
 
+function prettyJson(o: any) {
+  return JSON.stringify(
+    o,
+    (_k, v) => (v instanceof Set ? [...v].sort() : v),
+    2,
+  );
+}
+
 const info: Info = {};
-const root: Set<string> = new Set();
-collectInfoFromFile(buildingBlocks, info, root);
+collectInfoFromFile(buildingBlocks, info);
 (async () => {
   const chunks = await chunksPromise;
-  Object.entries(chunks).forEach(([key, value]) => {
-    try {
-      collectInfoFromFile(value, info, root);
-    } catch (e) {
-      console.error(key, e);
-      throw e;
-    }
-  })
-  fs.writeFile(
-    './data/80days.format.json',
-    JSON.stringify(
-      info,
-      (_k, v) => (v instanceof Set ? [...v].sort() : v),
-      2,
-    ),
-  );
-  console.log('buildingBlocks 对象的可能 field：', Array.from(root).sort());
+  Object.entries(chunks).forEach(([, value]) => {
+    collectInfoFromFile(value, info);
+  });
+  await fs.writeFile('./data/80days.format.json', prettyJson(info));
   const types = new TypeGenerator(info).generate();
-  fs.writeFile(
-    './src/auto-types.ts',
-    types,
+  await fs.writeFile('./src/auto-types.ts', types);
+  await fs.writeFile(
+    './data/80days.enum.json',
+    prettyJson(
+      Object.fromEntries(Object.entries(info)
+        .filter(([, v]) => v.values.size === 1 && v.values.has('string') && v.nestedValues.size === 0)
+        .map(([k, v]) => [k, v.valueEnumeration])),
+    ),
   );
 })();
