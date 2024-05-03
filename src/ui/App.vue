@@ -11,10 +11,15 @@
     <button type="button" @click="selectNewKnot(knotSelect?.value ?? 0)">
       Restart
     </button>
-    <label>
-      Use translated JSON:
-      <input type="file" @change="(e) => updateStoryWithTranslatedJson(e)" />
-    </label>
+    <div>
+      <label>
+        Use translated JSON/CSV/ZIP:
+        <input type="file" @change="(e) => updateStoryWithTranslation(e)" />
+      </label>
+      <label>
+        <input type="checkbox" v-model="debug.original" /> Show original text
+      </label>
+    </div>
     <div>
       Debug:
       <label>
@@ -53,9 +58,11 @@
 </template>
 
 <script setup lang="ts">
+import { parse as parseCsv } from 'csv-parse/browser/esm/sync';
 import {
-  computed, onMounted, ref,
+  computed, onMounted, ref, watch,
 } from 'vue';
+import JSZip from 'jszip';
 
 import { InkStoryRunner, Options } from './story';
 import { InkRootNode } from '../types';
@@ -78,10 +85,11 @@ const debug = ref({
   cycles: false,
   functions: false,
   diverts: false,
+  original: false,
 });
 
 const storyUniqueId = ref(0);
-let timeOutHandle: number | null = null;
+let timeOutHandle: ReturnType<typeof setTimeout> | null = null;
 async function fetchMore(delay: number = 20) {
   if (options.value.length !== 0) {
     return;
@@ -166,28 +174,114 @@ function resetVariables() {
   globalVariables.value = {};
 }
 
-async function updateStoryWithTranslatedJson(e: Event) {
+type CsvTranslation = {
+  json_path: string,
+  original: string,
+  translated: string,
+};
+
+function patchChunkWithTranslation(obj: unknown, translations: CsvTranslation[], isRoot: boolean) {
+  const chunk = (isRoot ? (obj as InkRootNode).buildingBlocks : obj) as unknown;
+  translations.forEach(({ json_path, translated }) => {
+    if (translated.trim() === '') {
+      return;
+    }
+    const path = json_path.split('.');
+    const last = path.pop();
+    const parent = path.reduce((acc, key) => (acc as Record<string, unknown>)?.[key], chunk);
+    if (parent === undefined || last === undefined) {
+      return;
+    }
+    (parent as Record<string, unknown>)[last] = translated;
+  });
+}
+
+function parseTranslationCsv(content: ArrayBuffer) {
+  const csv = new TextDecoder('utf-8').decode(content);
+  const translations: CsvTranslation[] = parseCsv(csv, {
+    bom: true,
+    cast: false,
+    columns: ['json_path', 'original', 'translated'],
+    skip_empty_lines: true,
+    relax_column_count_more: true,
+  });
+  return translations;
+}
+
+async function updateStoryWithFile(
+  stem: string,
+  extension: string,
+  content: ArrayBuffer,
+  shouldAlert: boolean,
+): Promise<boolean> {
+  const ext = extension.toLowerCase();
+  if (ext !== 'json' && ext !== 'csv' && ext !== 'zip') {
+    (shouldAlert ? alert : console.log)(`Please select a .json/.csv/.zip file: passed ${ext} (${stem})`);
+    return false;
+  }
+  const name = /^[0-9]{4}-/.test(stem) ? stem.substring(5) : stem;
+  if (ext !== 'zip' && name !== '' && root['indexed-content'].ranges[name] === undefined) {
+    (shouldAlert ? alert : console.log)(`Check your JSON/CSV filename: passed ${stem}`);
+    return false;
+  }
+  if (ext === 'csv') {
+    const translations = parseTranslationCsv(content);
+    const chunk = await story.copyChunk(name);
+    patchChunkWithTranslation(chunk, translations, stem === '');
+    story.loadExternalChunk(name, chunk);
+  } else if (ext === 'json') {
+    const json = new TextDecoder('utf-8').decode(content);
+    const translatedJson = JSON.parse(json);
+    story.loadExternalChunk(name, translatedJson);
+  } else {
+    const promises: Promise<boolean>[] = [];
+    (await (new JSZip().loadAsync(content))).forEach((path, data) => {
+      if (data.dir) {
+        return;
+      }
+      const segments = path.split('/');
+      const filename = segments.pop()!;
+      let [entryStem, entryExt] = filename.split('.');
+      if (!entryStem || !entryExt) {
+        return;
+      }
+      if (filename.includes('buildingBlocks')) {
+        entryStem = '';
+        entryExt = 'csv';
+      }
+      promises.push(
+        (async () => {
+          try {
+            return await updateStoryWithFile(entryStem, entryExt, await data.async('arraybuffer'), false);
+          } catch (e) {
+            console.log('Import error:', path, e);
+            return false;
+          }
+        })(),
+      );
+    });
+    alert(`It is going to take a while. After closing this alert, please wait until the story reloads.
+
+**Confirm** to start importing.`);
+    return (await Promise.all(promises)).some((b) => b);
+  }
+  return true;
+}
+
+async function updateStoryWithTranslation(e: Event) {
   const { files } = (e.target as HTMLInputElement);
   if (!files || files.length === 0) {
     return;
   }
   const [file] = files;
-  const [name, ext] = file.name.split('.');
-  if (ext !== 'json') {
-    // eslint-disable-next-line no-alert
-    alert('Please select a JSON file');
-    return;
+  const [stem, extension] = file.name.split('.');
+  if (await updateStoryWithFile(stem, extension, await file.arrayBuffer(), true)) {
+    await selectNewKnot(knotSelect.value?.value ?? 0);
   }
-  if (root['indexed-content'].ranges[name] === undefined) {
-    // eslint-disable-next-line no-alert
-    alert('Check your JSON filename');
-    return;
-  }
-  const json = await file.text();
-  const translatedJson = JSON.parse(json);
-  story.loadExternalChunk(name, translatedJson);
-  await selectNewKnot(knotSelect.value?.value ?? 0);
 }
+watch(() => debug.value.original, () => {
+  story.useExternal = !debug.value.original;
+});
 
 const displayConditions = computed(() => (debug.value.conditions ? 'inline-flex' : 'none'));
 const displayCycles = computed(() => (debug.value.cycles ? 'inline-flex' : 'none'));

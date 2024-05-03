@@ -65,7 +65,10 @@ type Message = 'return' | 'ended' | 'divert_in_function';
 export class InkStoryRunner {
   environment: InkEnvironment;
 
-  private chunkCache: Record<string, InkChunkNode>;
+  private chunkCaches: {
+    original: Record<string, InkChunkNode>;
+    external: Record<string, InkChunkNode>;
+  };
 
   private returnStack: InkReturnValue[];
 
@@ -73,8 +76,18 @@ export class InkStoryRunner {
 
   private decompiler: PoorOldInkSerializer;
 
-  constructor(public root: InkRootNode) {
-    this.chunkCache = {};
+  useExternal: boolean;
+
+  constructor(root: InkRootNode) {
+    this.useExternal = true;
+    this.chunkCaches = {
+      original: {
+        '': root,
+      },
+      external: {
+        '': JSON.parse(JSON.stringify(root)),
+      },
+    };
     this.returnStack = [];
     this.outputBuffer = [];
     this.decompiler = new PoorOldInkSerializer(root);
@@ -85,9 +98,13 @@ export class InkStoryRunner {
     return this.environment.variables;
   }
 
+  private getRoot(): InkRootNode {
+    return (this.useExternal ? this.chunkCaches.external[''] : this.chunkCaches.original['']) as InkRootNode;
+  }
+
   newEnvironment(): InkEnvironment {
     return {
-      variables: Object.fromEntries(Object.entries(this.root.variables)),
+      variables: Object.fromEntries(Object.entries(this.getRoot().variables)),
       history: {},
       callStack: [],
       cycleCounts: new Map(),
@@ -102,23 +119,37 @@ export class InkStoryRunner {
     this.returnStack = [];
     this.environment = this.newEnvironment();
     this.environment.callStack = [[]];
-    await this.divertTo(`:${initial ?? this.root.initial}`);
+    await this.divertTo(`:${initial ?? this.getRoot().initial}`);
+  }
+
+  async copyChunk(name: string) {
+    return JSON.parse(await this.getChunkText(name));
+  }
+
+  async getChunkText(name: string): Promise<string> {
+    if (name === '') {
+      return JSON.stringify(this.getRoot());
+    }
+    const chunkUrl = new URL(`../../data/chunks/${name}.json`, import.meta.url).href;
+    const text = await fetch(chunkUrl).then((r) => r.text());
+    return text;
   }
 
   private async getChunk(name: string): Promise<InkChunkNode> {
-    if (this.chunkCache[name]) {
-      return this.chunkCache[name];
+    const root = this.useExternal ? this.chunkCaches.external : this.chunkCaches.original;
+    if (root[name]) {
+      return root[name];
     }
 
-    const chunkUrl = new URL(`../../data/chunks/${name}.json`, import.meta.url)
-      .href;
-    const chunk = await fetch(chunkUrl).then((r) => r.json());
+    const text = await this.getChunkText(name);
+    this.chunkCaches.original[name] = JSON.parse(text);
+    const chunk = JSON.parse(text) as InkChunkNode;
     this.loadExternalChunk(name, chunk);
-    return chunk;
+    return this.getChunk(name);
   }
 
   loadExternalChunk(name: string, json: InkChunkNode) {
-    this.chunkCache[name] = json;
+    this.chunkCaches.external[name] = json;
   }
 
   private expectError(e: unknown, message: Message) {
@@ -198,7 +229,7 @@ export class InkStoryRunner {
             await this.evaluateExpr(e ?? ''),
           ]),
         );
-        const body = this.root.buildingBlocks[buildingBlock];
+        const body = this.getRoot().buildingBlocks[buildingBlock];
         this.returnStack.push({
           returned: false,
           value: '',
@@ -359,7 +390,7 @@ export class InkStoryRunner {
     return ip.reduce(
       (node, key) => node?.[key],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      this.chunkCache as any,
+      (this.useExternal ? this.chunkCaches.external : this.chunkCaches.original) as any,
     );
   }
 
