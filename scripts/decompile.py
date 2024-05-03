@@ -27,8 +27,14 @@ def get_pln(
     pln.is_func = False
     return pln
 
+def modern_knot(s):
+    if len(s) > 0 and s[0] == ':':
+        s = s[1:]
+    if ':' in s:
+        s = s.replace(':', '.')
+    return s
 
-divert = lambda d: f'-> {d}'
+divert = lambda d: f'-> {modern_knot(d)}'
 knot = lambda k: f'=== {k} ==='
 func = lambda f: knot(f"function {f}")
 stitch = lambda s: f'={s}'
@@ -81,13 +87,35 @@ def _dump_to_str(data):
                 return f'''{data[key]}({
                     ', '.join(map(_dump_to_str, data['params'].values()))
                 })'''
+            case 'option':     # TODO: 应该不对，需要修改，0015  cycle 套 options
+                opt = _dump_to_str(data['option'])
+                inlineflag = False
+                inline = ''
+                condition = None
+                if "inlineOption" in data:
+                    inlineflag = data['inlineOption']
+                if inlineflag:
+                    inline = '<>'
+                if "condition" in data:
+                    condition = data['condition']
+                if condition:
+                    return f'*     {{{condition}}} [{opt} {inline}] -> {data["linkPath"]}'
+                else:
+                    return f'*     [{opt} {inline}] -> {data["linkPath"]}'
+
+            case 'condition':
+                return _dump_to_str(data[key])
+            case 'divert':    #    TODO: 格式待确认
+                return f'{divert(data[key])}'
+            case 'action':
+                return f'// Action: {data["action"]} \n' + f'{json.dumps(data.get("userInfo", {}), separators=(",", ":"))}'
         if key in VARIABLE_TEXT_SYMBOLS:
             return f'{{{VARIABLE_TEXT_SYMBOLS[key]}{"|".join(map(_dump_to_str, data[key]))}}}'
         raise ValueError(f'Unknown key: {key}')
     elif isinstance(data, list):
         return " ".join(map(_dump_to_str, data))
     elif isinstance(data, str):
-        return data
+        return modern_knot(data)
     return json.dumps(data)
 
 
@@ -101,6 +129,8 @@ def decompile_do_funcs(data, pln):
                 pln(f'~ {args[0]} = {_dump_to_str(args[1])}')
             case 'buildingBlock':
                 pln(f'~ {_dump_to_str(func)}')
+            case 'func':
+                pln(f'~ {_dump_to_str(func)}')
             case _:
                 raise ValueError(f'Unknown key: {key}')
 
@@ -113,7 +143,10 @@ def decompile_condition(data, pln):
     condition = _dump_to_str(data['condition'])
     pln(f'{{{condition}:')
     decompile_data(data['then'], pln.indent())
-    e = data.get('else')
+    if 'otherwise' in data:
+        e = data['otherwise']
+    else:
+        e = data.get('else')
     if e:
         pln(f'  - else:')
         decompile_data(e, pln.indent())
@@ -125,6 +158,22 @@ def decompile_stitches(data, pln):
         pln(stitch(key))
         decompile_data(value, pln.indent())
 
+def decompile_option(data, pln):
+    option = _dump_to_str(data['option'])
+    inline = ""
+    condition = None
+    if "condition" in data:
+        condition = _dump_to_str(data['condition'])
+    if "inlineOption" in data and data['inlineOption']:
+        inline = "<>"
+    if condition is not None:
+        pln(f'*     {{{condition}}} [{option} {inline}] -> {data["linkPath"]}')
+    else:
+        pln(f'*     [{option} {inline}] -> {data["linkPath"]}')
+
+def decompile_func(data, pln):
+    func = _dump_to_str(data)
+    pln(func)
 
 def _find_args(key, data):
     n = 0
@@ -171,29 +220,35 @@ def decompile_data(data: Any, pln):
             decompile_data(item, pln)
         return pln()
     if isinstance(data, dict):
-        key = first_key(data)
-        match key:
-            case 'action':
-                return decompile_action(data, pln)
-            case 'doFuncs':
-                return decompile_do_funcs(data, pln)
-            case 'return':
-                return decompile_return(data, pln)
-            case 'condition':
-                return decompile_condition(data, pln)
-            case 'buildingBlock':
-                return pln(f'~ {_dump_to_str(data)}')
-            case 'divert':
-                if pln.is_func:
-                    return pln(f'// {divert(data[key])}')
-                return pln(divert(data[key]))
-            case 'initial':
-                return decompile_stitches(data, pln)
-            case 'content':
-                return decompile_data(data[key], pln)
-        if key in VARIABLE_TEXT_SYMBOLS:
-            return decompile_variable_text(data, pln)
-        raise ValueError(f'Unknown data: {key}')
+        if data:
+            key = first_key(data)
+            match key:
+                case 'action':
+                    return decompile_action(data, pln)
+                case 'doFuncs':
+                    return decompile_do_funcs(data, pln)
+                case 'return':
+                    return decompile_return(data, pln)
+                case 'condition':
+                    return decompile_condition(data, pln)
+                case 'buildingBlock':
+                    return pln(f'~ {_dump_to_str(data)}')
+                case 'divert':
+                    if pln.is_func:
+                        return pln(f'// {divert(data[key])}')
+                    return pln(divert(data[key]))
+                case 'initial':
+                    return decompile_stitches(data, pln)
+                case 'content':
+                    return decompile_data(data[key], pln)
+                case 'option':
+                    return decompile_option(data, pln)    # TODO: 大概率是对的 0012 0006
+                case 'storyCustomContentClass':
+                    return pln(f'~ {_dump_to_str(data[key])}')    # TODO: 确认应该改成什么格式 0015
+            if key in VARIABLE_TEXT_SYMBOLS:
+                return decompile_variable_text(data, pln)
+            raise ValueError(f'Unknown data: {key}')
+        return
     pln(_dump_to_str(data), end='')
 
 
