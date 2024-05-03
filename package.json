@@ -2,21 +2,48 @@
   "name": "ink-tools",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "unpack": "ts-node src/unpack.ts",
-    "decompile": "ts-node src/decompile.ts",
+    "unpack": "vite-node src/cli/unpack.ts",
+    "decompile": "vite-node src/cli/decompile.ts",
     "schema": "typeconv -f ts -t oapi -o schema src/auto-types.ts src/types.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@eslint/js": "^9.1.1",
+    "@rushstack/eslint-patch": "^1.10.2",
+    "@tsconfig/node20": "^20.1.4",
+    "@types/jsdom": "^21.1.6",
     "@types/node": "^20.12.8",
-    "eslint": "^9.1.1",
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/parser": "^6.8.0",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/eslint-config-airbnb-with-typescript": "^8.0.0",
+    "@vue/eslint-config-typescript": "^13.0.0",
+    "@vue/test-utils": "^2.4.5",
+    "@vue/tsconfig": "^0.5.1",
+    "eslint": "8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-vue": "^9.25.0",
+    "globals": "^15.1.0",
+    "jsdom": "^24.0.0",
+    "npm-run-all2": "^6.1.2",
     "ts-node": "^10.9.2",
     "typeconv": "^2.3.1",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.8.0",
+    "vite": "^5.2.8",
+    "vite-node": "^0.34.6",
+    "vitest": "^1.4.0",
+    "vue-tsc": "^2.0.11"
+  },
+  "dependencies": {
+    "vue": "^3.4.26"
   }
 }

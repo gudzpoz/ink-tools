@@ -1,8 +1,8 @@
 import fs from 'fs/promises';
 
-import type { InkRootNode } from './types';
+import type { InkRootNode } from '../types';
 
-import gameDataIndexJson from '../data/80days.json';
+import gameDataIndexJson from '../../data/80days.json';
 
 // 下面这行代码可以用来检查生成的类型是否正确（移除掉 @ts-expect-error）。
 // 但是 JSON 实在太大了，所以必定会生成一个 Excessive stack depth comparing types 错误。

@@ -1,9 +1,9 @@
 import fs from 'fs/promises';
 
-import rootNode from '../data/80days.json';
+import rootNode from '../../data/80days.json';
 
 import PoorOldInkSerializer from './decompiler';
-import { InkChunkNode, InkRootNode } from './types';
+import { InkChunkNode, InkRootNode } from '../types';
 
 (async () => {
   // @ts-expect-error

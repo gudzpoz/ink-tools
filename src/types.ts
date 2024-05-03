@@ -1,7 +1,15 @@
 // auto-types.ts 由 unpack.ts 生成
-import { Type_then } from './auto-types';
+import {
+  Type_actionTag, Type_buildingBlockWithParams, Type_conditionThen,
+  Type_customDictionary, Type_cycleNode, Type_divertNode,
+  Type_doFuncs,
+  Type_doFuncsNode, Type_funcWithParams, Type_get, Type_optionLink, Type_returnNode,
+  Type_sequenceNode, Type_set, Type_then,
+} from './auto-types';
 
 export type InkBlock = Type_then[number];
+
+export type InkBuildingBlockExpr = Exclude<InkBlock, Type_optionLink | Type_divertNode>;
 
 /**
  * `80days.txt` 的根节点类型信息。
@@ -14,7 +22,7 @@ export type InkRootNode = {
   /**
    * 看起来是一大堆全局函数定义。
    */
-  buildingBlocks: Record<string, InkBlock[]>;
+  buildingBlocks: Record<string, InkBuildingBlockExpr[]>;
   /**
    * 不知道为什么是 'storycrashed'，但总之似乎是故事入口名称。
    */
@@ -45,7 +53,7 @@ export type InkChunkWithStitches = {
 export type InkChunkNode =
   | InkChunkWithStitches
   | InkBlock[]
-  | {};
+  | Record<never, never>;
 
 /**
  * 这个是 `Type_func` 类型的所有可能取值。
@@ -72,3 +80,86 @@ export type InkFuncType =
   | 'NotEquals'
   | 'Or'
   | 'Subtract';
+
+export type InkExpr = Type_set[number] | Type_doFuncs[number] | Type_returnNode;
+
+export type TypedCycleNode = {
+  type: 'cycle',
+  value: Type_cycleNode,
+} | {
+  type: 'sequence',
+  value: Type_sequenceNode,
+};
+
+export type TypedInkBlock = {
+  type: 'value',
+  value: string | number | boolean,
+} | {
+  type: 'set',
+  value: { set: Type_set },
+} | {
+  type: 'get',
+  value: { get: Type_get },
+} | {
+  type: 'func',
+  value: Type_funcWithParams,
+} | {
+  type: 'action',
+  value: Type_actionTag,
+} | {
+  type: 'building',
+  value: Type_buildingBlockWithParams,
+} | {
+  type: 'condition',
+  value: Type_conditionThen,
+} | {
+  type: 'custom',
+  value: Type_customDictionary,
+} | {
+  type: 'divert',
+  value: Type_divertNode,
+} | {
+  type: 'do',
+  value: Type_doFuncsNode,
+} | {
+  type: 'option',
+  value: Type_optionLink,
+} | {
+  type: 'return',
+  value: Type_returnNode,
+} | TypedCycleNode;
+
+export function annotateInkBlockType(node: InkBlock | InkExpr): TypedInkBlock {
+  if (typeof node !== 'object') {
+    return {
+      type: 'value',
+      value: node,
+    };
+  }
+  const typeMapping: Record<string, TypedInkBlock['type']> = {
+    get: 'get',
+    set: 'set',
+    func: 'func',
+
+    action: 'action',
+    buildingBlock: 'building',
+    then: 'condition',
+    dictionary: 'custom',
+    cycle: 'cycle',
+    divert: 'divert',
+    doFuncs: 'do',
+    option: 'option',
+    return: 'return',
+    sequence: 'sequence',
+  };
+  const types = Object.entries(typeMapping)
+    .filter(([uniqueProperty]) => (node as Record<string, unknown>)[uniqueProperty] !== undefined)
+    .map(([, type]) => type);
+  if (types.length !== 1) {
+    throw new Error(`Unhandled node: ${JSON.stringify(node)}`);
+  }
+  return {
+    type: types[0],
+    value: node,
+  } as unknown as TypedInkBlock;
+}

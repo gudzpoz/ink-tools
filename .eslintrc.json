@@ -1,0 +1,29 @@
+{
+  "root": true,
+  "extends": [
+    "plugin:vue/vue3-essential",
+    "eslint:recommended",
+    "airbnb-base",
+    "airbnb-typescript/base",
+    "@vue/eslint-config-typescript/recommended",
+    "@vue/eslint-config-airbnb-with-typescript",
+    "plugin:promise/recommended"
+  ],
+  "parser": "vue-eslint-parser",
+  "parserOptions": {
+    "project": ["./tsconfig.json"],
+    "ecmaVersion": "latest"
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "promise"
+  ],
+  "ignorePatterns": [
+    "vite.config.ts",
+    ".eslintrc.cjs"
+  ],
+  "rules": {
+    "class-methods-use-this": "off",
+    "require-await": "error"
+  }
+}

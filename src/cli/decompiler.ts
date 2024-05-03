@@ -13,8 +13,8 @@ import {
   Type_returnNode,
   Type_sequenceNode,
   Type_set,
-} from './auto-types';
-import { InkBlock, InkChunkNode, InkChunkWithStitches, InkFuncType, InkRootNode } from './types';
+} from '../auto-types';
+import { InkBlock, InkChunkNode, InkChunkWithStitches, InkFuncType, InkRootNode } from '../types';
 
 /**
  * 把 Ink JSON 文件反序列化为 Ink 文本。
@@ -45,7 +45,7 @@ class PoorOldInkSerializer {
   }
 
   nl() {
-    return '\n' + '    '.repeat(this.indentation);
+    return '\n' + '  '.repeat(this.indentation);
   }
 
   checkIfIsArg(name: Type_paramsForFuncs[number], nestLevel: number): string {
@@ -78,7 +78,7 @@ class PoorOldInkSerializer {
     if (divert.startsWith(':')) {
       divert = divert.slice(1);
     }
-    divert = divert.replaceAll(':', '.');
+    divert = divert.replace(/:/g, '.');
     return divert;
   }
 
