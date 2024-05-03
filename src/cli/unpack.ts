@@ -17,8 +17,8 @@ async function splitChunks() {
   const indexedContent = index['indexed-content'];
   const content = await fs.readFile('./data/80days.inkcontent.txt');
   await fs.mkdir('./data/chunks', { recursive: true });
-  const typeCheckers = [`import { InkChunkNode } from './types';`];
-  const chunks: Record<string, any> = {};
+  const typeCheckers = ['import { InkChunkNode } from \'./types\';'];
+  const chunks: Record<string, object> = {};
   await Promise.all(Object.entries(indexedContent.ranges).map(([key, value], i) => {
     const filename = `${key}.json`;
     const [startS, lengthS] = value.split(' ');
@@ -34,8 +34,8 @@ console.assert(testeeJson${i}Typed);
     if (pretty.indexOf('"initial"') === -1) {
       chunks[key] = { chunk };
     } else {
-      Object.entries(chunk.stitches).forEach(([stitche, content]) => {
-        chunks[`${key}.${stitche}`] = content;
+      Object.entries(chunk.stitches).forEach(([stitche, contentValue]) => {
+        chunks[`${key}.${stitche}`] = contentValue as object;
       });
     }
     return fs.writeFile(`./data/chunks/${filename}`, pretty);
@@ -81,13 +81,14 @@ type Info = Record<string, {
 
 function collectStructures(
   key: string,
-  block: Record<string, any> | any[] | string | number,
-  info: Info,
+  block: Record<string, object> | (string | object)[] | string | number,
+  infoOut: Info,
 ): string {
   if (Array.isArray(block)) {
-    block.forEach((v) => collectStructures(key + '[]', v, info));
+    block.forEach((v) => collectStructures(`${key}[]`, v as Record<string, object>, infoOut));
     return '[<nested>]';
   }
+  const info = infoOut;
   if (info[key] === undefined) {
     info[key] = {
       values: new Set(),
@@ -103,8 +104,8 @@ function collectStructures(
     }
     return JSON.stringify(block);
   }
-  Object.entries(block).forEach(([key, value]) => {
-    collectStructures(key, value, info);
+  Object.entries(block).forEach(([k, value]) => {
+    collectStructures(k, value as Record<string, object>, info);
   });
   const keys = Object.keys(block).sort();
   // 有些 field 是空的 {}，特殊处理。
@@ -200,14 +201,14 @@ class TypeGenerator {
     const merged: FieldStats[] = [];
     while (sets.length !== 0) {
       unmerged = [];
+      const finalUnmerged = unmerged;
       const group = sets.reduce((prev, current) => {
         const intersects = [...prev].filter((i) => current.has(i)).length !== 0;
         if (intersects || current.size === 0 || prev.size === 0) {
           return new Set([...prev, ...current]);
-        } else {
-          unmerged.push(current);
-          return prev;
         }
+        finalUnmerged.push(current);
+        return prev;
       });
       if (group.size !== 0) {
         merged.push({
@@ -227,8 +228,9 @@ class TypeGenerator {
       .map((k) => [`Type_${k}`, this.typeFor(k)]));
     const mergedTypes: typeof types = {};
     Object.entries(types).forEach(([k, v]) => {
-      const match = /^([^\[\]]+)([\[\]]+)$/.exec(k);
-      let name, suffix;
+      const match = /^([^[\]]+)([[\]]+)$/.exec(k);
+      let name;
+      let suffix;
       if (match === null) {
         name = k;
         suffix = '';
@@ -239,10 +241,11 @@ class TypeGenerator {
         mergedTypes[name] = [];
       }
       mergedTypes[name].push(`(${v.join(' | ')})${suffix}`);
-      mergedTypes[name] = mergedTypes[name].filter((v) => v.indexOf('__bb') === -1);
+      mergedTypes[name] = mergedTypes[name].filter((vv) => vv.indexOf('__bb') === -1);
       if (name === 'Type_params') {
         if (name === 'Type_params') {
-        mergedTypes[name].push('{ [key: `__bb${string}`]: Type_return | undefined }');
+          // eslint-disable-next-line no-template-curly-in-string
+          mergedTypes[name].push('{ [key: `__bb${string}`]: Type_return | undefined }');
         }
       }
     });
@@ -252,7 +255,7 @@ class TypeGenerator {
   }
 }
 
-function prettyJson(o: any) {
+function prettyJson(o: object) {
   return JSON.stringify(
     o,
     (_k, v) => (v instanceof Set ? [...v].sort() : v),
@@ -265,7 +268,7 @@ collectInfoFromFile(buildingBlocks, info);
 (async () => {
   const chunks = await chunksPromise;
   Object.entries(chunks).forEach(([, value]) => {
-    collectInfoFromFile(value, info);
+    collectInfoFromFile(value as typeof buildingBlocks, info);
   });
   await fs.writeFile('./data/80days.format.json', prettyJson(info));
   const types = new TypeGenerator(info).generate();

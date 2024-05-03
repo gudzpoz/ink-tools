@@ -15,23 +15,36 @@
       Use translated JSON:
       <input type="file" @change="(e) => updateStoryWithTranslatedJson(e)" />
     </label>
+    <div>
+      Debug:
+      <label>
+        <input type="checkbox" v-model="debug.conditions" /> Conditions
+      </label>
+      <label>
+        <input type="checkbox" v-model="debug.cycles" /> Cycles/Sequences
+      </label>
+      <label>
+        <input type="checkbox" v-model="debug.diverts" /> Diverts
+      </label>
+      <label>
+        <input type="checkbox" v-model="debug.functions" /> Functions
+      </label>
+    </div>
   </div>
-  <div :class="{ inline: options[0]?.inline }">
+  <div class="body" :class="{ inline: options[0]?.inline }">
     <div v-for="line in lines" :key="line">
       <p v-html="line" />
     </div>
     <ul>
       <li v-for="option, i in options" :key="option.link">
-        <button type="button" @click="select(i)">
-          {{ option.text }}
-        </button>
+        <button type="button" @click="select(i)" v-html="option.text" :disabled="!option.condition" />
       </li>
     </ul>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 import { InkStoryRunner, Options } from './story';
 import { InkRootNode } from '../types';
@@ -47,6 +60,13 @@ const knotSelect = ref<HTMLSelectElement>();
 
 const lines = ref(['']);
 const options = ref<Options>([]);
+
+const debug = ref({
+  conditions: false,
+  cycles: false,
+  functions: false,
+  diverts: false,
+});
 
 const storyUniqueId = ref(0);
 let timeOutHandle: number | null = null;
@@ -117,12 +137,18 @@ async function updateStoryWithTranslatedJson(e: Event) {
   story.loadExternalChunk(name, translatedJson);
   await selectNewKnot(knotSelect.value?.value ?? 0);
 }
+
+const displayConditions = computed(() => (debug.value.conditions ? 'inline-flex' : 'none'));
+const displayCycles = computed(() => (debug.value.cycles ? 'inline-flex' : 'none'));
+const displayDiverts = computed(() => (debug.value.diverts ? 'inline-flex' : 'none'));
+const displayFunctions = computed(() => (debug.value.functions ? 'inline-flex' : 'none'));
 </script>
-<style scoped>
+<style>
 div.header {
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
+  flex-wrap: wrap;
 }
 div.inline > div:nth-last-child(2), div.inline > div:nth-last-child(2) > p {
   display: inline;
@@ -130,5 +156,51 @@ div.inline > div:nth-last-child(2), div.inline > div:nth-last-child(2) > p {
 div.inline > ul, div.inline > ul > li {
   display: inline;
   padding-left: 0;
+}
+
+span {
+    font-size: 0.5em;
+}
+span.condition {
+    font-family: monospace;
+    display: inline-flex;
+    flex-direction: column;
+    text-align: center;
+    vertical-align: top;
+    font-size: 1em;
+}
+span.condition > span {
+    display: block;
+}
+span.condition > span.result.false::after {
+    display: block;
+    content: "(skipped)";
+    text-align: right;
+}
+span.condition > span.result.false.has_otherwise::after {
+    content: "- else:";
+}
+span.result {
+    color: red;
+}
+
+span.start::before {
+    content: "{{";
+}
+span.end::after {
+    content: "}}";
+}
+
+div.body > div span.condition {
+  display: v-bind(displayConditions);
+}
+div.body > div span.start, div.body > div span.end {
+  display: v-bind(displayCycles);
+}
+div.body > div span.divert {
+  display: v-bind(displayDiverts);
+}
+div.body > div span.expr, div.body > div span.call {
+  display: v-bind(displayFunctions);
 }
 </style>

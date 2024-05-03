@@ -3,7 +3,6 @@ import type {
   Type_sequence,
 } from '../auto-types';
 import {
-  TypedCycleNode,
   annotateInkBlockType,
   type InkBlock,
   type InkBuildingBlockExpr,
@@ -12,7 +11,9 @@ import {
   type InkExpr,
   type InkFuncType,
   type InkRootNode,
+  type TypedCycleNode,
 } from '../types';
+import PoorOldInkSerializer from '../decompiler';
 
 type InkVariableType = string | number | boolean;
 
@@ -22,6 +23,7 @@ export type Options = {
   text: string,
   link: string,
   inline: boolean,
+  condition: boolean,
 }[];
 
 type InkCallStack = JSONPath[];
@@ -37,6 +39,13 @@ interface InkReturnValue {
   returned: boolean;
   value: InkVariableType;
   name: string;
+}
+
+function escapeHtml(html: string): string {
+  const text = document.createTextNode(html);
+  const p = document.createElement('p');
+  p.appendChild(text);
+  return p.innerHTML;
 }
 
 /**
@@ -62,10 +71,13 @@ export class InkStoryRunner {
 
   private outputBuffer: string[];
 
+  private decompiler: PoorOldInkSerializer;
+
   constructor(public root: InkRootNode) {
     this.chunkCache = {};
     this.returnStack = [];
     this.outputBuffer = [];
+    this.decompiler = new PoorOldInkSerializer(root);
     this.environment = this.newEnvironment();
   }
 
@@ -347,6 +359,9 @@ export class InkStoryRunner {
     );
   }
 
+  /**
+   * 这边是主要故事内容。
+   */
   private async getNext(): Promise<string | Options | null> {
     const ip = this.getIp();
     const current = await this.getCurrent();
@@ -355,17 +370,17 @@ export class InkStoryRunner {
       throw new Error('Invalid IP');
     }
     if (!current) {
+      let last: string | number = '';
       do {
-        while (typeof ip.pop() === 'number') {
-          // until goes a level up
-        }
-        if (ip.length === 0 || typeof ip[ip.length - 1] !== 'number') {
-          return this.throwError('ended');
-        }
-        (ip[ip.length - 1] as number) += 1;
-      // eslint-disable-next-line no-await-in-loop
-      } while (!(await this.getCurrent()));
-      return null;
+        last = ip.pop()!;
+        // until goes a level up
+      } while (typeof last === 'number');
+      if (ip.length === 0 || typeof ip[ip.length - 1] !== 'number') {
+        return this.throwError('ended');
+      }
+      (ip[ip.length - 1] as number) += 1;
+      return (last === 'cycle' || last === 'sequence')
+        ? ` <span class="end">${last}</span>` : null;
     }
     (ip[ip.length - 1] as number) += 1;
 
@@ -383,42 +398,52 @@ export class InkStoryRunner {
           (ip[ip.length - 1] as number) -= 1;
           ip.push('otherwise', 0);
         }
-        return this.collectOutputBuffer();
+        const cond = condition ? 'true' : 'false';
+        return `${this.collectOutputBuffer() ?? ''}
+<span class="condition"><span class="${cond}">${
+  escapeHtml(this.decompiler.serializeExpr(typed.value.condition))
+}</span><span class="result ${cond} ${
+  typed.value.otherwise ? 'has_otherwise' : ''
+}">=${escapeHtml(JSON.stringify(condition))}</span></span>`;
       }
       case 'building': {
         const output = await this.evaluateExpr(typed.value);
-        return `${this.collectOutputBuffer() ?? ''}${output as string}`;
+        return `<span class="call">${escapeHtml(typed.value.buildingBlock)}()</span>
+        <br>${this.collectOutputBuffer() ?? ''}${output as string}`;
       }
       case 'do': {
         await this.evaluateExpr(typed.value.doFuncs);
-        return this.collectOutputBuffer();
+        return `<span class="expr">${escapeHtml(this.decompiler.serializeDoFuncsNode(typed.value))}</span>
+        <br>${this.collectOutputBuffer() ?? ''}`;
       }
       case 'divert': {
         await this.divertTo(typed.value.divert);
-        return null;
+        return `<span class="divert">-&gt; ${escapeHtml(typed.value.divert)}</span>`;
       }
       case 'cycle':
       case 'sequence': {
-        const [, cycleI] = this.getCycleDetails(typed);
+        const [contents, cycleI] = this.getCycleDetails(typed);
         const key = typed.type;
         (ip[ip.length - 1] as number) -= 1;
         ip.push(key, cycleI, 0);
-        return null;
+        return `<span class="start">${typed.type}(${cycleI + 1}/${contents.length})</span> `;
       }
       case 'option': {
-        let prefix = '';
         const option = typed.value;
         const options: Options = [{
-          text: prefix + option.option,
+          text: option.option,
           link: option.linkPath,
           inline: option.inlineOption ?? false,
+          condition: true,
         }];
         if (option.condition) {
           const condition = await this.evaluateExpr(option.condition);
-          prefix = this.collectOutputBuffer() ?? '';
-          if (!condition) {
-            options.pop();
-          }
+          options[0].condition = !!condition;
+          options[0].text = `${this.collectOutputBuffer() ?? ''}
+<span class="condition"><span class="${condition ? 'true' : 'false'}">${
+  escapeHtml(this.decompiler.serializeExpr(option.condition))
+}</span><span class="result">=${JSON.stringify(condition)}</span></span>
+${options[0].text}`;
         }
         const peek = await this.getCurrent();
         if (!peek) {
@@ -509,6 +534,7 @@ export class InkStoryRunner {
         text: '>>> No option offered. Please report this bug. <<<',
         link: this.getIp()[0] as string,
         inline: false,
+        condition: false,
       }];
     }
     return text;

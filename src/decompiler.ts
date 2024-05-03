@@ -13,8 +13,10 @@ import {
   Type_returnNode,
   Type_sequenceNode,
   Type_set,
-} from '../auto-types';
-import { InkBlock, InkChunkNode, InkChunkWithStitches, InkFuncType, InkRootNode } from '../types';
+} from './auto-types';
+import {
+  InkBlock, InkChunkNode, InkChunkWithStitches, InkFuncType, InkRootNode,
+} from './types';
 
 /**
  * 把 Ink JSON 文件反序列化为 Ink 文本。
@@ -25,7 +27,9 @@ import { InkBlock, InkChunkNode, InkChunkWithStitches, InkFuncType, InkRootNode 
  */
 class PoorOldInkSerializer {
   root: InkRootNode;
+
   indentation: number;
+
   argStack: { args: Set<string>, refs: Set<string> }[];
 
   constructor(root: InkRootNode) {
@@ -45,12 +49,12 @@ class PoorOldInkSerializer {
   }
 
   nl() {
-    return '\n' + '  '.repeat(this.indentation);
+    return `\n${'  '.repeat(this.indentation)}`;
   }
 
   checkIfIsArg(name: Type_paramsForFuncs[number], nestLevel: number): string {
     if (typeof name === 'number' || typeof name === 'boolean'
-      || typeof name !== 'string' && !(name as { get: Type_get }).get) {
+      || ((typeof name !== 'string') && !(name as { get: Type_get }).get)) {
       throw new Error(`Unknown arg type: ${name}`);
     }
     /**
@@ -76,10 +80,10 @@ class PoorOldInkSerializer {
       throw new Error(`Unknown divert type: ${divert}`);
     }
     if (divert.startsWith(':')) {
+      // eslint-disable-next-line no-param-reassign
       divert = divert.slice(1);
     }
-    divert = divert.replace(/:/g, '.');
-    return divert;
+    return divert.replace(/:/g, '.');
   }
 
   serializeExpr(expr: Type_set[number]): string {
@@ -95,15 +99,15 @@ class PoorOldInkSerializer {
     }
     if ((expr as Type_buildingBlockWithParams).buildingBlock !== undefined) {
       const { buildingBlock, params } = expr as Type_buildingBlockWithParams;
-      let paramList = Array.isArray(params)
+      const paramList = Array.isArray(params)
         ? params
         : Object.keys(params).sort()
-            .filter((k) => params[k as any])
-            .map((k) => params[k as any]!);
+          .filter((k) => params[k as never])
+          .map((k) => params[k as never]!);
       return `${buildingBlock}(${paramList.map((p) => this.serializeExpr(p)).join(', ')})`;
     }
     const { func, params } = expr as Type_funcWithParams;
-    const op: InkFuncType = func as any;
+    const op = func as InkFuncType;
     const [param1, param2] = params;
     switch (op) {
       case 'FlagIsSet':
@@ -152,7 +156,7 @@ class PoorOldInkSerializer {
           return `~ ${set[0]} = ${set[1]}`;
         }
         return `~ ${this.serializeExpr(
-          func as Type_funcWithParams | Type_buildingBlockWithParams
+          func as Type_funcWithParams | Type_buildingBlockWithParams,
         )}`;
       })
       .join(this.nl());
@@ -169,9 +173,9 @@ class PoorOldInkSerializer {
     if (typeof block === 'string') {
       const s = block.replace(/^-/, '\\-');
       if (s.indexOf('<br><br>') !== -1) {
-        return s.replace('<br><br>', '<br><br>' + this.nl().repeat(2));
+        return s.replace('<br><br>', `<br><br>${this.nl().repeat(2)}`);
       }
-      return s + ' <>';
+      return `${s} <>`;
     }
 
     if ((block as Type_actionTag).action !== undefined) {
@@ -184,13 +188,12 @@ class PoorOldInkSerializer {
 
     if ((block as Type_returnNode).return !== undefined) {
       return `${this.nl()}~ return ${this.serializeExpr(
-        (block as Type_returnNode).return
+        (block as Type_returnNode).return,
       )}${this.nl()}`;
     }
 
     if ((block as Type_customDictionary).dictionary !== undefined) {
-      const { dictionary, storyCustomContentClass } =
-        block as Type_customDictionary;
+      const { dictionary, storyCustomContentClass } = block as Type_customDictionary;
       return `${this.nl()}# ${storyCustomContentClass}: ${JSON.stringify(dictionary)}`;
     }
 
@@ -199,9 +202,11 @@ class PoorOldInkSerializer {
     }
 
     if ((block as Type_optionLink).option !== undefined) {
-      const { option, linkPath, condition, inlineOption } = block as Type_optionLink;
+      const {
+        option, linkPath, condition, inlineOption,
+      } = block as Type_optionLink;
       const postfix = inlineOption ? ' <>' : '';
-      const marker = `+ `;
+      const marker = '+ ';
       const cond = condition ? `{${this.serializeExpr(condition)}} ` : '';
       return `${this.nl()}${marker}${cond}${option}${postfix}${
         this.nl()
@@ -213,7 +218,7 @@ class PoorOldInkSerializer {
       let s = `{${this.nl()}  - ${this.serializeExpr(condition)}:${this.nl()}${
         this.serializeBlocks(then)
       }`;
-      if (otherwise && otherwise.filter((s) => typeof s !== 'string' || s.trim() !== '').length > 0) {
+      if (otherwise && otherwise.filter((ss) => typeof ss !== 'string' || ss.trim() !== '').length > 0) {
         s += `${this.nl()}  - else:${this.nl()}${this.serializeBlocks(otherwise)}`;
       }
       s += `${this.nl()}}${this.nl()}`;
@@ -224,7 +229,9 @@ class PoorOldInkSerializer {
       || (block as Type_sequenceNode).sequence !== undefined) {
       const isCycle = (block as Type_cycleNode).cycle;
       const key = isCycle ? 'cycle' : 'stopping';
-      const nested: InkBlock[][] = isCycle ? (block as Type_cycleNode).cycle : (block as Type_sequenceNode).sequence;
+      const nested: InkBlock[][] = isCycle
+        ? (block as Type_cycleNode).cycle
+        : (block as Type_sequenceNode).sequence;
       return `{ ${key}:${this.nl()}  - ${
         nested.map((blocks) => this.serializeBlocks(blocks)).join(`${this.nl()}  - `)
       }${this.nl()}}`;
@@ -232,7 +239,7 @@ class PoorOldInkSerializer {
 
     if ((block as Type_divertNode).divert !== undefined) {
       const { divert } = block as Type_divertNode;
-      return `-> ${this.fixDivertFormat(divert)}${this.nl()}`
+      return `-> ${this.fixDivertFormat(divert)}${this.nl()}`;
     }
 
     throw new Error(`Unknown block type: ${Object.keys(block)}`);
@@ -248,7 +255,7 @@ class PoorOldInkSerializer {
     return `=== function ${name} (${
       [...args.args].sort()
         .filter((arg) => arg.startsWith(`__bb${name}`))
-        .map((arg) => args.refs.has(arg) ? `ref ${arg}` : arg)
+        .map((arg) => (args.refs.has(arg) ? `ref ${arg}` : arg))
         .join(', ')
     }) ===${this.nl()}${serialization}`;
   }
@@ -267,8 +274,7 @@ INCLUDE indexed-content.ink
           .join('\n'),
         'indexed-content.ink': Object.entries(root['indexed-content'].ranges)
           .map(
-            ([name], i) =>
-              `INCLUDE content/${String(i + 1).padStart(4, '0')}-${name}.ink`
+            ([name], i) => `INCLUDE content/${String(i + 1).padStart(4, '0')}-${name}.ink`,
           )
           .join('\n'),
         'buildingBlocks.ink': Object.entries(root.buildingBlocks)
@@ -291,7 +297,7 @@ INCLUDE indexed-content.ink
     const content = file as InkChunkWithStitches;
     return `=== ${name} ===${this.nl()}${this.nl()}${
       Object.entries(content.stitches).map(
-        ([stitch, blocks]) => `= ${stitch}${this.nl()}${this.serializeBlocks(blocks.content)}`
+        ([stitch, blocks]) => `= ${stitch}${this.nl()}${this.serializeBlocks(blocks.content)}`,
       ).join(this.nl())
     }`;
   }
