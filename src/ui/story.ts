@@ -81,6 +81,10 @@ export class InkStoryRunner {
     this.environment = this.newEnvironment();
   }
 
+  getVariables() {
+    return this.environment.variables;
+  }
+
   newEnvironment(): InkEnvironment {
     return {
       variables: Object.fromEntries(Object.entries(this.root.variables)),

@@ -30,6 +30,15 @@
         <input type="checkbox" v-model="debug.functions" /> Functions
       </label>
     </div>
+    <div>
+      Variables:
+      <button type="button" @click="alertUsage">
+        Edit
+      </button>
+      <button type="button" @click="resetVariables">
+        Reset
+      </button>
+    </div>
   </div>
   <div class="body" :class="{ inline: options[0]?.inline }">
     <div v-for="line in lines" :key="line">
@@ -44,7 +53,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import {
+  computed, onMounted, ref,
+} from 'vue';
 
 import { InkStoryRunner, Options } from './story';
 import { InkRootNode } from '../types';
@@ -54,6 +65,7 @@ import rootJson from '../../data/80days.json';
 // @ts-expect-error: Excessive stack depth comparing types
 const root: InkRootNode = rootJson;
 const story = new InkStoryRunner(root);
+const globalVariables = ref<ReturnType<typeof story.getVariables>>({});
 
 const stories = Object.keys(root['indexed-content'].ranges);
 const knotSelect = ref<HTMLSelectElement>();
@@ -103,11 +115,31 @@ async function selectNewKnot(i: string | number) {
   lines.value = [''];
   options.value = [];
   await story.init(stories[typeof i === 'string' ? parseInt(i, 10) : i]);
+  const variables = story.getVariables();
+  Object.entries(globalVariables.value).forEach(([k, v]) => {
+    variables[k] = v;
+  });
   await fetchMore();
+}
+
+declare global {
+  interface Window {
+    ink: Record<string, string | number | boolean>;
+  }
 }
 
 onMounted(async () => {
   await selectNewKnot(0);
+  window.ink = new Proxy({}, {
+    get(_: never, p: string) {
+      return story.getVariables()[p];
+    },
+    set(_: never, p: string, v: string | number | boolean) {
+      globalVariables.value[p] = v;
+      story.getVariables()[p] = v;
+      return true;
+    },
+  });
 });
 
 async function select(i: number) {
@@ -115,6 +147,23 @@ async function select(i: number) {
   options.value = [];
   story.selectOption(value, i);
   await fetchMore();
+}
+
+function alertUsage() {
+  // eslint-disable-next-line no-alert
+  alert(`Press F12 to open up a "Console" and type:
+    ink.<variable> = newValue;
+to set variable values. For example:
+
+    ink.banksize = 3;
+
+    ink.money = 1000;
+
+These variables will be restored to the value you set when you restart the story (until you press "Reset").`);
+}
+
+function resetVariables() {
+  globalVariables.value = {};
 }
 
 async function updateStoryWithTranslatedJson(e: Event) {
@@ -125,10 +174,12 @@ async function updateStoryWithTranslatedJson(e: Event) {
   const [file] = files;
   const [name, ext] = file.name.split('.');
   if (ext !== 'json') {
+    // eslint-disable-next-line no-alert
     alert('Please select a JSON file');
     return;
   }
   if (root['indexed-content'].ranges[name] === undefined) {
+    // eslint-disable-next-line no-alert
     alert('Check your JSON filename');
     return;
   }
