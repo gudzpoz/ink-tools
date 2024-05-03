@@ -21,6 +21,7 @@ type JSONPath = (string | number)[];
 export type Options = {
   text: string,
   link: string,
+  inline: boolean,
 }[];
 
 type InkCallStack = JSONPath[];
@@ -49,6 +50,8 @@ async function evaluateSequentially(promises: (() => Promise<unknown>)[]): Promi
     await promises[i]();
   }
 }
+
+type Message = 'return' | 'ended' | 'divert_in_function';
 
 export class InkStoryRunner {
   environment: InkEnvironment;
@@ -94,15 +97,23 @@ export class InkStoryRunner {
     const chunkUrl = new URL(`../../data/chunks/${name}.json`, import.meta.url)
       .href;
     const chunk = await fetch(chunkUrl).then((r) => r.json());
-    this.chunkCache[name] = chunk;
+    this.loadExternalChunk(name, chunk);
     return chunk;
   }
 
-  private expectError(e: unknown, message: 'return' | 'ended' | 'divert_in_function') {
+  loadExternalChunk(name: string, json: InkChunkNode) {
+    this.chunkCache[name] = json;
+  }
+
+  private expectError(e: unknown, message: Message) {
     if (e instanceof Error && e.message === message) {
       return true;
     }
     return false;
+  }
+
+  private throwError(message: Message): never {
+    throw new Error(message);
   }
 
   private getVar(name: string) {
@@ -158,7 +169,7 @@ export class InkStoryRunner {
         const eax = this.returnStack[this.returnStack.length - 1];
         eax.returned = true;
         eax.value = result;
-        throw new Error('return');
+        return this.throwError('return');
       }
       case 'func': {
         return this.evaluateFuncExpr(typed.value);
@@ -239,7 +250,7 @@ export class InkStoryRunner {
         // 函数里面出现了 divert，不知道怎么处理。总之就清空 stack 然后跳转吧……
         this.environment.callStack = [[]];
         await this.divertTo(typed.value.divert);
-        throw new Error('divert_in_function');
+        return this.throwError('divert_in_function');
       }
       default:
         throw new Error(`Unknown node: ${typed.type} (${Object.keys(blocks)})`);
@@ -349,7 +360,7 @@ export class InkStoryRunner {
           // until goes a level up
         }
         if (ip.length === 0 || typeof ip[ip.length - 1] !== 'number') {
-          throw new Error('ended');
+          return this.throwError('ended');
         }
         (ip[ip.length - 1] as number) += 1;
       // eslint-disable-next-line no-await-in-loop
@@ -400,6 +411,7 @@ export class InkStoryRunner {
         const options: Options = [{
           text: prefix + option.option,
           link: option.linkPath,
+          inline: option.inlineOption ?? false,
         }];
         if (option.condition) {
           const condition = await this.evaluateExpr(option.condition);
@@ -457,7 +469,7 @@ export class InkStoryRunner {
       ip[0] = absKnot;
       ip.push(0);
     } else if (Object.keys(chunk).length === 0) {
-      throw new Error('ended');
+      this.throwError('ended');
     } else {
       const knot = chunk as InkChunkWithStitches;
       const stitch = absStitch ?? knot.initial;
@@ -476,12 +488,14 @@ export class InkStoryRunner {
     try {
       const text = await this.getNext();
       if (!text) {
-        return await this.next();
+        return await this.getUntilNext();
       }
       return text;
     } catch (e) {
       if (!this.expectError(e, 'divert_in_function')) {
-        console.log(e);
+        if (!this.expectError(e, 'ended')) {
+          console.log(e);
+        }
         return null;
       }
       return await this.getUntilNext();
@@ -494,6 +508,7 @@ export class InkStoryRunner {
       return [{
         text: '>>> No option offered. Please report this bug. <<<',
         link: this.getIp()[0] as string,
+        inline: false,
       }];
     }
     return text;

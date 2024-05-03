@@ -8,7 +8,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "unpack": "vite-node src/cli/unpack.ts",
     "decompile": "vite-node src/cli/decompile.ts",
-    "schema": "typeconv -f ts -t oapi -o schema src/auto-types.ts src/types.ts"
+    "schema": "typeconv -f ts -t oapi -o schema src/auto-types.ts src/types.ts",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "keywords": [],
   "author": "",

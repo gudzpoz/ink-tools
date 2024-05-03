@@ -1,27 +1,32 @@
 <template>
-  <label>
-    Starting Knot:
-    <select ref="knotSelect" @change="(e) => selectNewKnot((e.target as HTMLSelectElement).value)">
-      <option v-for="story, i in stories" :key="story" :value="i">
-        {{ String(i + 1).padStart(4, '0') }}-{{ story }}
-      </option>
-    </select>
-  </label>
-  <button type="button" @click="selectNewKnot(knotSelect?.value ?? 0)">
-    Restart
-  </button>
-  <div>
+  <div class="header">
+    <label>
+      Starting Knot:
+      <select ref="knotSelect" @change="(e) => selectNewKnot((e.target as HTMLSelectElement).value)">
+        <option v-for="story, i in stories" :key="story" :value="i">
+          {{ String(i + 1).padStart(4, '0') }}-{{ story }}
+        </option>
+      </select>
+    </label>
+    <button type="button" @click="selectNewKnot(knotSelect?.value ?? 0)">
+      Restart
+    </button>
+    <label>
+      Use translated JSON:
+      <input type="file" @change="(e) => updateStoryWithTranslatedJson(e)" />
+    </label>
+  </div>
+  <div :class="{ inline: options[0]?.inline }">
     <div v-for="line in lines" :key="line">
       <p v-html="line" />
     </div>
-  </div>
-  <div>
-    <button
-      type="button"
-      v-for="option, i in options"
-      :key="option.link"
-      @click="select(i)"
-    >{{ option.text }}</button>
+    <ul>
+      <li v-for="option, i in options" :key="option.link">
+        <button type="button" @click="select(i)">
+          {{ option.text }}
+        </button>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -43,12 +48,17 @@ const knotSelect = ref<HTMLSelectElement>();
 const lines = ref(['']);
 const options = ref<Options>([]);
 
+const storyUniqueId = ref(0);
 let timeOutHandle: number | null = null;
 async function fetchMore(delay: number = 20) {
   if (options.value.length !== 0) {
     return;
   }
+  const startingId = storyUniqueId.value;
   const line = await story.next();
+  if (startingId !== storyUniqueId.value) {
+    return;
+  }
   if (typeof line === 'string') {
     if (line !== '<br><br>') {
       lines.value[lines.value.length - 1] += line;
@@ -69,11 +79,11 @@ async function selectNewKnot(i: string | number) {
     clearTimeout(timeOutHandle);
     timeOutHandle = null;
   }
+  storyUniqueId.value += 1;
   lines.value = [''];
   options.value = [];
   await story.init(stories[typeof i === 'string' ? parseInt(i, 10) : i]);
   await fetchMore();
-  fetchMore();
 }
 
 onMounted(async () => {
@@ -86,5 +96,39 @@ async function select(i: number) {
   story.selectOption(value, i);
   await fetchMore();
 }
+
+async function updateStoryWithTranslatedJson(e: Event) {
+  const { files } = (e.target as HTMLInputElement);
+  if (!files || files.length === 0) {
+    return;
+  }
+  const [file] = files;
+  const [name, ext] = file.name.split('.');
+  if (ext !== 'json') {
+    alert('Please select a JSON file');
+    return;
+  }
+  if (root['indexed-content'].ranges[name] === undefined) {
+    alert('Check your JSON filename');
+    return;
+  }
+  const json = await file.text();
+  const translatedJson = JSON.parse(json);
+  story.loadExternalChunk(name, translatedJson);
+  await selectNewKnot(knotSelect.value?.value ?? 0);
+}
 </script>
-<style scoped></style>
+<style scoped>
+div.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+div.inline > div:nth-last-child(2), div.inline > div:nth-last-child(2) > p {
+  display: inline;
+}
+div.inline > ul, div.inline > ul > li {
+  display: inline;
+  padding-left: 0;
+}
+</style>
