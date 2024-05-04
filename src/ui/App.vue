@@ -15,11 +15,11 @@
     </div>
     <div>
       <label>
-        Use translated JSON/CSV/ZIP:
+        Use Translated JSON/CSV/ZIP:
         <input type="file" @change="(e) => updateStoryWithTranslation(e)" />
       </label>
       <label>
-        <input type="checkbox" v-model="debug.original" /> Show original text
+        <input type="checkbox" v-model="debug.original" /> Show Original Text
       </label>
     </div>
     <div>
@@ -35,6 +35,9 @@
       </label>
       <label>
         <input type="checkbox" v-model="debug.functions" /> Functions
+      </label>
+      <label>
+        <input type="checkbox" v-model="debug.logPaths" /> Log Paths in F12 Console
       </label>
       <div>
         Variables:
@@ -61,7 +64,7 @@
           </select>
         </label>
         <button type="button" @click="clearSaves">
-          Clear saves
+          Clear Saves
         </button>
       </div>
     </div>
@@ -114,6 +117,7 @@ const debug = ref({
   functions: false,
   diverts: false,
   original: false,
+  logPaths: false,
 });
 
 function saveStory() {
@@ -360,6 +364,9 @@ async function updateStoryWithTranslation(e: Event) {
 }
 watch(() => debug.value.original, () => {
   story.useExternal = !debug.value.original;
+});
+watch(() => debug.value.logPaths, () => {
+  story.logPaths = !debug.value.logPaths;
 });
 
 const displayConditions = computed(() => (debug.value.conditions ? 'inline-flex' : 'none'));

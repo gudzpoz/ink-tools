@@ -82,8 +82,11 @@ export class InkStoryRunner {
 
   useExternal: boolean;
 
+  logPaths: boolean;
+
   constructor(root: InkRootNode) {
     this.useExternal = true;
+    this.logPaths = false;
     this.chunkCaches = {
       original: {
         '': root,
@@ -288,6 +291,9 @@ export class InkStoryRunner {
     switch (typed.type) {
       case 'value': {
         this.outputBuffer.push(typed.value as string);
+        if (this.logPaths) {
+          console.log(`@ ${this.returnStack[this.returnStack.length - 1].name}:`, typed.value);
+        }
         return typed.value;
       }
       case 'building':
@@ -445,6 +451,11 @@ export class InkStoryRunner {
     const typed = annotateInkBlockType(current);
     switch (typed.type) {
       case 'value': {
+        if (this.logPaths) {
+          (ip[ip.length - 1] as number) -= 1;
+          console.log(`@ ${ip.join('.')}:`, typed.value);
+          (ip[ip.length - 1] as number) += 1;
+        }
         return typed.value as string;
       }
       case 'condition': {
