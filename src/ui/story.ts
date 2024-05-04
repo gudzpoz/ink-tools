@@ -281,6 +281,7 @@ export class InkStoryRunner {
           value: '',
           name: buildingBlock,
         });
+        const callerSaved = params.map(([name]) => [name, this.getVar(name as string)]);
         params.forEach(([name, value]) => this.setVar(name as string, value));
         try {
           await this.evaluateBuildingBlocks(body);
@@ -290,6 +291,7 @@ export class InkStoryRunner {
             throw e;
           }
         }
+        callerSaved.forEach(([name, value]) => this.setVar(name as string, value));
         return this.returnStack.pop()!.value;
       }
       default:
