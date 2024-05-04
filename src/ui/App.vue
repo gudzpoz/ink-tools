@@ -1,8 +1,8 @@
 <template>
   <div class="header">
     <div>
-      <label>
-        Starting Knot:
+      <label class="select">
+        ⤷ 选择故事起点：
         <select ref="knotSelect" @change="(e) => selectNewKnot((e.target as HTMLSelectElement).value)">
           <option v-for="story, i in stories" :key="story" :value="i">
             {{ String(i + 1).padStart(4, '0') }}-{{ story }}
@@ -10,49 +10,49 @@
         </select>
       </label>
       <button type="button" @click="selectNewKnot(knotSelect?.value ?? 0)">
-        Restart
+        ⟳ 从头再来
       </button>
     </div>
     <div>
-      <label>
-        Use Translated JSON/CSV/ZIP:
+      <label class="file">
+        📤 上传翻译后的 JSON/CSV/ZIP 以替换文本
         <input type="file" @change="(e) => updateStoryWithTranslation(e)" />
       </label>
       <label>
-        <input type="checkbox" v-model="debug.original" /> Show Original Text
+        <input type="checkbox" v-model="debug.original" /> 📄 显示原文
       </label>
     </div>
     <div>
-      Debug:
+      显示附加信息：
       <label>
-        <input type="checkbox" v-model="debug.conditions" /> Conditions
+        <input type="checkbox" v-model="debug.conditions" /> ❗ 条件
       </label>
       <label>
-        <input type="checkbox" v-model="debug.cycles" /> Cycles/Sequences
+        <input type="checkbox" v-model="debug.cycles" /> ♻️ 循环文本（Cycles/Sequences）
       </label>
       <label>
-        <input type="checkbox" v-model="debug.diverts" /> Diverts
+        <input type="checkbox" v-model="debug.diverts" /> 🦘 跳转（Diverts）
       </label>
       <label>
-        <input type="checkbox" v-model="debug.functions" /> Functions
+        <input type="checkbox" v-model="debug.functions" /> ⚙️ 表达式与函数
       </label>
       <label>
-        <input type="checkbox" v-model="debug.logPaths" /> Log Paths in F12 Console
+        <input type="checkbox" v-model="debug.logPaths" /> 📝 在 F12 的 Console 中记录路径
       </label>
       <div>
-        Variables:
+        变量控制：
         <button type="button" @click="alertUsage">
-          Edit
+          🐞 如何使用
         </button>
         <button type="button" @click="resetVariables">
-          Reset
+          🗑️ 重置
         </button>
-        Flow:
+        存盘与读取：
         <button type="button" @click="quickLoad">
-          Q.Load
+          ⤴️ 上一个选项点
         </button>
-        <label>
-          Load:
+        <label class="select">
+          ⋙ 选择之前选项点
           <select ref="saveSelect" @change="(e) => loadStory((e.target as HTMLSelectElement).value)">
             <option
               v-for="save, i in saves"
@@ -64,7 +64,7 @@
           </select>
         </label>
         <button type="button" @click="clearSaves">
-          Clear Saves
+          🗑️ 清除存盘
         </button>
       </div>
     </div>
@@ -171,6 +171,7 @@ async function selectNewKnot(i: string | number) {
     clearTimeout(timeOutHandle);
     timeOutHandle = null;
   }
+  saves.value = [];
   clearContents();
   await story.init(stories[typeof i === 'string' ? parseInt(i, 10) : i]);
   const variables = story.getVariables();
@@ -242,15 +243,13 @@ function clearSaves() {
 
 function alertUsage() {
   // eslint-disable-next-line no-alert
-  alert(`Press F12 to open up a "Console" and type:
+  alert(`请按 F12 打开浏览器的开发者工具，并点击进入控制台（Console）。
+在 Console 里输入下面内容来改变变量值：
     ink.<variable> = newValue;
-to set variable values. For example:
-
+例如
     ink.banksize = 3;
-
     ink.money = 1000;
-
-These variables will be restored to the value you set when you restart the story (until you press "Reset").`);
+这些变量在输入之后以及每次故事从头运行时都会被设置成您所设定的值。（按“重置”按钮来恢复默认值。）`);
 }
 
 function resetVariables() {
@@ -299,12 +298,12 @@ async function updateStoryWithFile(
 ): Promise<boolean> {
   const ext = extension.toLowerCase();
   if (ext !== 'json' && ext !== 'csv' && ext !== 'zip') {
-    (shouldAlert ? alert : console.log)(`Please select a .json/.csv/.zip file: passed ${ext} (${stem})`);
+    (shouldAlert ? alert : console.log)(`请上传 .json/.csv/.zip 文件：实际上传了 ${ext}（${stem}）`);
     return false;
   }
   const name = /^[0-9]{4}-/.test(stem) ? stem.substring(5) : stem;
   if (ext !== 'zip' && name !== '' && root['indexed-content'].ranges[name] === undefined) {
-    (shouldAlert ? alert : console.log)(`Check your JSON/CSV filename: passed ${stem}`);
+    (shouldAlert ? alert : console.log)(`JSON/CSV 的文件名不符合：无对应 ${stem} 的 Ink 节点`);
     return false;
   }
   if (ext === 'csv') {
@@ -337,15 +336,15 @@ async function updateStoryWithFile(
           try {
             return await updateStoryWithFile(entryStem, entryExt, await data.async('arraybuffer'), false);
           } catch (e) {
-            console.log('Import error:', path, e);
+            console.log('导入错误：', path, e);
             return false;
           }
         })(),
       );
     });
-    alert(`It is going to take a while. After closing this alert, please wait until the story reloads.
+    alert(`导入可能会导致您的浏览器卡顿一段时间。开始导入后，请耐心等待直至故事重新加载。
 
-**Confirm** to start importing.`);
+关闭此对话框以**开始导入**。`);
     return (await Promise.all(promises)).some((b) => b);
   }
   return true;
@@ -407,10 +406,15 @@ span.condition > span {
 span.condition > span.result.false::after {
     display: block;
     content: "(skipped)";
-    text-align: right;
+    text-align: center;
 }
 span.condition > span.result.false.has_otherwise::after {
+    text-align: right;
     content: "- else:";
+}
+span.condition > span.result.true::after {
+    text-align: right;
+    content: "- then:";
 }
 span.result {
     color: red;
@@ -434,5 +438,28 @@ div.body > div span.divert {
 }
 div.body > div span.expr, div.body > div span.call {
   display: v-bind(displayFunctions);
+}
+
+label {
+  display: inline-block;
+}
+label.file, label.select {
+  flex-direction: column;
+  justify-content: left;
+  flex-wrap: wrap;
+  margin: 0.2em 3em;
+  background-color: #eee;
+  padding: 0.2em;
+  border-radius: 0.2em;
+  border: 1px solid #ccc;
+}
+label.file:hover {
+  background-color: #ddd;
+}
+label.file:active {
+  background-color: #bbb;
+}
+label.file > input {
+  display: none;
 }
 </style>
