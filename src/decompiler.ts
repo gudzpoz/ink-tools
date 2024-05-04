@@ -55,7 +55,7 @@ class PoorOldInkSerializer {
   checkIfIsArg(name: Type_paramsForFuncs[number], nestLevel: number): string {
     if (typeof name === 'number' || typeof name === 'boolean'
       || ((typeof name !== 'string') && !(name as { get: Type_get }).get)) {
-      throw new Error(`Unknown arg type: ${name}`);
+      throw new Error(`Unknown arg type: ${JSON.stringify(name)}`);
     }
     /**
      * 我们暂时把 double set + get 这种情况都看作是 ref 值。
@@ -77,7 +77,7 @@ class PoorOldInkSerializer {
 
   fixDivertFormat(divert: Type_paramsForFuncs[number]) {
     if (typeof divert !== 'string') {
-      throw new Error(`Unknown divert type: ${divert}`);
+      throw new Error(`Unknown divert type: ${JSON.stringify(divert)}`);
     }
     if (divert.startsWith(':')) {
       // eslint-disable-next-line no-param-reassign
@@ -104,7 +104,7 @@ class PoorOldInkSerializer {
         : Object.keys(params).sort()
           .filter((k) => params[k as never])
           .map((k) => params[k as never]!);
-      return `${buildingBlock}(${paramList.map((p) => this.serializeExpr(p)).join(', ')})`;
+      return `${buildingBlock}(${paramList.map((p) => this.serializeExpr(p as never)).join(', ')})`;
     }
     const { func, params } = expr as Type_funcWithParams;
     const op = func as InkFuncType;
@@ -242,7 +242,7 @@ class PoorOldInkSerializer {
       return `-> ${this.fixDivertFormat(divert)}${this.nl()}`;
     }
 
-    throw new Error(`Unknown block type: ${Object.keys(block)}`);
+    throw new Error(`Unknown block type: ${Object.keys(block).join(', ')}`);
   }
 
   serializeBuildingBlock(name: string, content: InkBlock[]) {
@@ -291,7 +291,7 @@ INCLUDE indexed-content.ink
     }
 
     if (Array.isArray(file)) {
-      return `=== ${name} ===${this.nl()}${this.serializeBlocks(file)}`;
+      return `=== ${name} ===${this.nl()}${this.serializeBlocks(file as InkBlock[])}`;
     }
 
     const content = file as InkChunkWithStitches;

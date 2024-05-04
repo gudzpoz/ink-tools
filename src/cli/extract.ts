@@ -45,7 +45,7 @@ class JSONPathExtractor {
         return;
       }
       path.push(key);
-      this.extractTranslatableFields(value, key, path);
+      this.extractTranslatableFields(value as never, key, path);
       path.pop();
     });
   }
@@ -72,7 +72,7 @@ await fs.mkdir('./serialization/translables/', { recursive: true });
 await extractor.export('./serialization/translables/$meta.buildingBlocks.csv');
 await Promise.all(Object.keys(rootNode['indexed-content'].ranges).map(async (knot, i) => {
   const file = `./data/chunks/${knot}.json`;
-  const json = JSON.parse(await fs.readFile(file, 'utf-8'));
+  const json = JSON.parse(await fs.readFile(file, 'utf-8')) as never;
   extractor.extractTranslatableFields(json, '', []);
   await extractor.export(`./serialization/translables/${String(i + 1).padStart(4, '0')}-${knot}.csv`);
 }));

@@ -21,7 +21,8 @@
   ],
   "ignorePatterns": [
     "vite.config.ts",
-    ".eslintrc.cjs"
+    ".eslintrc.cjs",
+    "dist/**/*"
   ],
   "rules": {
     "class-methods-use-this": "off",

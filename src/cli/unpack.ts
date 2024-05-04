@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 
-import type { InkRootNode } from '../types';
+import type { InkChunkNode, InkChunkWithStitches, InkRootNode } from '../types';
 
 import gameDataIndexJson from '../../data/80days.json';
 
@@ -24,7 +24,7 @@ async function splitChunks() {
     const [startS, lengthS] = value.split(' ');
     const start = parseInt(startS, 10);
     const length = parseInt(lengthS, 10);
-    const chunk = JSON.parse(content.subarray(start, start + length).toString('utf-8'));
+    const chunk = JSON.parse(content.subarray(start, start + length).toString('utf-8')) as InkChunkNode;
     const pretty = JSON.stringify(chunk, null, 2);
     typeCheckers.push(`import testeeJson${i} from '../data/chunks/${filename}';
 const testeeJson${i}Typed: InkChunkNode = testeeJson${i};
@@ -34,9 +34,10 @@ console.assert(testeeJson${i}Typed);
     if (pretty.indexOf('"initial"') === -1) {
       chunks[key] = { chunk };
     } else {
-      Object.entries(chunk.stitches).forEach(([stitche, contentValue]) => {
-        chunks[`${key}.${stitche}`] = contentValue as object;
-      });
+      Object.entries((chunk as InkChunkWithStitches).stitches)
+        .forEach(([stitche, contentValue]) => {
+          chunks[`${key}.${stitche}`] = contentValue as object;
+        });
     }
     return fs.writeFile(`./data/chunks/${filename}`, pretty);
   }));
@@ -258,29 +259,27 @@ class TypeGenerator {
 function prettyJson(o: object) {
   return JSON.stringify(
     o,
-    (_k, v) => (v instanceof Set ? [...v].sort() : v),
+    (_k, v) => (v instanceof Set ? [...v].sort() : v) as never,
     2,
   );
 }
 
 const info: Info = {};
 collectInfoFromFile(buildingBlocks, info);
-(async () => {
-  const chunks = await chunksPromise;
-  Object.entries(chunks).forEach(([, value]) => {
-    collectInfoFromFile(value as typeof buildingBlocks, info);
-  });
-  await fs.writeFile('./data/80days.format.json', prettyJson(info));
-  const types = new TypeGenerator(info).generate();
-  if (process.env.GENERATE_TYPES !== undefined) {
-    await fs.writeFile('./src/auto-types.ts', types);
-  }
-  await fs.writeFile(
-    './data/80days.enum.json',
-    prettyJson(
-      Object.fromEntries(Object.entries(info)
-        .filter(([, v]) => v.values.size === 1 && v.values.has('string') && v.nestedValues.size === 0)
-        .map(([k, v]) => [k, v.valueEnumeration])),
-    ),
-  );
-})();
+const chunks = await chunksPromise;
+Object.entries(chunks).forEach(([, value]) => {
+  collectInfoFromFile(value as typeof buildingBlocks, info);
+});
+await fs.writeFile('./data/80days.format.json', prettyJson(info));
+const types = new TypeGenerator(info).generate();
+if (process.env.GENERATE_TYPES !== undefined) {
+  await fs.writeFile('./src/auto-types.ts', types);
+}
+await fs.writeFile(
+  './data/80days.enum.json',
+  prettyJson(
+    Object.fromEntries(Object.entries(info)
+      .filter(([, v]) => v.values.size === 1 && v.values.has('string') && v.nestedValues.size === 0)
+      .map(([k, v]) => [k, v.valueEnumeration])),
+  ),
+);
