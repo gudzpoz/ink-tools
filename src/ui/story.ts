@@ -1,7 +1,7 @@
 import type {
   Type_funcWithParams,
   Type_sequence,
-} from './auto-types';
+} from '../auto-types';
 import {
   annotateInkBlockType,
   type InkBlock,
@@ -12,8 +12,8 @@ import {
   type InkFuncType,
   type InkRootNode,
   type TypedCycleNode,
-} from './types';
-import PoorOldInkSerializer from './decompiler';
+} from '../types';
+import PoorOldInkSerializer from '../decompiler';
 
 type InkVariableType = string | number | boolean;
 

@@ -88,7 +88,7 @@ import {
 } from 'vue';
 import JSZip from 'jszip';
 
-import { InkStoryRunner, Options } from '../story';
+import { InkStoryRunner, Options } from './story';
 import { InkRootNode } from '../types';
 
 import rootJson from '../../data/80days.json';
