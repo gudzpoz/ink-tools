@@ -6,7 +6,7 @@
  * `buildingBlock` 是自定义的函数。
  */
 export type Type_buildingBlockWithParams = {
-  buildingBlock: Type_buildingBlock;
+  buildingBlock: string;
   params: Type_paramsForbuildingBlocks;
 };
 
@@ -14,7 +14,7 @@ export type Type_buildingBlockWithParams = {
  * `func` 是引擎内置的例如 `Equals, HasRead` 等函数。
  */
 export type Type_funcWithParams = {
-  func: Type_func;
+  func: string;
   params: Type_paramsForFuncs;
 };
 
@@ -41,13 +41,13 @@ export type Type_optionLink = {
   /**
    * [可翻译]
    */
-  option: Type_option;
-  linkPath: Type_linkPath;
+  option: string;
+  linkPath: string;
   condition?: Type_condition;
   /**
    * 看群里的代码似乎是 Ink 里 `<>` 的意思。
    */
-  inlineOption?: Type_inlineOption;
+  inlineOption?: boolean;
 };
 
 /**
@@ -92,7 +92,13 @@ export type Type_sequenceNode = {
  * `-> knot`
  */
 export type Type_divertNode = {
-  divert: Type_divert;
+  /**
+   * 看起来语法有 `:knot`, `:knot:stitche` 和 `stitche` 三种，
+   * 分别是绝对 knot 路径、绝对 stitche 路径和相对 stitche 路径。
+   *
+   * 当然，“现代” Ink 用的是 `knot.stitche` 的形式，要转换。
+   */
+  divert: string;
 };
 
 /**
@@ -136,53 +142,51 @@ export type Type_action = string;
  */
 export type Type_userInfo =
   | {
-    now: Type_now;
+    now: boolean;
   }
   | {
-    city?: Type_city;
-    generateSpeaker?: Type_generateSpeaker;
-    journey?: Type_journey;
+    city?: string;
+    generateSpeaker?: boolean;
+    journey?: string;
     /**
      * [可翻译]
      */
-    retelling?: Type_retelling;
+    retelling?: string;
     /**
      * [可翻译]
      */
-    speaker?: Type_speaker;
+    speaker?: string;
     /**
      * [可翻译]
      */
-    text: Type_text;
+    text: string;
   }
   | {
-    by: Type_by;
+    by: number;
   }
   | {
-    copyingJourney?: Type_copyingJourney;
-    duration?: Type_duration;
-    to: Type_to;
+    copyingJourney?: string;
+    duration?: number;
+    to: number | string;
   }
   | {
-    number: Type_number;
+    number: number;
   }
   | {
-    at: Type_at;
+    at: number | string;
   }
   | {
-    name: Type_name;
+    name: string;
   }
   | {
     /**
      * [可翻译]
      */
-    title: Type_title;
+    title: string;
   }
   | {
-    disable: Type_disable;
+    disable: boolean;
   };
-
-export type Type_now = boolean;
 
 export type Type_doFuncs = (
   | {
@@ -210,8 +214,6 @@ export type Type_set = (
 
 export type Type_return = Type_set[number];
 
-export type Type_func = string;
-
 export type Type_paramsForFuncs = (
   | number
   | boolean
@@ -236,80 +238,26 @@ export type Type_get =
     get: Type_get;
   };
 
-export type Type_buildingBlock = string;
-
 export type Type_condition = Type_somethingWithParams;
-
-export type Type_text = string;
 
 export type Type_cycle = Type_sequence;
 
-export type Type_by = number;
-
-export type Type_to = number | string;
-
-export type Type_number = number;
-
 export type Type_sequence = Type_then[];
-
-/**
- * 看起来语法有 `:knot`, `:knot:stitche` 和 `stitche` 三种，
- * 分别是绝对 knot 路径、绝对 stitche 路径和相对 stitche 路径。
- *
- * 当然，“现代” Ink 用的是 `knot.stitche` 的形式，要转换。
- */
-export type Type_divert = string;
-
-export type Type_at = number | string;
-
-export type Type_city = string;
-
-export type Type_journey = string;
-
-export type Type_generateSpeaker = boolean;
-
-export type Type_retelling = string;
-
-export type Type_option = string;
-
-export type Type_linkPath = string;
-
-export type Type_inlineOption = boolean;
-
-export type Type_storyCustomContentClass = string;
 
 export type Type_dictionary =
   | Record<never, never>
   | {
-    styleName: Type_styleName;
+    styleName: string;
   }
   | {
-    isNewspaper?: Type_isNewspaper;
+    isNewspaper?: boolean;
     /**
      * [可翻译]
      */
-    speakerName: Type_speakerName;
+    speakerName: string;
   };
 
 export type Type_customDictionary = {
   dictionary: Type_dictionary;
-  storyCustomContentClass: Type_storyCustomContentClass;
+  storyCustomContentClass: string;
 };
-
-export type Type_speaker = string;
-
-export type Type_duration = number;
-
-export type Type_name = string;
-
-export type Type_title = string;
-
-export type Type_styleName = string;
-
-export type Type_speakerName = string;
-
-export type Type_isNewspaper = boolean;
-
-export type Type_disable = boolean;
-
-export type Type_copyingJourney = string;

@@ -7,6 +7,7 @@
     "nightwatch.conf.*",
     "playwright.config.*",
     "src/cli/*",
+    "src/*",
   ],
   "compilerOptions": {
     "composite": true,

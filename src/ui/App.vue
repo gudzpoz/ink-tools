@@ -1,16 +1,18 @@
 <template>
   <div class="header">
-    <label>
-      Starting Knot:
-      <select ref="knotSelect" @change="(e) => selectNewKnot((e.target as HTMLSelectElement).value)">
-        <option v-for="story, i in stories" :key="story" :value="i">
-          {{ String(i + 1).padStart(4, '0') }}-{{ story }}
-        </option>
-      </select>
-    </label>
-    <button type="button" @click="selectNewKnot(knotSelect?.value ?? 0)">
-      Restart
-    </button>
+    <div>
+      <label>
+        Starting Knot:
+        <select ref="knotSelect" @change="(e) => selectNewKnot((e.target as HTMLSelectElement).value)">
+          <option v-for="story, i in stories" :key="story" :value="i">
+            {{ String(i + 1).padStart(4, '0') }}-{{ story }}
+          </option>
+        </select>
+      </label>
+      <button type="button" @click="selectNewKnot(knotSelect?.value ?? 0)">
+        Restart
+      </button>
+    </div>
     <div>
       <label>
         Use translated JSON/CSV/ZIP:
@@ -34,15 +36,34 @@
       <label>
         <input type="checkbox" v-model="debug.functions" /> Functions
       </label>
-    </div>
-    <div>
-      Variables:
-      <button type="button" @click="alertUsage">
-        Edit
-      </button>
-      <button type="button" @click="resetVariables">
-        Reset
-      </button>
+      <div>
+        Variables:
+        <button type="button" @click="alertUsage">
+          Edit
+        </button>
+        <button type="button" @click="resetVariables">
+          Reset
+        </button>
+        Flow:
+        <button type="button" @click="quickLoad">
+          Q.Load
+        </button>
+        <label>
+          Load:
+          <select ref="saveSelect" @change="(e) => loadStory((e.target as HTMLSelectElement).value)">
+            <option
+              v-for="save, i in saves"
+              :key="i"
+              :value="i"
+            >
+              #{{ saves.length - i }}@{{ save.title }}
+            </option>
+          </select>
+        </label>
+        <button type="button" @click="clearSaves">
+          Clear saves
+        </button>
+      </div>
     </div>
   </div>
   <div class="body" :class="{ inline: options[0]?.inline }">
@@ -64,7 +85,7 @@ import {
 } from 'vue';
 import JSZip from 'jszip';
 
-import { InkStoryRunner, Options } from './story';
+import { InkStoryRunner, Options } from '../story';
 import { InkRootNode } from '../types';
 
 import rootJson from '../../data/80days.json';
@@ -72,10 +93,17 @@ import rootJson from '../../data/80days.json';
 // @ts-expect-error: Excessive stack depth comparing types
 const root: InkRootNode = rootJson;
 const story = new InkStoryRunner(root);
+const saves = ref<{
+  save: unknown,
+  lines: string[],
+  options: Options,
+  title: string,
+}[]>([]);
 const globalVariables = ref<ReturnType<typeof story.getVariables>>({});
 
 const stories = Object.keys(root['indexed-content'].ranges);
 const knotSelect = ref<HTMLSelectElement>();
+const saveSelect = ref<HTMLSelectElement>();
 
 const lines = ref(['']);
 const options = ref<Options>([]);
@@ -88,6 +116,16 @@ const debug = ref({
   original: false,
 });
 
+function saveStory() {
+  const save = story.save();
+  saves.value.unshift({
+    save,
+    lines: lines.value.map((e) => e),
+    options: options.value.map((e) => e),
+    title: story.copyIp().join('.'),
+  });
+}
+
 const storyUniqueId = ref(0);
 let timeOutHandle: ReturnType<typeof setTimeout> | null = null;
 async function fetchMore(delay: number = 20) {
@@ -99,6 +137,9 @@ async function fetchMore(delay: number = 20) {
   if (startingId !== storyUniqueId.value) {
     return;
   }
+  if (saveSelect.value) {
+    saveSelect.value.selectedIndex = -1;
+  }
   if (typeof line === 'string') {
     if (line !== '<br><br>') {
       lines.value[lines.value.length - 1] += line;
@@ -109,9 +150,16 @@ async function fetchMore(delay: number = 20) {
   } else if (Array.isArray(line)) {
     lines.value[lines.value.length - 1] += ' ';
     options.value = line;
+    saveStory();
   } else {
     lines.value.push('Story Ended');
   }
+}
+
+function clearContents() {
+  storyUniqueId.value += 1;
+  lines.value = [''];
+  options.value = [];
 }
 
 async function selectNewKnot(i: string | number) {
@@ -119,9 +167,7 @@ async function selectNewKnot(i: string | number) {
     clearTimeout(timeOutHandle);
     timeOutHandle = null;
   }
-  storyUniqueId.value += 1;
-  lines.value = [''];
-  options.value = [];
+  clearContents();
   await story.init(stories[typeof i === 'string' ? parseInt(i, 10) : i]);
   const variables = story.getVariables();
   Object.entries(globalVariables.value).forEach(([k, v]) => {
@@ -155,6 +201,39 @@ async function select(i: number) {
   options.value = [];
   story.selectOption(value, i);
   await fetchMore();
+}
+
+async function loadStory(i: string) {
+  const to = parseInt(i, 10);
+  const { save, lines: savedLines, options: savedOptions } = saves.value[to];
+  clearContents();
+  saves.value = saves.value.splice(to);
+  await story.load(save as never);
+  lines.value = savedLines;
+  options.value = savedOptions;
+  if (savedOptions.length !== 0) {
+    await fetchMore();
+  }
+  if (knotSelect.value) {
+    knotSelect.value.selectedIndex = -1;
+  }
+}
+
+async function quickLoad() {
+  if (options.value.length === 0 && saves.value.length >= 1) {
+    await loadStory('0');
+    return;
+  }
+  if (saves.value.length >= 2) {
+    await loadStory('1');
+    return;
+  }
+  saves.value = [];
+  await selectNewKnot(knotSelect.value?.value ?? 0);
+}
+
+function clearSaves() {
+  saves.value.splice(0);
 }
 
 function alertUsage() {
@@ -291,9 +370,10 @@ const displayFunctions = computed(() => (debug.value.functions ? 'inline-flex' :
 <style>
 div.header {
   display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
+  flex-direction: column;
+  justify-content: left;
   flex-wrap: wrap;
+  margin: 0.2em 3em;
 }
 div.inline > div:nth-last-child(2), div.inline > div:nth-last-child(2) > p {
   display: inline;

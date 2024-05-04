@@ -1,7 +1,7 @@
 import type {
   Type_funcWithParams,
   Type_sequence,
-} from '../auto-types';
+} from './auto-types';
 import {
   annotateInkBlockType,
   type InkBlock,
@@ -12,8 +12,8 @@ import {
   type InkFuncType,
   type InkRootNode,
   type TypedCycleNode,
-} from '../types';
-import PoorOldInkSerializer from '../decompiler';
+} from './types';
+import PoorOldInkSerializer from './decompiler';
 
 type InkVariableType = string | number | boolean;
 
@@ -60,6 +60,10 @@ async function evaluateSequentially(promises: (() => Promise<unknown>)[]): Promi
   }
 }
 
+function shallowCopy<T extends object>(obj: T): T {
+  return Object.fromEntries(Object.entries(obj)) as T;
+}
+
 type Message = 'return' | 'ended' | 'divert_in_function';
 
 export class InkStoryRunner {
@@ -92,6 +96,25 @@ export class InkStoryRunner {
     this.outputBuffer = [];
     this.decompiler = new PoorOldInkSerializer(root);
     this.environment = this.newEnvironment();
+  }
+
+  save(): InkEnvironment {
+    return {
+      variables: shallowCopy(this.environment.variables),
+      history: Object.fromEntries(Object.entries(this.environment.history)
+        .map(([k, v]) => [k, shallowCopy(v)])),
+      callStack: [[...this.getIp()]],
+      cycleCounts: new Map(this.environment.cycleCounts),
+    };
+  }
+
+  copyIp(): JSONPath {
+    return [...this.getIp()];
+  }
+
+  async load(environment: InkEnvironment) {
+    this.environment = environment;
+    await this.getCurrent();
   }
 
   getVariables() {
