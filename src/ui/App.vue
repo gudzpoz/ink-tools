@@ -475,6 +475,16 @@ span.count {
   top: -1em;
 }
 
+span.return {
+  position: relative;
+  padding-left: 0.5em;
+}
+span.return::before {
+  content: "end";
+  position: absolute;
+  top: -1em;
+}
+
 div.body > div span.condition {
   display: v-bind(displayConditions);
 }
@@ -484,7 +494,7 @@ div.body > div span.start, div.body > div span.end {
 div.body > div span.divert {
   display: v-bind(displayDiverts);
 }
-div.body > div span.expr, div.body > div span.call {
+div.body > div span.expr, div.body > div span.call, div.body > div span.return {
   display: v-bind(displayFunctions);
 }
 

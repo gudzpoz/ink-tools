@@ -517,13 +517,15 @@ export class InkStoryRunner {
         return null;
       }
       case 'building': {
-        this.output('debug', `<span class="call">${escapeHtml(typed.value.buildingBlock)}(${
+        const name = escapeHtml(typed.value.buildingBlock);
+        this.output('debug', `<span class="call">${name}(${
           Object.entries(typed.value.params)
             .map(([, v]) => `${this.decompiler.serializeExpr(v ?? 'undefined')}`)
             .join(', ')
         })</span> `);
         const output = await this.evaluateExpr(typed.value);
         this.output('output', `${output}`);
+        this.output('debug', `<span class="return">${name}</span>`);
         return this.collectOutputBuffer();
       }
       case 'do': {
