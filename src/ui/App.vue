@@ -12,6 +12,9 @@
       <button type="button" @click="selectNewKnot(knotSelect?.value ?? 0)">
         ⟳ 从头再来
       </button>
+      <button type="button" @click="selectNewKnot(-1)" v-if="DEVELOPMENTAL">
+        Test
+      </button>
     </div>
     <div>
       <label class="file">
@@ -39,6 +42,12 @@
       <label>
         <input type="checkbox" v-model="debug.logPaths" /> 📝 在 F12 的 Console 中记录路径
       </label>
+      <label>
+        <input type="checkbox" v-model="debug.stepping" /> 🐌 步进
+      </label>
+      <button type="button" @click="fetchMore()" :disabled="!debug.stepping">
+        👣 步进
+      </button>
       <div>
         变量控制：
         <button type="button" @click="alertUsage">
@@ -90,9 +99,11 @@ import {
 import JSZip from 'jszip';
 
 import { InkStoryRunner, Options } from './story';
-import { InkRootNode } from '../types';
+import { InkChunkNode, InkRootNode } from '../types';
 
 import rootJson from '../../data/80days.json';
+
+const DEVELOPMENTAL = import.meta.env.DEV;
 
 // @ts-expect-error: Excessive stack depth comparing types
 const root: InkRootNode = rootJson;
@@ -121,6 +132,7 @@ const debug = ref({
   diverts: false,
   original: false,
   logPaths: false,
+  stepping: false,
 });
 
 function saveStory() {
@@ -135,6 +147,10 @@ function saveStory() {
 
 const storyUniqueId = ref(0);
 let timeOutHandle: ReturnType<typeof setTimeout> | null = null;
+function schedule(delay: number) {
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  timeOutHandle = setTimeout(() => { fetchMore().catch(console.log); }, delay);
+}
 async function fetchMore(delay: number = 20) {
   ip.value = story.copyIp() as never[];
   if (options.value.length !== 0) {
@@ -152,7 +168,10 @@ async function fetchMore(delay: number = 20) {
     const [first, ...rest] = line.split('<br><br>');
     lines.value[lines.value.length - 1] += first;
     lines.value.push(...rest);
-    timeOutHandle = setTimeout(fetchMore, delay);
+    if (debug.value.stepping) {
+      return;
+    }
+    schedule(delay);
   } else if (Array.isArray(line)) {
     // 全部不可选的情况下应该会有一个默认选项的。
     if (line.every((e) => !e.condition)) {
@@ -164,7 +183,10 @@ async function fetchMore(delay: number = 20) {
           otherOptions.map((e) => `<li><button disabled>${e.text}</button></li>`).join('')
         }</ul>`);
         lines.value.push(option.text);
-        timeOutHandle = setTimeout(fetchMore, delay);
+        if (debug.value.stepping) {
+          return;
+        }
+        schedule(delay);
         return;
       }
     }
@@ -182,14 +204,15 @@ function clearContents() {
   options.value = [];
 }
 
-async function selectNewKnot(i: string | number) {
+async function selectNewKnot(n: string | number) {
   if (timeOutHandle !== null) {
     clearTimeout(timeOutHandle);
     timeOutHandle = null;
   }
   saves.value = [];
   clearContents();
-  await story.init(stories[typeof i === 'string' ? parseInt(i, 10) : i]);
+  const i = typeof n === 'string' ? parseInt(n, 10) : n;
+  await story.init(i === -1 ? 'test' : stories[i]);
   const variables = story.getVariables();
   Object.entries(globalVariables.value).forEach(([k, v]) => {
     variables[k] = v;
@@ -234,7 +257,7 @@ onMounted(async () => {
 async function select(i: number) {
   const { value } = options;
   options.value = [];
-  story.selectOption(value, i);
+  await story.selectOption(value, i);
   await fetchMore();
 }
 
@@ -298,7 +321,7 @@ type CsvTranslation = {
 };
 
 function patchChunkWithTranslation(obj: unknown, translations: CsvTranslation[], isRoot: boolean) {
-  const chunk = (isRoot ? (obj as InkRootNode).buildingBlocks : obj) as unknown;
+  const chunk = isRoot ? (obj as InkRootNode).buildingBlocks : obj;
   translations.forEach(({ json_path, translated }) => {
     if (translated.trim() === '') {
       return;
@@ -315,14 +338,14 @@ function patchChunkWithTranslation(obj: unknown, translations: CsvTranslation[],
 
 function parseTranslationCsv(content: ArrayBuffer) {
   const csv = new TextDecoder('utf-8').decode(content);
-  const translations: CsvTranslation[] = parseCsv(csv, {
+  const translations = parseCsv(csv, {
     bom: true,
     cast: false,
     columns: ['json_path', 'original', 'translated'],
     skip_empty_lines: true,
     relax_column_count_less: true,
     relax_column_count_more: true,
-  });
+  }) as CsvTranslation[];
   return translations.map((item) => {
     const { json_path: path, original, translated } = item;
     if (path && original && translated) {
@@ -348,7 +371,7 @@ async function updateStoryWithFile(
     return false;
   }
   const [, name] = /^.*[0-9]{4}-(.+)$/.exec(stem) ?? ['', stem];
-  if (ext !== 'zip' && name !== '' && root['indexed-content'].ranges[name] === undefined) {
+  if (ext !== 'zip' && name !== '' && name !== 'test' && root['indexed-content'].ranges[name] === undefined) {
     (shouldAlert ? alert : console.log)(`JSON/CSV 的文件名不符合：无对应 ${stem} 的 Ink 节点`);
     return false;
   }
@@ -359,7 +382,7 @@ async function updateStoryWithFile(
     story.loadExternalChunk(name, chunk);
   } else if (ext === 'json') {
     const json = new TextDecoder('utf-8').decode(content);
-    const translatedJson = JSON.parse(json);
+    const translatedJson = JSON.parse(json) as InkChunkNode;
     story.loadExternalChunk(name, translatedJson);
   } else {
     const promises: Promise<boolean>[] = [];

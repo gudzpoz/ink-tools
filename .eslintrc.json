@@ -7,7 +7,8 @@
     "airbnb-typescript/base",
     "@vue/eslint-config-typescript/recommended",
     "@vue/eslint-config-airbnb-with-typescript",
-    "plugin:promise/recommended"
+    "plugin:promise/recommended",
+    "plugin:@typescript-eslint/recommended-type-checked"
   ],
   "parser": "vue-eslint-parser",
   "parserOptions": {
