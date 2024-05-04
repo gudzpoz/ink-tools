@@ -4,21 +4,19 @@ import type {
   Type_set,
 } from '../auto-types';
 import {
+  TypedInkBlockWithKeys,
   annotateInkBlockType,
   type InkBlock,
-  type InkBuildingBlockExpr,
   type InkChunkNode,
   type InkChunkWithStitches,
-  type InkExpr,
   type InkFuncType,
   type InkRootNode,
+  type JSONPath,
   type TypedCycleNode,
 } from '../types';
 import PoorOldInkSerializer from '../decompiler';
 
 type InkVariableType = string | number | boolean;
-
-type JSONPath = (string | number)[];
 
 export type Options = {
   text: string,
@@ -34,7 +32,7 @@ interface InkEnvironment {
   variables: { [key: string]: InkVariableType };
   history: Record<string, Record<string, number>>;
   callStack: InkCallStack;
-  cycleCounts: Map<object, number>;
+  cycleCounts: Record<string, number>;
 }
 
 interface InkReturnValue {
@@ -53,13 +51,23 @@ function escapeHtml(html: string): string {
 /**
  * 因为 JS 里的 Promise 并没有 back-pressure 的概念，所以只能再用一层函数来包装。
  *
+ * 因为 InkStoryRunner 是所有函数共用一套栈的，所以绝对不能使用 `Promise.all`。
+ * 下面的类型体操是直接从 `Promise.all` 的类型定义里改过来的。
+ *
+ * 非要说的话，毕竟 JS 是单线程，在加载完网络资源之后其实并行化也没大必要。
+ *
  * @param promises 顺序执行的函数
  */
-async function evaluateSequentially(promises: (() => Promise<unknown>)[]): Promise<void> {
+async function evaluateSequentially<T>(
+  promises: (() => Promise<T>)[],
+): Promise<T[]> {
+  const results: T[] = [];
   for (let i = 0; i < promises.length; i += 1) {
     // eslint-disable-next-line no-await-in-loop
-    await promises[i]();
+    const result = await promises[i]();
+    results.push(result);
   }
+  return results;
 }
 
 function shallowCopy<T extends object>(obj: T): T {
@@ -104,7 +112,7 @@ export class InkStoryRunner {
         '': root,
       },
       external: {
-        '': JSON.parse(JSON.stringify(root)),
+        '': JSON.parse(JSON.stringify(root)) as InkRootNode,
       },
     };
     this.returnStack = [];
@@ -118,8 +126,8 @@ export class InkStoryRunner {
       variables: shallowCopy(this.environment.variables),
       history: Object.fromEntries(Object.entries(this.environment.history)
         .map(([k, v]) => [k, shallowCopy(v)])),
-      callStack: [[...this.getIp()]],
-      cycleCounts: new Map(this.environment.cycleCounts),
+      callStack: [this.copyIp()],
+      cycleCounts: { ...this.environment.cycleCounts },
     };
   }
 
@@ -145,7 +153,7 @@ export class InkStoryRunner {
       variables: Object.fromEntries(Object.entries(this.getRoot().variables)),
       history: {},
       callStack: [],
-      cycleCounts: new Map(),
+      cycleCounts: {},
     };
   }
 
@@ -160,8 +168,8 @@ export class InkStoryRunner {
     await this.divertTo(`:${initial ?? this.getRoot().initial}`);
   }
 
-  async copyChunk(name: string) {
-    return JSON.parse(await this.getChunkText(name));
+  async copyChunk(name: string): Promise<InkBlock | InkRootNode> {
+    return JSON.parse(await this.getChunkText(name)) as InkBlock | InkRootNode;
   }
 
   async getChunkText(name: string): Promise<string> {
@@ -179,9 +187,8 @@ export class InkStoryRunner {
       return root[name];
     }
 
-    const text = await this.getChunkText(name);
-    this.chunkCaches.original[name] = JSON.parse(text);
-    const chunk = JSON.parse(text) as InkChunkNode;
+    this.chunkCaches.original[name] = await this.copyChunk(name);
+    const chunk = await this.copyChunk(name);
     this.loadExternalChunk(name, chunk);
     return this.getChunk(name);
   }
@@ -234,48 +241,50 @@ export class InkStoryRunner {
    * @param expr 表达式
    */
   private async evaluateExpr(
-    expr: InkExpr | InkExpr[],
+    path: JSONPath,
   ): Promise<string | number | boolean> {
+    const expr: InkBlock | InkBlock[] | undefined = await this.getCurrent(path);
+    if (!expr) {
+      return '';
+    }
     if (typeof expr !== 'object') {
       return expr;
     }
     if (Array.isArray(expr)) {
       await evaluateSequentially(
-        expr.map((e) => () => this.evaluateExpr(e)),
+        expr.map((_, i) => () => this.evaluateExpr([...path, i])),
       );
       return '';
     }
     const typed = annotateInkBlockType(expr);
     switch (typed.type) {
       case 'get': {
-        return this.getVar((await this.evaluateExpr(typed.value.get)) as string);
+        return this.getVar((await this.evaluateExpr(typed.join(path, 'get'))) as string);
       }
       case 'set': {
-        const [nameExpr, valueExpr] = typed.value.set;
-        const name = await this.evaluateExpr(nameExpr);
-        const value = await this.evaluateExpr(valueExpr);
+        const name = await this.evaluateExpr(typed.join(path, 'set', 0));
+        const value = await this.evaluateExpr(typed.join(path, 'set', 1));
         this.setVar(name as string, value);
         return '';
       }
       case 'return': {
-        const result = await this.evaluateExpr(typed.value.return);
+        const result = await this.evaluateExpr(typed.join(path, 'return'));
         const eax = this.returnStack[this.returnStack.length - 1];
         eax.returned = true;
         eax.value = result;
         return this.throwError('return');
       }
       case 'func': {
-        return this.evaluateFuncExpr(typed.value);
+        return this.evaluateFuncExpr(path, typed);
       }
       case 'building': {
         const { buildingBlock } = typed.value;
-        const params = await Promise.all(
-          Object.entries(typed.value.params).map(async ([name, e]) => [
+        const params = await evaluateSequentially(
+          Object.keys(typed.value.params).map((name) => async () => [
             name,
-            await this.evaluateExpr(e ?? ''),
+            await this.evaluateExpr(typed.join(path, 'params', name as never)),
           ]),
         );
-        const body = this.getRoot().buildingBlocks[buildingBlock];
         this.returnStack.push({
           returned: false,
           value: '',
@@ -284,7 +293,7 @@ export class InkStoryRunner {
         const callerSaved = params.map(([name]) => [name, this.getVar(name as string)]);
         params.forEach(([name, value]) => this.setVar(name as string, value));
         try {
-          await this.evaluateBuildingBlocks(body);
+          await this.evaluateBuildingBlocks(['', 'buildingBlocks', buildingBlock]);
         } catch (e) {
           if (!this.expectError(e, 'return')) {
             this.returnStack.pop();
@@ -295,16 +304,20 @@ export class InkStoryRunner {
         return this.returnStack.pop()!.value;
       }
       default:
-        throw new Error(`Unknown expr type: ${typed.type} (${Object.keys(expr)})`);
+        throw new Error(`Unknown expr type: ${typed.type} (${Object.keys(expr).join(', ')})`);
     }
   }
 
   private async evaluateBuildingBlocks(
-    blocks: InkBuildingBlockExpr | InkBuildingBlockExpr[],
+    path: JSONPath,
   ): Promise<InkVariableType> {
+    const blocks = await this.getCurrent(path);
+    if (!blocks) {
+      return '';
+    }
     if (Array.isArray(blocks)) {
       await evaluateSequentially(
-        blocks.map((b) => () => this.evaluateBuildingBlocks(b)),
+        blocks.map((_, i) => () => this.evaluateBuildingBlocks([...path, i])),
       );
       return '';
     }
@@ -320,25 +333,25 @@ export class InkStoryRunner {
       }
       case 'building':
       case 'return': {
-        return this.evaluateExpr(typed.value);
+        return this.evaluateExpr(path);
       }
       case 'condition': {
-        const condition = await this.evaluateExpr(typed.value.condition);
+        const condition = await this.evaluateExpr(typed.join(path, 'condition'));
         if (condition) {
-          return this.evaluateBuildingBlocks(typed.value.then as InkBuildingBlockExpr[]);
+          return this.evaluateBuildingBlocks(typed.join(path, 'then'));
         }
         if (typed.value.otherwise) {
-          return this.evaluateBuildingBlocks(typed.value.otherwise as InkBuildingBlockExpr[]);
+          return this.evaluateBuildingBlocks(typed.join(path, 'otherwise'));
         }
         return '';
       }
       case 'do': {
-        return this.evaluateExpr(typed.value.doFuncs);
+        return this.evaluateExpr(typed.join(path, 'doFuncs'));
       }
       case 'cycle':
       case 'sequence': {
-        const [contents, cycleI] = this.getCycleDetails(typed);
-        return this.evaluateBuildingBlocks(contents[cycleI] as InkBuildingBlockExpr[]);
+        const [, cycleI] = this.getCycleDetails(typed, path);
+        return this.evaluateBuildingBlocks(typed.join(path, typed.type as never, cycleI));
       }
       case 'action':
       case 'custom': {
@@ -351,14 +364,15 @@ export class InkStoryRunner {
         return this.throwError('divert_in_function');
       }
       default:
-        throw new Error(`Unknown node: ${typed.type} (${Object.keys(blocks)})`);
+        throw new Error(`Unknown node: ${typed.type} (${Object.keys(blocks).join(', ')})`);
     }
   }
 
-  private getCycleDetails(block: TypedCycleNode): [Type_sequence, number] {
+  private getCycleDetails(block: TypedCycleNode, path: JSONPath): [Type_sequence, number] {
     const contents = block.type === 'cycle' ? block.value.cycle : block.value.sequence;
-    const count = this.environment.cycleCounts.get(block) ?? 0;
-    this.environment.cycleCounts.set(block, count + 1);
+    const key = path.join('.');
+    const count = this.environment.cycleCounts[key] ?? 0;
+    this.environment.cycleCounts[key] = count + 1;
     return [
       contents,
       block.type === 'cycle' ? count % (contents.length) : Math.min(contents.length - 1, count),
@@ -366,10 +380,15 @@ export class InkStoryRunner {
   }
 
   private async evaluateFuncExpr(
-    funcExpr: Type_funcWithParams,
+    path: JSONPath,
+    typed: TypedInkBlockWithKeys<'func', Type_funcWithParams>,
   ): Promise<string | number | boolean> {
-    const [p1, p2] = await Promise.all(
-      funcExpr.params.map((p) => this.evaluateExpr(p)),
+    const funcExpr = await this.getCurrent(path) as Type_funcWithParams | undefined;
+    if (!funcExpr) {
+      return '';
+    }
+    const [p1, p2] = await evaluateSequentially(
+      funcExpr.params.map((_, i) => () => this.evaluateExpr(typed.join(path, 'params', i))),
     );
     // 不知道 Ink 是不是动态类型的，所以下面全是 == 和 !=。
     switch (funcExpr.func as InkFuncType) {
@@ -382,7 +401,7 @@ export class InkStoryRunner {
         return '';
       case 'Divide':
         // Ink 的数字应该只有整数。
-        return Math.floor((p1 as number) / (p2 as number));
+        return (p1 as number - (p1 as number % (p2 as number))) / (p2 as number);
       case 'Equals':
         // eslint-disable-next-line eqeqeq
         return p1 == p2;
@@ -407,7 +426,7 @@ export class InkStoryRunner {
       case 'LessThanOrEqualTo':
         return (p1 as number) <= (p2 as number);
       case 'Log10':
-        return Math.log10(p1 as number);
+        return Math.floor(Math.log10(p1 as number));
       case 'Mod':
         return (p1 as number) % (p2 as number);
       case 'Multiply':
@@ -439,14 +458,13 @@ export class InkStoryRunner {
     return output;
   }
 
-  private async getCurrent(): Promise<InkBlock | undefined> {
-    const ip = this.getIp();
+  private async getCurrent(path?: JSONPath): Promise<InkBlock | undefined> {
+    const ip = path ?? this.getIp();
     await this.getChunk(ip[0] as string);
     return ip.reduce(
-      (node, key) => node?.[key],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (this.useExternal ? this.chunkCaches.external : this.chunkCaches.original) as any,
-    );
+      (node, key) => (node as Record<string, unknown>)?.[key],
+      (this.useExternal ? this.chunkCaches.external : this.chunkCaches.original) as unknown,
+    ) as InkBlock | undefined;
   }
 
   private outputDebugCondition(
@@ -470,6 +488,7 @@ export class InkStoryRunner {
    */
   private async getNext(): Promise<string | Options | null> {
     const ip = this.getIp();
+    const path = this.copyIp();
     const current = await this.getCurrent();
     // IP 自动推进到下一各元素
     if (typeof ip[ip.length - 1] !== 'number') {
@@ -504,7 +523,7 @@ export class InkStoryRunner {
         return this.collectOutputBuffer() ?? '';
       }
       case 'condition': {
-        const condition = await this.evaluateExpr(typed.value.condition);
+        const condition = await this.evaluateExpr(typed.join(path, 'condition'));
         if (condition) {
           (ip[ip.length - 1] as number) -= 1;
           ip.push('then', 0);
@@ -526,13 +545,13 @@ export class InkStoryRunner {
             .map(([, v]) => `${this.decompiler.serializeExpr(v ?? 'undefined')}`)
             .join(', ')
         })</span> `);
-        const output = await this.evaluateExpr(typed.value);
+        const output = await this.evaluateExpr(path);
         this.output('output', `${output}`);
         this.output('debug', `<span class="return">${name}</span>`);
         return this.collectOutputBuffer();
       }
       case 'do': {
-        await this.evaluateExpr(typed.value.doFuncs);
+        await this.evaluateExpr(typed.join(path, 'doFuncs'));
         this.output(
           'debug',
           `<span class="expr">${escapeHtml(this.decompiler.serializeDoFuncsNode(typed.value))}</span>
@@ -547,7 +566,7 @@ export class InkStoryRunner {
       }
       case 'cycle':
       case 'sequence': {
-        const [contents, cycleI] = this.getCycleDetails(typed);
+        const [contents, cycleI] = this.getCycleDetails(typed, path);
         const key = typed.type;
         (ip[ip.length - 1] as number) -= 1;
         ip.push(key, cycleI, 0);
@@ -564,7 +583,7 @@ export class InkStoryRunner {
           default: false,
         }];
         if (option.condition) {
-          const condition = await this.evaluateExpr(option.condition);
+          const condition = await this.evaluateExpr(typed.join(path, 'condition'));
           options[0].condition = !!condition;
           this.outputDebugCondition(
             condition,
@@ -612,7 +631,9 @@ export class InkStoryRunner {
   }
 
   async divertTo(divert: string) {
-    console.log(` -> ${divert}`);
+    if (this.logPaths) {
+      console.log(` -> ${divert}`);
+    }
     const ip = this.getIp();
     this.setReadCount(divert, this.getReadCount(divert) + 1);
     const [absKnot, absStitch] = this.getAbsKnotStitch(divert);

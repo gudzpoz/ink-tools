@@ -135,57 +135,60 @@ export const UNTRANSLATABLE_FIELD_KEYS: Record<string, 0 | 1> = {
 
 export type InkExpr = Type_set[number] | Type_doFuncs[number] | Type_returnNode;
 
-export type TypedCycleNode = {
-  type: 'cycle',
-  value: Type_cycleNode,
-} | {
-  type: 'sequence',
-  value: Type_sequenceNode,
-};
+export type JSONPath = (string | number)[];
 
-export type TypedInkBlock = {
-  type: 'value',
-  value: string | number | boolean,
-} | {
-  type: 'set',
-  value: { set: Type_set },
-} | {
-  type: 'get',
-  value: { get: Type_get },
-} | {
-  type: 'func',
-  value: Type_funcWithParams,
-} | {
-  type: 'action',
-  value: Type_actionTag,
-} | {
-  type: 'building',
-  value: Type_buildingBlockWithParams,
-} | {
-  type: 'condition',
-  value: Type_conditionThen,
-} | {
-  type: 'custom',
-  value: Type_customDictionary,
-} | {
-  type: 'divert',
-  value: Type_divertNode,
-} | {
-  type: 'do',
-  value: Type_doFuncsNode,
-} | {
-  type: 'option',
-  value: Type_optionLink,
-} | {
-  type: 'return',
-  value: Type_returnNode,
-} | TypedCycleNode;
+export interface TypedInkBlockWithKeys<T extends string, V extends (InkBlock | InkExpr)> {
+  type: T;
+  value: V;
+  /**
+   * 极致的类型体操……
+   *
+   * 可能还不算就是了。
+   */
+  join: (
+    path: JSONPath,
+    key1: keyof V,
+    key2?: keyof V[keyof V],
+    key3?: keyof V[keyof V][keyof V[keyof V]],
+  ) => JSONPath;
+}
+
+export type TypedCycleNode =
+  | TypedInkBlockWithKeys<'cycle', Type_cycleNode>
+  | TypedInkBlockWithKeys<'sequence', Type_sequenceNode>;
+
+export type TypedInkBlock =
+  | TypedInkBlockWithKeys<'value', string | number | boolean>
+  | TypedInkBlockWithKeys<'get', { get: Type_get }>
+  | TypedInkBlockWithKeys<'set', { set: Type_set }>
+  | TypedInkBlockWithKeys<'func', Type_funcWithParams>
+  | TypedInkBlockWithKeys<'action', Type_actionTag>
+  | TypedInkBlockWithKeys<'building', Type_buildingBlockWithParams>
+  | TypedInkBlockWithKeys<'condition', Type_conditionThen>
+  | TypedInkBlockWithKeys<'custom', Type_customDictionary>
+  | TypedInkBlockWithKeys<'divert', Type_divertNode>
+  | TypedInkBlockWithKeys<'do', Type_doFuncsNode>
+  | TypedInkBlockWithKeys<'option', Type_optionLink>
+  | TypedInkBlockWithKeys<'return', Type_returnNode>
+  | TypedCycleNode;
+
+const join = ((path: JSONPath, key1: unknown, key2?: unknown, key3?: unknown): JSONPath => {
+  const newPath = [...path, key1] as JSONPath;
+  if (key2 !== undefined) {
+    newPath.push(key2 as never);
+    if (key3 !== undefined) {
+      newPath.push(key3 as never);
+    }
+  }
+  return newPath;
+});
 
 export function annotateInkBlockType(node: InkBlock | InkExpr): TypedInkBlock {
   if (typeof node !== 'object') {
     return {
       type: 'value',
       value: node,
+      join,
     };
   }
   const typeMapping: Record<string, TypedInkBlock['type']> = {
@@ -213,5 +216,6 @@ export function annotateInkBlockType(node: InkBlock | InkExpr): TypedInkBlock {
   return {
     type: types[0],
     value: node,
-  } as unknown as TypedInkBlock;
+    join,
+  } as TypedInkBlock;
 }
