@@ -4,8 +4,8 @@
       <label class="select">
         ⤷ 选择故事起点：
         <select ref="knotSelect" @change="(e) => selectNewKnot((e.target as HTMLSelectElement).value)">
-          <option v-for="story, i in stories" :key="story" :value="i">
-            {{ String(i + 1).padStart(4, '0') }}-{{ story }}
+          <option v-for="knot, i in stories" :key="knot" :value="i">
+            {{ String(i + 1).padStart(4, '0') }}-{{ knot }}
           </option>
         </select>
       </label>
@@ -13,7 +13,7 @@
         ⟳ 从头再来
       </button>
       <button type="button" @click="selectNewKnot(-1)" v-if="DEVELOPMENTAL">
-        Test
+        运行上传的 test.json（不上传就运行的话应该会出很多错）
       </button>
     </div>
     <div>
@@ -53,8 +53,15 @@
         <button type="button" @click="alertUsage">
           🐞 如何使用
         </button>
+        <button type="button" @click="showVariableBrowser()">
+          🔍 变量查看器
+        </button>
         <button type="button" @click="resetVariables">
-          🗑️ 重置
+          🗑️ 重置 {{
+            Object.keys(store.globalVariables).length
+          }} 个变量以及 {{
+            Object.keys(store.globalReadCounts).length
+          }} 个读取计数器
         </button>
         存盘与读取：
         <button type="button" @click="quickLoad">
@@ -64,11 +71,11 @@
           ⋙ 选择之前选项点
           <select ref="saveSelect" @change="(e) => loadStory((e.target as HTMLSelectElement).value)">
             <option
-              v-for="save, i in saves"
+              v-for="save, i in store.saves"
               :key="i"
               :value="i"
             >
-              #{{ saves.length - i }}@{{ save.title }}
+              #{{ store.saves.length - i }}@{{ save.title }}
             </option>
           </select>
         </label>
@@ -80,26 +87,109 @@
     </div>
   </div>
   <div class="body" :class="{ inline: options[0]?.inline }">
-    <div v-for="line in lines" :key="line">
-      <p v-html="line" />
-    </div>
-    <ul>
+    <TransitionGroup name="list">
+      <div v-for="line, i in lines" :key="i">
+        <p v-html="line" />
+      </div>
+    </TransitionGroup>
+    <TransitionGroup name="list" tag="ul">
       <li v-for="option, i in options" :key="option.link">
         <button type="button" @click="select(i)" v-html="option.text" :disabled="!option.condition" />
       </li>
-    </ul>
+    </TransitionGroup>
   </div>
+  <Dialog
+    class="variable-browser"
+    v-model:visible="shouldShowVariableBrowser"
+    header="变量/节点查看器"
+    :keepInViewPort="false"
+  >
+    <TabView>
+      <TabPanel header="变量">
+        <div class="variable-browser-inner">
+          <label v-for="[k, v] in Object.entries(variablesShown)" :key="k">
+            {{ k }}<span v-if="store.globalVariables[k] !== undefined">（已修改）</span>=
+            <input
+              v-if="typeof v === 'number'"
+              type="number"
+              :value="v"
+              @change="ink[k] = Number(($event.target as HTMLInputElement).value)"
+            />
+            <input
+              v-else
+              type="checkbox"
+              :checked="!!v"
+              @change="ink[k] = Boolean(($event.target as HTMLInputElement).checked)"
+            />
+          </label>
+        </div>
+      </TabPanel>
+      <TabPanel header="节点">
+        <div class="knot-browser">
+          <label class="select">
+            Knot 文件名：
+            <select v-model="browserSelectedKnot">
+              <option v-for="knot in stories" :key="knot" :value="knot">
+                :{{ knot }}
+              </option>
+            </select>
+          </label>
+          <label>
+            :{{ browserSelectedKnot }} 访问次数
+            <span v-if="store.globalReadCounts[`:${browserSelectedKnot}`] !== undefined">（已修改）</span>：
+            <input
+              type="number"
+              :value="story.getReadCount(`:${browserSelectedKnot}`)"
+              @change="inkHistory[`:${browserSelectedKnot}`] = Number(($event.target as HTMLInputElement).value)"
+            />
+          </label>
+          <label class="select">
+            Stitch 名称：
+            <select v-model="browserSelectedStitch">
+              <option v-for="stitch in stitchesShown" :key="stitch" :value="stitch">
+                :{{ stitch }}
+              </option>
+            </select>
+          </label>
+          <label>
+            :{{ browserSelectedKnot }}:{{
+              stitchesShown.includes(browserSelectedStitch) ? browserSelectedStitch : '???'
+            }} 访问次数
+            <span
+              v-if="store.globalReadCounts[
+                `:${browserSelectedKnot}:${browserSelectedStitch}`
+              ] !== undefined">（已修改）</span>：
+            <input
+              type="number"
+              :disabled="!stitchesShown.includes(browserSelectedStitch)"
+              :value="story.getReadCount(`:${browserSelectedKnot}:${
+                stitchesShown.includes(browserSelectedStitch) ? browserSelectedStitch : '???'
+              }`)"
+              @change="inkHistory[
+                `:${browserSelectedKnot}:${browserSelectedStitch}`
+              ] = Number(($event.target as HTMLInputElement).value)"
+            />
+          </label>
+        </div>
+      </TabPanel>
+    </TabView>
+  </Dialog>
 </template>
 
 <script setup lang="ts">
+import Dialog from 'primevue/dialog';
+import TabPanel from 'primevue/tabpanel';
+import TabView from 'primevue/tabview';
+
 import { parse as parseCsv } from 'csv-parse/browser/esm/sync';
 import {
   computed, onMounted, ref, watch,
 } from 'vue';
 import JSZip from 'jszip';
 
-import { InkStoryRunner, Options } from './story';
-import { InkChunkNode, InkRootNode } from '../types';
+import useStore from './store';
+import { InkStoryRunner, InkVariableType, Options } from './story';
+import { InkChunkNode, InkChunkWithStitches, InkRootNode } from '../types';
 
 import rootJson from '../../data/80days.json';
 
@@ -109,14 +199,6 @@ const DEVELOPMENTAL = import.meta.env.DEV;
 const root: InkRootNode = rootJson;
 const story = new InkStoryRunner(root);
 const ip = ref([]);
-const saves = ref<{
-  save: unknown,
-  lines: string[],
-  options: Options,
-  title: string,
-}[]>([]);
-const globalVariables = ref<ReturnType<typeof story.getVariables>>({});
-const globalReadCounts = ref<Record<string, number>>({});
 
 const stories = Object.keys(root['indexed-content'].ranges);
 const knotSelect = ref<HTMLSelectElement>();
@@ -134,10 +216,39 @@ const debug = ref({
   logPaths: false,
   stepping: false,
 });
+const store = useStore();
+const shouldShowVariableBrowser = ref(false);
+
+const variablesShown = ref<Record<string, InkVariableType>>({});
+const browserSelectedKnot = ref('');
+const browserSelectedStitch = ref('');
+const stitchesShown = ref<string[]>([]);
+function showVariableBrowser() {
+  variablesShown.value = Object.fromEntries(
+    story.getVariableNames().map((name) => [name, story.getVar(name)]),
+  );
+  shouldShowVariableBrowser.value = true;
+}
+story.listener = (event) => {
+  if (event.type === 'variable') {
+    variablesShown.value[event.name] = event.value;
+  } else {
+    browserSelectedKnot.value = event.knot;
+    browserSelectedStitch.value = event.stitch ?? '';
+  }
+};
+watch(browserSelectedKnot, async (name) => {
+  const chunk = await story.copyChunk(name) as InkChunkNode;
+  if (Array.isArray(chunk) || Object.keys(chunk).length === 0) {
+    stitchesShown.value = [];
+    return;
+  }
+  stitchesShown.value = Object.keys((chunk as InkChunkWithStitches).stitches);
+});
 
 function saveStory() {
   const save = story.save();
-  saves.value.unshift({
+  store.saves.unshift({
     save,
     lines: lines.value.map((e) => e),
     options: options.value.map((e) => e),
@@ -151,7 +262,7 @@ function schedule(delay: number) {
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   timeOutHandle = setTimeout(() => { fetchMore().catch(console.log); }, delay);
 }
-async function fetchMore(delay: number = 20) {
+async function fetchMore(delay: number = 0) {
   ip.value = story.copyIp() as never[];
   if (options.value.length !== 0) {
     return;
@@ -209,15 +320,14 @@ async function selectNewKnot(n: string | number) {
     clearTimeout(timeOutHandle);
     timeOutHandle = null;
   }
-  saves.value = [];
+  store.saves = [];
   clearContents();
   const i = typeof n === 'string' ? parseInt(n, 10) : n;
   await story.init(i === -1 ? 'test' : stories[i]);
-  const variables = story.getVariables();
-  Object.entries(globalVariables.value).forEach(([k, v]) => {
-    variables[k] = v;
+  Object.entries(store.globalVariables).forEach(([k, v]) => {
+    story.setVar(k, v);
   });
-  Object.entries(globalReadCounts.value).forEach(([k, v]) => {
+  Object.entries(store.globalReadCounts).forEach(([k, v]) => {
     story.setReadCount(k, v);
   });
   await fetchMore();
@@ -230,28 +340,36 @@ declare global {
   }
 }
 
+const ink = new Proxy<Record<string, InkVariableType>>({}, {
+  get(_: never, p: string) {
+    return story.getVar(p);
+  },
+  set(_: never, p: string, v: string | number | boolean) {
+    store.globalVariables[p] = v;
+    story.setVar(p, v);
+    return true;
+  },
+  ownKeys() {
+    return story.getVariableNames();
+  },
+});
+const inkHistory = new Proxy<Record<string, number>>({}, {
+  get(_: never, p: string) {
+    return story.getReadCount(p);
+  },
+  set(_: never, p: string, v: number) {
+    store.globalReadCounts[p] = v;
+    story.setReadCount(p, v);
+    return true;
+  },
+  ownKeys() {
+    return Object.keys(root['indexed-content'].ranges).map((e) => `:${e}`);
+  },
+});
 onMounted(async () => {
   await selectNewKnot(0);
-  window.ink = new Proxy({}, {
-    get(_: never, p: string) {
-      return story.getVariables()[p];
-    },
-    set(_: never, p: string, v: string | number | boolean) {
-      globalVariables.value[p] = v;
-      story.getVariables()[p] = v;
-      return true;
-    },
-  });
-  window.inkHistory = new Proxy({}, {
-    get(_: never, p: string) {
-      return story.getReadCount(p);
-    },
-    set(_: never, p: string, v: number) {
-      globalReadCounts.value[p] = v;
-      story.setReadCount(p, v);
-      return true;
-    },
-  });
+  window.ink = ink;
+  window.inkHistory = inkHistory;
 });
 
 async function select(i: number) {
@@ -263,9 +381,9 @@ async function select(i: number) {
 
 async function loadStory(i: string) {
   const to = parseInt(i, 10);
-  const { save, lines: savedLines, options: savedOptions } = saves.value[to];
+  const { save, lines: savedLines, options: savedOptions } = store.saves[to];
   clearContents();
-  saves.value = saves.value.splice(to);
+  store.saves = store.saves.splice(to);
   await story.load(save as never);
   lines.value = savedLines;
   options.value = savedOptions;
@@ -279,30 +397,31 @@ async function loadStory(i: string) {
 }
 
 async function quickLoad() {
-  if (options.value.length === 0 && saves.value.length >= 1) {
+  if (options.value.length === 0 && store.saves.length >= 1) {
     await loadStory('0');
     return;
   }
-  if (saves.value.length >= 2) {
+  if (store.saves.length >= 2) {
     await loadStory('1');
     return;
   }
-  saves.value = [];
+  store.saves = [];
   await selectNewKnot(knotSelect.value?.value ?? 0);
 }
 
 function clearSaves() {
-  saves.value.splice(0);
+  store.saves = [];
 }
 
 function alertUsage() {
   // eslint-disable-next-line no-alert
-  alert(`请按 F12 打开浏览器的开发者工具，并点击进入控制台（Console）。
+  alert(`你当然可以直接使用右边的变量查看器。
+如果用控制台的话，请按 F12 打开浏览器的开发者工具，并点击进入控制台（Console）。
 在 Console 里输入下面内容来改变变量值：
     ink.<variable> = newValue;
 在 Console 里输入下面内容来改变是否读过某 knot / stitch 的统计量：
     inkHistory[':knot:stitch'] = 1;
-例如
+例如：
     ink.banksize = 3;
     ink.money = 1000;
     inkHistory[':meet_manager:__default_paragraph_4'] = 1;
@@ -310,8 +429,8 @@ function alertUsage() {
 }
 
 function resetVariables() {
-  globalVariables.value = {};
-  globalReadCounts.value = {};
+  store.globalVariables = {};
+  store.globalReadCounts = {};
 }
 
 type CsvTranslation = {
@@ -466,7 +585,7 @@ div.inline > ul, div.inline > ul > li {
   padding-left: 0;
 }
 
-span {
+div.body span {
   font-size: 0.5em;
   color: var(--span-color);
 }
@@ -567,5 +686,28 @@ label.file:active {
 }
 label.file > input {
   display: none;
+}
+
+.variable-browser-inner > label {
+  display: flex;
+  justify-content: space-between;
+  height: 1.5em;
+}
+.knot-browser {
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
 }
 </style>

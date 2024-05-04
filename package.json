@@ -51,6 +51,9 @@
     "csv-parse": "^5.5.5",
     "csv-stringify": "^6.4.6",
     "jszip": "^3.10.1",
+    "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^3.2.1",
+    "primevue": "^3.52.0",
     "vue": "^3.4.26"
   }
 }

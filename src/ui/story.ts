@@ -16,7 +16,7 @@ import {
 } from '../types';
 import PoorOldInkSerializer from '../decompiler';
 
-type InkVariableType = string | number | boolean;
+export type InkVariableType = string | number | boolean;
 
 export type Options = {
   text: string,
@@ -76,6 +76,18 @@ function shallowCopy<T extends object>(obj: T): T {
 
 type Message = 'return' | 'ended' | 'divert_in_function';
 
+export type RunnerListener = (
+  event: {
+    type: 'variable',
+    name: string,
+    value: InkVariableType,
+  } | {
+    type: 'read_count',
+    knot: string,
+    stitch?: string,
+  },
+) => void;
+
 export class InkStoryRunner {
   environment: InkEnvironment;
 
@@ -103,6 +115,8 @@ export class InkStoryRunner {
   useExternal: boolean;
 
   logPaths: boolean;
+
+  listener?: RunnerListener;
 
   constructor(root: InkRootNode) {
     this.useExternal = true;
@@ -138,10 +152,6 @@ export class InkStoryRunner {
   async load(environment: InkEnvironment) {
     this.environment = environment;
     await this.getCurrent();
-  }
-
-  getVariables() {
-    return this.environment.variables;
   }
 
   private getRoot(): InkRootNode {
@@ -208,11 +218,22 @@ export class InkStoryRunner {
     throw new Error(message);
   }
 
-  private getVar(name: string) {
+  getVariableNames() {
+    return Object.keys(this.environment.variables);
+  }
+
+  getVar(name: string) {
     return this.environment.variables[name];
   }
 
-  private setVar(name: string, value: boolean | string | number) {
+  setVar(name: string, value: boolean | string | number) {
+    if (this.listener) {
+      this.listener({
+        type: 'variable',
+        name,
+        value,
+      });
+    }
     this.environment.variables[name] = value;
   }
 
@@ -637,6 +658,13 @@ export class InkStoryRunner {
     const ip = this.getIp();
     this.setReadCount(divert, this.getReadCount(divert) + 1);
     const [absKnot, absStitch] = this.getAbsKnotStitch(divert);
+    if (this.listener) {
+      this.listener({
+        type: 'read_count',
+        knot: absKnot,
+        stitch: absStitch,
+      });
+    }
     const chunk = await this.getChunk(absKnot);
     if (Array.isArray(chunk)) {
       ip.splice(1);
