@@ -306,9 +306,20 @@ function parseTranslationCsv(content: ArrayBuffer) {
     cast: false,
     columns: ['json_path', 'original', 'translated'],
     skip_empty_lines: true,
+    relax_column_count_less: true,
     relax_column_count_more: true,
   });
-  return translations;
+  return translations.map((item) => {
+    const { json_path: path, original, translated } = item;
+    if (path && original && translated) {
+      return item;
+    }
+    return {
+      json_path: path ?? '',
+      original: original ?? '',
+      translated: translated ?? original ?? '',
+    };
+  });
 }
 
 async function updateStoryWithFile(
@@ -322,7 +333,7 @@ async function updateStoryWithFile(
     (shouldAlert ? alert : console.log)(`请上传 .json/.csv/.zip 文件：实际上传了 ${ext}（${stem}）`);
     return false;
   }
-  const name = /^[0-9]{4}-/.test(stem) ? stem.substring(5) : stem;
+  const [, name] = /^.*[0-9]{4}-(.+)$/.exec(stem) ?? ['', stem];
   if (ext !== 'zip' && name !== '' && root['indexed-content'].ranges[name] === undefined) {
     (shouldAlert ? alert : console.log)(`JSON/CSV 的文件名不符合：无对应 ${stem} 的 Ink 节点`);
     return false;
