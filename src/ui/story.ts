@@ -1,6 +1,7 @@
 import type {
   Type_funcWithParams,
   Type_sequence,
+  Type_set,
 } from '../auto-types';
 import {
   annotateInkBlockType,
@@ -76,7 +77,17 @@ export class InkStoryRunner {
 
   private returnStack: InkReturnValue[];
 
-  private outputBuffer: string[];
+  /**
+   * 一般我们直接返回输出就可以了。
+   * 但有些时候（例如函数求值时），输出基本是个副作用，就需要输出到这边来。
+   * 函数求值完之后直接输出并清空。
+   *
+   * Debug 信息也放在这边。
+   */
+  private dumbBuffer: {
+    type: 'output' | 'debug',
+    value: string,
+  }[];
 
   private decompiler: PoorOldInkSerializer;
 
@@ -96,7 +107,7 @@ export class InkStoryRunner {
       },
     };
     this.returnStack = [];
-    this.outputBuffer = [];
+    this.dumbBuffer = [];
     this.decompiler = new PoorOldInkSerializer(root);
     this.environment = this.newEnvironment();
   }
@@ -141,7 +152,7 @@ export class InkStoryRunner {
     if (!initial && this.environment.callStack.length > 0) {
       return;
     }
-    this.outputBuffer = [];
+    this.dumbBuffer = [];
     this.returnStack = [];
     this.environment = this.newEnvironment();
     this.environment.callStack = [[]];
@@ -290,7 +301,7 @@ export class InkStoryRunner {
     const typed = annotateInkBlockType(blocks);
     switch (typed.type) {
       case 'value': {
-        this.outputBuffer.push(typed.value as string);
+        this.output('output', typed.value as string);
         if (this.logPaths) {
           console.log(`@ ${this.returnStack[this.returnStack.length - 1].name}:`, typed.value);
         }
@@ -404,12 +415,16 @@ export class InkStoryRunner {
     }
   }
 
+  output(type: 'output' | 'debug', value: string) {
+    this.dumbBuffer.push({ type, value });
+  }
+
   private collectOutputBuffer() {
-    if (this.outputBuffer.length === 0) {
+    if (!this.dumbBuffer.some((e) => e.type === 'output' && e.value !== '')) {
       return null;
     }
-    const output = this.outputBuffer.join('');
-    this.outputBuffer = [];
+    const output = this.dumbBuffer.map((o) => o.value).join('');
+    this.dumbBuffer = [];
     return output;
   }
 
@@ -423,8 +438,24 @@ export class InkStoryRunner {
     );
   }
 
+  private outputDebugCondition(
+    condition: InkVariableType,
+    expr: Type_set[number],
+    elseClass: string,
+  ) {
+    const cond = condition ? 'true' : 'false';
+    this.output('debug', `<span class="condition"><span class="${cond}">${
+      escapeHtml(this.decompiler.serializeExpr(expr))
+    }</span><span class="result ${cond} ${
+      elseClass
+    }">=${escapeHtml(JSON.stringify(condition))}</span></span>`);
+  }
+
   /**
    * 这边是主要故事内容。
+   *
+   * 有可能会 throw 一个 ended 的错误，用来指示故事结束。
+   * 不希望结束的 catch 一下即可。
    */
   private async getNext(): Promise<string | Options | null> {
     const ip = this.getIp();
@@ -443,8 +474,10 @@ export class InkStoryRunner {
         return this.throwError('ended');
       }
       (ip[ip.length - 1] as number) += 1;
-      return (last === 'cycle' || last === 'sequence')
-        ? ` <span class="end">${last}</span>` : null;
+      if (last === 'cycle' || last === 'sequence') {
+        this.output('debug', ` <span class="end">${last}</span>`);
+      }
+      return null;
     }
     (ip[ip.length - 1] as number) += 1;
 
@@ -456,7 +489,8 @@ export class InkStoryRunner {
           console.log(`@ ${ip.join('.')}:`, typed.value);
           (ip[ip.length - 1] as number) += 1;
         }
-        return typed.value as string;
+        this.output('output', typed.value as string);
+        return this.collectOutputBuffer() ?? '';
       }
       case 'condition': {
         const condition = await this.evaluateExpr(typed.value.condition);
@@ -467,27 +501,32 @@ export class InkStoryRunner {
           (ip[ip.length - 1] as number) -= 1;
           ip.push('otherwise', 0);
         }
-        const cond = condition ? 'true' : 'false';
-        return `${this.collectOutputBuffer() ?? ''}
-<span class="condition"><span class="${cond}">${
-  escapeHtml(this.decompiler.serializeExpr(typed.value.condition))
-}</span><span class="result ${cond} ${
-  typed.value.otherwise ? 'has_otherwise' : ''
-}">=${escapeHtml(JSON.stringify(condition))}</span></span>`;
+        this.outputDebugCondition(
+          condition,
+          typed.value.condition,
+          typed.value.otherwise ? 'has_otherwise' : '',
+        );
+        return null;
       }
       case 'building': {
+        this.output('debug', `<span class="call">${escapeHtml(typed.value.buildingBlock)}()</span> `);
         const output = await this.evaluateExpr(typed.value);
-        return `<span class="call">${escapeHtml(typed.value.buildingBlock)}()</span>
-        <br>${this.collectOutputBuffer() ?? ''}${output as string}`;
+        this.output('output', `${output}`);
+        return this.collectOutputBuffer();
       }
       case 'do': {
         await this.evaluateExpr(typed.value.doFuncs);
-        return `<span class="expr">${escapeHtml(this.decompiler.serializeDoFuncsNode(typed.value))}</span>
-        <br>${this.collectOutputBuffer() ?? ''}`;
+        this.output(
+          'debug',
+          `<span class="expr">${escapeHtml(this.decompiler.serializeDoFuncsNode(typed.value))}</span>
+          <br>`,
+        );
+        return this.collectOutputBuffer();
       }
       case 'divert': {
         await this.divertTo(typed.value.divert);
-        return `<span class="divert">-&gt; ${escapeHtml(typed.value.divert)}</span>`;
+        this.output('debug', `<span class="divert">-&gt; ${escapeHtml(typed.value.divert)}</span>`);
+        return null;
       }
       case 'cycle':
       case 'sequence': {
@@ -495,12 +534,13 @@ export class InkStoryRunner {
         const key = typed.type;
         (ip[ip.length - 1] as number) -= 1;
         ip.push(key, cycleI, 0);
-        return `<span class="start">${typed.type}(${cycleI + 1}/${contents.length})</span> `;
+        this.output('debug', `<span class="start">${typed.type}<span class="count">(${cycleI + 1}/${contents.length})</span></span> `);
+        return null;
       }
       case 'option': {
         const option = typed.value;
         const options: Options = [{
-          text: option.option,
+          text: '',
           link: option.linkPath,
           inline: option.inlineOption ?? false,
           condition: true,
@@ -508,33 +548,27 @@ export class InkStoryRunner {
         if (option.condition) {
           const condition = await this.evaluateExpr(option.condition);
           options[0].condition = !!condition;
-          options[0].text = `${this.collectOutputBuffer() ?? ''}
-<span class="condition"><span class="${condition ? 'true' : 'false'}">${
-  escapeHtml(this.decompiler.serializeExpr(option.condition))
-}</span><span class="result">=${JSON.stringify(condition)}</span></span>
-${options[0].text}`;
+          this.outputDebugCondition(
+            condition,
+            option.condition,
+            '',
+          );
         }
-        const peek = await this.getCurrent();
-        if (!peek) {
+        this.output('output', option.option);
+        options[0].text = this.collectOutputBuffer() ?? '';
+        // 开始 options 时已经没必要注意恢复现场了，因为之后必定会 divert。
+        const next = await this.getUntilNext();
+        if (!next) {
           return options;
         }
-        const nextType = annotateInkBlockType(peek).type;
-        if (nextType === 'option' || nextType === 'condition') {
-          try {
-            const moreOptions = await this.getUntilNext();
-            if (Array.isArray(moreOptions)) {
-              options.push(...moreOptions);
-            }
-          } catch (e) {
-            if (!this.expectError(e, 'ended')) {
-              throw e;
-            }
-          }
+        if (Array.isArray(next)) {
+          options.push(...next);
         }
         return options;
       }
       default:
-        return `<br><br>${JSON.stringify(typed.value)}`;
+        this.output('output', `<br><br>${JSON.stringify(typed.value)}`);
+        return this.collectOutputBuffer() ?? '';
     }
   }
 
@@ -577,6 +611,9 @@ ${options[0].text}`;
     return this.environment.callStack[this.environment.callStack.length - 1];
   }
 
+  /**
+   * @returns 返回 null 时必定是故事已经结束了
+   */
   private async getUntilNext(): Promise<string | Options | null> {
     await this.init();
     try {

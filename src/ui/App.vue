@@ -374,6 +374,14 @@ const displayDiverts = computed(() => (debug.value.diverts ? 'inline-flex' : 'no
 const displayFunctions = computed(() => (debug.value.functions ? 'inline-flex' : 'none'));
 </script>
 <style>
+body {
+  --background: #f0f0f0;
+  --color: #111;
+  --span-color: #666;
+  background-color: var(--background);
+  color: var(--color);
+}
+
 div.header {
   display: flex;
   flex-direction: column;
@@ -390,41 +398,60 @@ div.inline > ul, div.inline > ul > li {
 }
 
 span {
-    font-size: 0.5em;
+  font-size: 0.5em;
+  color: var(--span-color);
 }
 span.condition {
-    font-family: monospace;
-    display: inline-flex;
-    flex-direction: column;
-    text-align: center;
-    vertical-align: top;
-    font-size: 1em;
+  font-family: monospace;
+  display: inline-flex;
+  flex-direction: column;
+  text-align: center;
+  vertical-align: top;
+  font-size: 1em;
 }
 span.condition > span {
-    display: block;
+  display: block;
+}
+span.condition > span.result::after {
+  display: block;
 }
 span.condition > span.result.false::after {
-    display: block;
-    content: "(skipped)";
-    text-align: center;
+  display: block;
+  content: "(skipped)";
+  text-align: center;
 }
 span.condition > span.result.false.has_otherwise::after {
-    text-align: right;
-    content: "- else:";
+  text-align: right;
+  content: "- else:";
 }
 span.condition > span.result.true::after {
-    text-align: right;
-    content: "- then:";
+  text-align: right;
+  content: "- then:";
 }
-span.result {
-    color: red;
+span.result.true {
+  color: green;
+}
+span.result.false {
+  color: red;
+}
+span.result.false.has_otherwise {
+  color: orange;
 }
 
 span.start::before {
-    content: "{{";
+  content: "{{";
 }
 span.end::after {
-    content: "}}";
+  content: "}}";
+}
+span.start {
+  position: relative;
+}
+span.count {
+  padding-left: 1em;
+  font-size: 1em;
+  position: absolute;
+  top: -1em;
 }
 
 div.body > div span.condition {
@@ -448,7 +475,7 @@ label.file, label.select {
   justify-content: left;
   flex-wrap: wrap;
   margin: 0.2em 3em;
-  background-color: #eee;
+  background-color: white;
   padding: 0.2em;
   border-radius: 0.2em;
   border: 1px solid #ccc;
