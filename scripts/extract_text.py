@@ -4,13 +4,29 @@ META_PREFIX = '$meta'
 # TODO: should we extract variables?
 META_FIELD_KEYS = ['variables', 'buildingBlocks']
 SKIPPED_PATH_LEAFS = [
-    'initial',
-    'func',
-    'get',
-    'linkPath',
-    'divert',
-    'buildingBlock',
+    # /** action */
     'action',
+    # /** 变量相关 */
+    'get',
+    # /** 函数相关 */
+    'buildingBlock',
+    'func',
+    'return',
+    # /** userInfo 相关 */
+    'journey',
+    'city',
+    'at',
+    'to',
+    'name',
+    'copyingJourney',
+    # /** 跳转相关 */
+    'divert',
+    'linkPath',
+    # /** dictionary 相关 */
+    'storyCustomContentClass',
+    'styleName',
+    # /** InkRootNode */
+    'initial',
 ]
 SKIPPED_PARENT_LEAFS = ['set', 'params']
 SKIPPED_VALUES = ['<br><br>']

@@ -81,6 +81,58 @@ export type InkFuncType =
   | 'Or'
   | 'Subtract';
 
+/**
+ * 从 `auto-types.ts` 里手动汇总的除数组元素外的可翻译字段名称。
+ *
+ * 但是，一般用 `UNTRANSLATABLE_FIELD_KEYS` 判断会更好一些。
+ * 也可以双重保险。
+ */
+export const TRANSLATABLE_FIELD_KEYS: string[] = [
+  /** 选项部分 */
+  'option',
+  /** userInfo 部分 */
+  'retelling',
+  'speaker',
+  'text',
+  'title',
+  /** dictionary 部分 */
+  'speakerName',
+];
+/**
+ * 从 `auto-types.ts` 里手动汇总的不可翻译字段的名称。
+ * 数字代表深度。
+ *
+ * 另外，所有以 `__bb` 开头的字段都是不可翻译的。
+ * 这个应该可以通过处理 `params` 字段来判断。
+ */
+export const UNTRANSLATABLE_FIELD_KEYS: Record<string, 0 | 1> = {
+  /** action */
+  action: 0,
+  /** 变量相关 */
+  get: 0,
+  set: 1, // set: ["varName", value]
+  /** 函数相关 */
+  buildingBlock: 0,
+  func: 0,
+  params: 1, // params: ["paramName", value] or params: { __bbXXX: value }
+  return: 0,
+  /** userInfo 相关 */
+  journey: 0,
+  city: 0,
+  at: 0,
+  to: 0,
+  name: 0,
+  copyingJourney: 0,
+  /** 跳转相关 */
+  divert: 0,
+  linkPath: 0,
+  /** dictionary 相关 */
+  storyCustomContentClass: 0,
+  styleName: 0,
+  /** InkRootNode */
+  initial: 0,
+};
+
 export type InkExpr = Type_set[number] | Type_doFuncs[number] | Type_returnNode;
 
 export type TypedCycleNode = {
