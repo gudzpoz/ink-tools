@@ -25,6 +25,7 @@ export type Options = {
   link: string,
   inline: boolean,
   condition: boolean,
+  default: boolean,
 }[];
 
 type InkCallStack = JSONPath[];
@@ -558,6 +559,7 @@ export class InkStoryRunner {
           link: option.linkPath,
           inline: option.inlineOption ?? false,
           condition: true,
+          default: false,
         }];
         if (option.condition) {
           const condition = await this.evaluateExpr(option.condition);
@@ -577,6 +579,19 @@ export class InkStoryRunner {
         }
         if (Array.isArray(next)) {
           options.push(...next);
+        } else {
+          // 这个时候输出的值是默认选项，在递归完之后再处理。
+          this.output('output', next);
+        }
+        // 递归完了，如果 options 全部不可选的话输出默认选项。
+        if (options.every((o) => !o.condition)) {
+          options.push({
+            text: this.collectOutputBuffer() ?? '',
+            link: '',
+            inline: options[0].inline,
+            condition: false,
+            default: true,
+          });
         }
         return options;
       }
@@ -649,6 +664,7 @@ export class InkStoryRunner {
         link: this.getIp()[0] as string,
         inline: false,
         condition: false,
+        default: false,
       }];
     }
     return text;

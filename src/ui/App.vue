@@ -154,6 +154,20 @@ async function fetchMore(delay: number = 20) {
     lines.value.push(...rest);
     timeOutHandle = setTimeout(fetchMore, delay);
   } else if (Array.isArray(line)) {
+    // 全部不可选的情况下应该会有一个默认选项的。
+    if (line.every((e) => !e.condition)) {
+      // 默认选项当成普通文本来处理。
+      const otherOptions = line.filter((e) => !e.default);
+      const option = line.find((e) => e.default);
+      if (option) {
+        lines.value.push(`<ul>${
+          otherOptions.map((e) => `<li><button disabled>${e.text}</button></li>`).join('')
+        }</ul>`);
+        lines.value.push(option.text);
+        timeOutHandle = setTimeout(fetchMore, delay);
+        return;
+      }
+    }
     lines.value[lines.value.length - 1] += ' ';
     options.value = line;
     saveStory();
