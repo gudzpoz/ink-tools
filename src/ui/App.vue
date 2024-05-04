@@ -66,6 +66,7 @@
         <button type="button" @click="clearSaves">
           🗑️ 清除存盘
         </button>
+        <p>你现在处在：{{ ip.join('.') }}</p>
       </div>
     </div>
   </div>
@@ -96,6 +97,7 @@ import rootJson from '../../data/80days.json';
 // @ts-expect-error: Excessive stack depth comparing types
 const root: InkRootNode = rootJson;
 const story = new InkStoryRunner(root);
+const ip = ref([]);
 const saves = ref<{
   save: unknown,
   lines: string[],
@@ -103,6 +105,7 @@ const saves = ref<{
   title: string,
 }[]>([]);
 const globalVariables = ref<ReturnType<typeof story.getVariables>>({});
+const globalReadCounts = ref<Record<string, number>>({});
 
 const stories = Object.keys(root['indexed-content'].ranges);
 const knotSelect = ref<HTMLSelectElement>();
@@ -133,6 +136,7 @@ function saveStory() {
 const storyUniqueId = ref(0);
 let timeOutHandle: ReturnType<typeof setTimeout> | null = null;
 async function fetchMore(delay: number = 20) {
+  ip.value = story.copyIp() as never[];
   if (options.value.length !== 0) {
     return;
   }
@@ -178,12 +182,16 @@ async function selectNewKnot(i: string | number) {
   Object.entries(globalVariables.value).forEach(([k, v]) => {
     variables[k] = v;
   });
+  Object.entries(globalReadCounts.value).forEach(([k, v]) => {
+    story.setReadCount(k, v);
+  });
   await fetchMore();
 }
 
 declare global {
   interface Window {
     ink: Record<string, string | number | boolean>;
+    inkHistory: Record<string, number>;
   }
 }
 
@@ -196,6 +204,16 @@ onMounted(async () => {
     set(_: never, p: string, v: string | number | boolean) {
       globalVariables.value[p] = v;
       story.getVariables()[p] = v;
+      return true;
+    },
+  });
+  window.inkHistory = new Proxy({}, {
+    get(_: never, p: string) {
+      return story.getReadCount(p);
+    },
+    set(_: never, p: string, v: number) {
+      globalReadCounts.value[p] = v;
+      story.setReadCount(p, v);
       return true;
     },
   });
@@ -219,6 +237,7 @@ async function loadStory(i: string) {
   if (savedOptions.length !== 0) {
     await fetchMore();
   }
+  ip.value = story.copyIp() as never[];
   if (knotSelect.value) {
     knotSelect.value.selectedIndex = -1;
   }
@@ -246,14 +265,18 @@ function alertUsage() {
   alert(`请按 F12 打开浏览器的开发者工具，并点击进入控制台（Console）。
 在 Console 里输入下面内容来改变变量值：
     ink.<variable> = newValue;
+在 Console 里输入下面内容来改变是否读过某 knot / stitch 的统计量：
+    inkHistory[':knot:stitch'] = 1;
 例如
     ink.banksize = 3;
     ink.money = 1000;
+    inkHistory[':meet_manager:__default_paragraph_4'] = 1;
 这些变量在输入之后以及每次故事从头运行时都会被设置成您所设定的值。（按“重置”按钮来恢复默认值。）`);
 }
 
 function resetVariables() {
   globalVariables.value = {};
+  globalReadCounts.value = {};
 }
 
 type CsvTranslation = {

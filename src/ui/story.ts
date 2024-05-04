@@ -216,9 +216,17 @@ export class InkStoryRunner {
     return [absKnot, absStitch];
   }
 
-  private getReadCount(name: string): number {
+  getReadCount(name: string): number {
     const [absKnot, absStitch] = this.getAbsKnotStitch(name);
     return this.environment.history[absKnot]?.[absStitch ?? ''] ?? 0;
+  }
+
+  setReadCount(name: string, count: number) {
+    const [absKnot, absStitch] = this.getAbsKnotStitch(name);
+    if (!this.environment.history[absKnot]) {
+      this.environment.history[absKnot] = {};
+    }
+    this.environment.history[absKnot][absStitch ?? ''] = count;
   }
 
   /**
@@ -583,14 +591,8 @@ export class InkStoryRunner {
   async divertTo(divert: string) {
     console.log(` -> ${divert}`);
     const ip = this.getIp();
+    this.setReadCount(divert, this.getReadCount(divert) + 1);
     const [absKnot, absStitch] = this.getAbsKnotStitch(divert);
-    if (!this.environment.history[absKnot]) {
-      this.environment.history[absKnot] = {};
-    }
-    if (!this.environment.history[absKnot][absStitch ?? '']) {
-      this.environment.history[absKnot][absStitch ?? ''] = 0;
-    }
-    this.environment.history[absKnot][absStitch ?? ''] += 1;
     const chunk = await this.getChunk(absKnot);
     if (Array.isArray(chunk)) {
       ip.splice(1);
