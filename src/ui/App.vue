@@ -149,11 +149,9 @@ async function fetchMore(delay: number = 20) {
     saveSelect.value.selectedIndex = -1;
   }
   if (typeof line === 'string') {
-    if (line !== '<br><br>') {
-      lines.value[lines.value.length - 1] += line;
-    } else {
-      lines.value.push('');
-    }
+    const [first, ...rest] = line.split('<br><br>');
+    lines.value[lines.value.length - 1] += first;
+    lines.value.push(...rest);
     timeOutHandle = setTimeout(fetchMore, delay);
   } else if (Array.isArray(line)) {
     lines.value[lines.value.length - 1] += ' ';

@@ -517,7 +517,11 @@ export class InkStoryRunner {
         return null;
       }
       case 'building': {
-        this.output('debug', `<span class="call">${escapeHtml(typed.value.buildingBlock)}()</span> `);
+        this.output('debug', `<span class="call">${escapeHtml(typed.value.buildingBlock)}(${
+          Object.entries(typed.value.params)
+            .map(([, v]) => `${this.decompiler.serializeExpr(v ?? 'undefined')}`)
+            .join(', ')
+        })</span> `);
         const output = await this.evaluateExpr(typed.value);
         this.output('output', `${output}`);
         return this.collectOutputBuffer();
