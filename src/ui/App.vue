@@ -89,7 +89,7 @@
         <input type="checkbox" v-model="debug.keepCycles" /> 💫 重开/读取存档保留 Cycle 计数
       </label>
     </div>
-    <p>你现在处在：{{ ip.join('.') }}</p>
+    <p class="ip">你现在处在：{{ ip.join('.') }}</p>
   </div>
   <div class="body" :class="{ inline: options[0]?.inline }">
     <TransitionGroup name="list">
@@ -212,17 +212,8 @@ const saveSelect = ref<HTMLSelectElement>();
 const lines = ref(['']);
 const options = ref<Options>([]);
 
-const debug = ref({
-  conditions: false,
-  cycles: false,
-  functions: false,
-  diverts: false,
-  original: false,
-  logPaths: false,
-  stepping: false,
-  keepCycles: false,
-});
 const store = useStore();
+const debug = computed(() => store.debug);
 const shouldShowVariableBrowser = ref(false);
 
 const variablesShown = ref<Record<string, InkVariableType>>({});
@@ -268,7 +259,7 @@ function schedule(delay: number) {
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   timeOutHandle = setTimeout(() => { fetchMore().catch(console.log); }, delay);
 }
-async function fetchMore(delay: number = 0) {
+async function fetchMore(delay: number = 20) {
   ip.value = story.copyIp() as never[];
   if (options.value.length !== 0) {
     return;
@@ -724,5 +715,12 @@ label.file > input {
 .list-leave-to {
   opacity: 0;
   transform: translateX(30px);
+}
+
+p.ip {
+  height: 1.5em;
+  width: fit-content;
+  overflow-x: auto;
+  text-wrap: nowrap;
 }
 </style>

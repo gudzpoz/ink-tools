@@ -12,7 +12,19 @@ export default defineStore('saves', () => {
   }[]>([]);
   const globalVariables = ref<Record<string, InkVariableType>>({});
   const globalReadCounts = ref<Record<string, number>>({});
-  return { saves, globalReadCounts, globalVariables };
+  const debug = ref({
+    conditions: false,
+    cycles: false,
+    functions: false,
+    diverts: false,
+    original: false,
+    logPaths: false,
+    stepping: false,
+    keepCycles: false,
+  });
+  return {
+    saves, globalReadCounts, globalVariables, debug,
+  };
 }, {
   persist: true,
 });
