@@ -48,43 +48,48 @@
       <button type="button" @click="fetchMore()" :disabled="!debug.stepping">
         👣 步进
       </button>
-      <div>
-        变量控制：
-        <button type="button" @click="alertUsage">
-          🐞 如何使用
-        </button>
-        <button type="button" @click="showVariableBrowser()">
-          🔍 变量查看器
-        </button>
-        <button type="button" @click="resetVariables">
-          🗑️ 重置 {{
-            Object.keys(store.globalVariables).length
-          }} 个变量以及 {{
-            Object.keys(store.globalReadCounts).length
-          }} 个读取计数器
-        </button>
-        存盘与读取：
-        <button type="button" @click="quickLoad">
-          ⤴️ 上一个选项点
-        </button>
-        <label class="select">
-          ⋙ 选择之前选项点
-          <select ref="saveSelect" @change="(e) => loadStory((e.target as HTMLSelectElement).value)">
-            <option
-              v-for="save, i in store.saves"
-              :key="i"
-              :value="i"
-            >
-              #{{ store.saves.length - i }}@{{ save.title }}
-            </option>
-          </select>
-        </label>
-        <button type="button" @click="clearSaves">
-          🗑️ 清除存盘
-        </button>
-        <p>你现在处在：{{ ip.join('.') }}</p>
-      </div>
     </div>
+    <div>
+      变量控制：
+      <button type="button" @click="alertUsage">
+        🐞 如何使用
+      </button>
+      <button type="button" @click="showVariableBrowser()">
+        🔍 变量查看器
+      </button>
+      <button type="button" @click="resetVariables">
+        🗑️ 重置 {{
+          Object.keys(store.globalVariables).length
+        }} 个变量以及 {{
+          Object.keys(store.globalReadCounts).length
+        }} 个读取计数器
+      </button>
+    </div>
+    <div>
+      存盘与读取：
+      <label class="select">
+        ⋙ 选择之前选项点
+        <select ref="saveSelect" @change="(e) => loadStory((e.target as HTMLSelectElement).value)">
+          <option
+            v-for="save, i in store.saves"
+            :key="i"
+            :value="i"
+          >
+            #{{ store.saves.length - i }}@{{ save.title }}
+          </option>
+        </select>
+      </label>
+      <button type="button" @click="quickLoad">
+        ⤴️ 上一个选项点
+      </button>
+      <button type="button" @click="clearSaves">
+        🗑️ 清除存盘
+      </button>
+      <label>
+        <input type="checkbox" v-model="debug.keepCycles" /> 💫 重开/读取存档保留 Cycle 计数
+      </label>
+    </div>
+    <p>你现在处在：{{ ip.join('.') }}</p>
   </div>
   <div class="body" :class="{ inline: options[0]?.inline }">
     <TransitionGroup name="list">
@@ -215,6 +220,7 @@ const debug = ref({
   original: false,
   logPaths: false,
   stepping: false,
+  keepCycles: false,
 });
 const store = useStore();
 const shouldShowVariableBrowser = ref(false);
@@ -323,7 +329,11 @@ async function selectNewKnot(n: string | number) {
   store.saves = [];
   clearContents();
   const i = typeof n === 'string' ? parseInt(n, 10) : n;
+  const cycleCounts = debug.value.keepCycles && story.save().cycleCounts;
   await story.init(i === -1 ? 'test' : stories[i]);
+  if (cycleCounts) {
+    story.environment.cycleCounts = cycleCounts;
+  }
   Object.entries(store.globalVariables).forEach(([k, v]) => {
     story.setVar(k, v);
   });
@@ -384,7 +394,11 @@ async function loadStory(i: string) {
   const { save, lines: savedLines, options: savedOptions } = store.saves[to];
   clearContents();
   store.saves = store.saves.splice(to);
+  const cycleCounts = debug.value.keepCycles && story.save().cycleCounts;
   await story.load(save as never);
+  if (cycleCounts) {
+    story.environment.cycleCounts = cycleCounts;
+  }
   lines.value = savedLines;
   options.value = savedOptions;
   if (savedOptions.length !== 0) {
