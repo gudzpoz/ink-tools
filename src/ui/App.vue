@@ -217,6 +217,7 @@ import {
 import { InkChunkNode, InkChunkWithStitches, InkRootNode } from '../types';
 
 import rootJson from '../../data/80days.json';
+import { yieldToMain } from './utils';
 
 const DEVELOPMENTAL = import.meta.env.DEV;
 
@@ -549,6 +550,8 @@ async function updateStoryWithFile(
     (shouldAlert ? alert : console.log)(`JSON/CSV 的文件名不符合：无对应 ${stem} 的 Ink 节点`);
     return false;
   }
+  // 操作可能较为费时，优先保证 UI 响应。
+  await yieldToMain();
   if (ext === 'csv') {
     const translations = parseTranslationCsv(content);
     const chunk = await story.copyChunk(name);

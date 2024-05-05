@@ -15,6 +15,7 @@ import {
   type TypedCycleNode,
 } from '../types';
 import PoorOldInkSerializer from '../decompiler';
+import { evaluateSequentially } from './utils';
 
 export type InkVariableType = string | number | boolean;
 
@@ -59,28 +60,6 @@ function escapeHtml(html: string): string {
 
 export function isParameterName(name: string): boolean {
   return name.startsWith('__bb');
-}
-
-/**
- * 因为 JS 里的 Promise 并没有 back-pressure 的概念，所以只能再用一层函数来包装。
- *
- * 因为 InkStoryRunner 是所有函数共用一套栈的，所以绝对不能使用 `Promise.all`。
- * 下面的类型体操是直接从 `Promise.all` 的类型定义里改过来的。
- *
- * 非要说的话，毕竟 JS 是单线程，在加载完网络资源之后其实并行化也没大必要。
- *
- * @param promises 顺序执行的函数
- */
-async function evaluateSequentially<T>(
-  promises: (() => Promise<T>)[],
-): Promise<T[]> {
-  const results: T[] = [];
-  for (let i = 0; i < promises.length; i += 1) {
-    // eslint-disable-next-line no-await-in-loop
-    const result = await promises[i]();
-    results.push(result);
-  }
-  return results;
 }
 
 function shallowCopy<T extends object>(obj: T): T {
