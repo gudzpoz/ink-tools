@@ -234,14 +234,15 @@ export class InkStoryRunner {
   }
 
   private expectError(e: unknown, message: Message) {
-    if (e instanceof Error && e.message === message) {
+    if (typeof e === 'string' && e === message) {
       return true;
     }
     return false;
   }
 
   private throwError(message: Message): never {
-    throw new Error(message);
+    // 性能优化，Error 需要 stack trace 会耗很多性能。
+    throw message as unknown;
   }
 
   getVariableNames() {
