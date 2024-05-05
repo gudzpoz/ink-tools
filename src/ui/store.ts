@@ -24,7 +24,12 @@ export default defineStore('saves', () => {
     keepCycles: false,
   });
   return {
-    saves, globalReadCounts, globalVariables, debug,
+    saves,
+    globalReadCounts,
+    globalVariables,
+    debug,
+    variableFilter: ref(''),
+    selectedKnot: ref(''),
   };
 }, {
   persist: true,

@@ -3,16 +3,16 @@
     <div>
       <label class="select">
         ⤷ 选择故事起点：
-        <select ref="knotSelect" @change="(e) => selectNewKnot((e.target as HTMLSelectElement).value)">
-          <option v-for="knot, i in stories" :key="knot" :value="i">
+        <select v-model="store.selectedKnot">
+          <option v-for="knot, i in stories" :key="knot" :value="knot">
             {{ String(i + 1).padStart(4, '0') }}-{{ knot }}
           </option>
         </select>
       </label>
-      <button type="button" @click="selectNewKnot(knotSelect?.value ?? 0)">
+      <button type="button" @click="selectNewKnot()">
         ⟳ 从头再来
       </button>
-      <button type="button" @click="selectNewKnot(-1)" v-if="DEVELOPMENTAL">
+      <button type="button" @click="selectNewKnot('test')" v-if="DEVELOPMENTAL">
         运行上传的 test.json（不上传就运行的话应该会出很多错）
       </button>
     </div>
@@ -115,8 +115,19 @@
   >
     <TabView>
       <TabPanel header="变量">
+        <label>
+          正则表示式筛选：
+          <input
+            type="text"
+            v-model="store.variableFilter"
+            placeholder="示例：money|fogg"
+          />
+        </label>
         <div class="variable-browser-inner">
-          <label v-for="[k, v] in Object.entries(variablesShown)" :key="k">
+          <label
+            v-for="[k, v] in filteredVariables"
+            :key="k"
+          >
             {{ k }}<span v-if="store.globalVariables[k] !== undefined">（已修改）</span>=
             <input
               v-if="typeof v === 'number'"
@@ -125,11 +136,12 @@
               @change="ink[k] = Number(($event.target as HTMLInputElement).value)"
             />
             <input
-              v-else
+              v-else-if="typeof v === 'boolean'"
               type="checkbox"
               :checked="!!v"
               @change="ink[k] = Boolean(($event.target as HTMLInputElement).checked)"
             />
+            <div v-else>出错啦！（{{ k }}={{ v }}）请向开发者汇报～</div>
           </label>
         </div>
       </TabPanel>
@@ -212,7 +224,6 @@ const story = new InkStoryRunner(root);
 const ip = ref([]);
 
 const stories = Object.keys(root['indexed-content'].ranges);
-const knotSelect = ref<HTMLSelectElement>();
 const saveSelect = ref<HTMLSelectElement>();
 
 const lines = ref(['']);
@@ -223,6 +234,10 @@ const debug = computed(() => store.debug);
 const shouldShowVariableBrowser = ref(false);
 
 const variablesShown = ref<Record<string, InkVariableType>>({});
+const filteredVariables = computed(() => {
+  const regex = RegExp(store.variableFilter);
+  return Object.entries(variablesShown.value).filter(([k]) => regex.test(k));
+});
 const browserSelectedKnot = ref('');
 const browserSelectedStitch = ref('');
 const stitchesShown = ref<string[]>([]);
@@ -348,16 +363,15 @@ function clearContents() {
   options.value = [];
 }
 
-async function selectNewKnot(n: string | number) {
+async function selectNewKnot(knot?: string) {
   if (timeOutHandle !== null) {
     clearTimeout(timeOutHandle);
     timeOutHandle = null;
   }
   store.saves = [];
   clearContents();
-  const i = typeof n === 'string' ? parseInt(n, 10) : n;
   const cycleCounts = debug.value.keepCycles && story.save().cycleCounts;
-  await story.init(i === -1 ? 'test' : stories[i]);
+  await story.init(knot ?? store.selectedKnot);
   if (cycleCounts) {
     story.environment.cycleCounts = cycleCounts;
   }
@@ -369,6 +383,7 @@ async function selectNewKnot(n: string | number) {
   });
   await fetchMore();
 }
+watch(() => store.selectedKnot, () => selectNewKnot(store.selectedKnot));
 
 declare global {
   interface Window {
@@ -404,7 +419,7 @@ const inkHistory = new Proxy<Record<string, number>>({}, {
   },
 });
 onMounted(async () => {
-  await selectNewKnot(0);
+  await selectNewKnot();
   window.ink = ink;
   window.inkHistory = inkHistory;
 });
@@ -432,9 +447,6 @@ async function loadStory(i: string) {
     await fetchMore();
   }
   ip.value = story.copyIp() as never[];
-  if (knotSelect.value) {
-    knotSelect.value.selectedIndex = -1;
-  }
 }
 
 async function quickLoad() {
@@ -447,7 +459,7 @@ async function quickLoad() {
     return;
   }
   store.saves = [];
-  await selectNewKnot(knotSelect.value?.value ?? 0);
+  await selectNewKnot(store.selectedKnot);
 }
 
 function clearSaves() {
@@ -587,7 +599,7 @@ async function updateStoryWithTranslation(e: Event) {
   const [file] = files;
   const [stem, extension] = file.name.split('.');
   if (await updateStoryWithFile(stem, extension, await file.arrayBuffer(), true)) {
-    await selectNewKnot(knotSelect.value?.value ?? 0);
+    await selectNewKnot();
   }
 }
 watch(() => debug.value.original, () => {

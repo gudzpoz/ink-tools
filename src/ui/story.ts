@@ -272,7 +272,6 @@ export class InkStoryRunner {
     if (value === undefined) {
       delete this.environment.variables[name];
     } else {
-      console.log(name, value, this.debugExprIp.join('.'));
       this.environment.variables[name] = value;
     }
   }
