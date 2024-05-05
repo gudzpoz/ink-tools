@@ -18,13 +18,22 @@ import PoorOldInkSerializer from '../decompiler';
 
 export type InkVariableType = string | number | boolean;
 
+export type DebugInfo = {
+  info: string,
+  usedVariables?: string[],
+  usedFunctions?: string[],
+  usedKnots?: string[],
+};
+
 export type Options = {
   text: string,
   link: string,
   inline: boolean,
   condition: boolean,
-  default: boolean,
+  debug: (string | DebugInfo)[],
 }[];
+
+export type StoryLine = string | DebugInfo | Options;
 
 type InkCallStack = JSONPath[];
 
@@ -78,6 +87,12 @@ function shallowCopy<T extends object>(obj: T): T {
   return Object.fromEntries(Object.entries(obj)) as T;
 }
 
+type ConditionTrack = {
+  variables: Set<string>,
+  functions: Set<string>,
+  knots: Set<string>,
+};
+
 type Message = 'return' | 'ended' | 'divert_in_function';
 
 export type RunnerListener = (
@@ -102,17 +117,21 @@ export class InkStoryRunner {
 
   private returnStack: InkReturnValue[];
 
+  private conditionTrackStack: ConditionTrack[];
+
+  private debugExprIp: JSONPath;
+
+  private collectingOptions: boolean;
+
   /**
    * 一般我们直接返回输出就可以了。
    * 但有些时候（例如函数求值时），输出基本是个副作用，就需要输出到这边来。
    * 函数求值完之后直接输出并清空。
    *
    * Debug 信息也放在这边。
+   * `string` 是正经输出，数组是 Options，其它是 debug 信息。
    */
-  private dumbBuffer: {
-    type: 'output' | 'debug',
-    value: string,
-  }[];
+  private dumbBuffer: (string | DebugInfo)[];
 
   private decompiler: PoorOldInkSerializer;
 
@@ -133,7 +152,10 @@ export class InkStoryRunner {
         '': JSON.parse(JSON.stringify(root)) as InkRootNode,
       },
     };
+    this.debugExprIp = [];
+    this.collectingOptions = false;
     this.returnStack = [];
+    this.conditionTrackStack = [];
     this.dumbBuffer = [];
     this.decompiler = new PoorOldInkSerializer(root);
     this.environment = this.newEnvironment();
@@ -226,7 +248,16 @@ export class InkStoryRunner {
     return Object.keys(this.environment.variables);
   }
 
+  private track(key: keyof ConditionTrack, value: string) {
+    if (this.conditionTrackStack.length > 0) {
+      this.conditionTrackStack[this.conditionTrackStack.length - 1][key].add(value);
+    }
+  }
+
   getVar(name: string) {
+    if (!isParameterName(name)) {
+      this.track('variables', name);
+    }
     return this.environment.variables[name];
   }
 
@@ -241,6 +272,7 @@ export class InkStoryRunner {
     if (value === undefined) {
       delete this.environment.variables[name];
     } else {
+      console.log(name, value, this.debugExprIp.join('.'));
       this.environment.variables[name] = value;
     }
   }
@@ -255,6 +287,7 @@ export class InkStoryRunner {
 
   getReadCount(name: string): number {
     const [absKnot, absStitch] = this.getAbsKnotStitch(name);
+    this.track('knots', `:${absKnot}${absStitch ? `:${absStitch}` : ''}`);
     return this.environment.history[absKnot]?.[absStitch ?? ''] ?? 0;
   }
 
@@ -272,8 +305,9 @@ export class InkStoryRunner {
   private async evaluateExpr(
     path: JSONPath,
   ): Promise<string | number | boolean> {
+    this.debugExprIp = path;
     const expr: InkBlock | InkBlock[] | undefined = await this.getCurrent(path);
-    if (!expr) {
+    if (expr === undefined) {
       return '';
     }
     if (typeof expr !== 'object') {
@@ -308,6 +342,7 @@ export class InkStoryRunner {
       }
       case 'building': {
         const { buildingBlock } = typed.value;
+        this.track('functions', buildingBlock);
         const params = await evaluateSequentially(
           Object.keys(typed.value.params).map((name) => async () => [
             name,
@@ -354,7 +389,7 @@ export class InkStoryRunner {
     const typed = annotateInkBlockType(blocks);
     switch (typed.type) {
       case 'value': {
-        this.output('output', typed.value as string);
+        this.output(typed.value as string);
         if (this.logPaths) {
           console.log(`@ ${this.returnStack[this.returnStack.length - 1].name}:`, typed.value);
         }
@@ -474,15 +509,31 @@ export class InkStoryRunner {
     }
   }
 
-  output(type: 'output' | 'debug', value: string) {
-    this.dumbBuffer.push({ type, value });
+  private output(value: string) {
+    this.dumbBuffer.push(value);
   }
 
-  private collectOutputBuffer() {
-    if (!this.dumbBuffer.some((e) => e.type === 'output' && e.value !== '')) {
-      return null;
+  private debug(
+    info: string,
+    usedVariables?: Set<string>,
+    usedFunctions?: Set<string>,
+    usedKnots?: Set<string>,
+  ) {
+    this.dumbBuffer.push({
+      info,
+      usedVariables: usedVariables && [...usedVariables],
+      usedFunctions: usedFunctions && [...usedFunctions],
+      usedKnots: usedKnots && [...usedKnots],
+    });
+  }
+
+  private collectOutputBuffer(force?: boolean): (string | DebugInfo)[] {
+    if (!force && !this.dumbBuffer.some(
+      (e) => (typeof e === 'string' && e !== ''),
+    )) {
+      return [];
     }
-    const output = this.dumbBuffer.map((o) => o.value).join('');
+    const output = this.dumbBuffer;
     this.dumbBuffer = [];
     return output;
   }
@@ -496,17 +547,26 @@ export class InkStoryRunner {
     ) as InkBlock | undefined;
   }
 
-  private outputDebugCondition(
-    condition: InkVariableType,
+  private async evaluateCondition(
+    path: JSONPath,
     expr: Type_set[number],
     elseClass: string,
-  ) {
+  ): Promise<boolean> {
+    this.conditionTrackStack.push({ variables: new Set(), functions: new Set(), knots: new Set() });
+    const condition = await this.evaluateExpr(path);
+    const { variables, functions, knots } = this.conditionTrackStack.pop()!;
     const cond = condition ? 'true' : 'false';
-    this.output('debug', `<span class="condition"><span class="${cond}">${
-      escapeHtml(this.decompiler.serializeExpr(expr))
-    }</span><span class="result ${cond} ${
-      elseClass
-    }">=${escapeHtml(JSON.stringify(condition))}</span></span>`);
+    this.debug(
+      `<span class="condition"><span class="${cond}">${
+        escapeHtml(this.decompiler.serializeExpr(expr))
+      }</span><span class="result ${cond} ${
+        elseClass
+      }">=${escapeHtml(JSON.stringify(condition))}</span></span>`,
+      variables,
+      functions,
+      knots,
+    );
+    return !!condition;
   }
 
   /**
@@ -515,7 +575,7 @@ export class InkStoryRunner {
    * 有可能会 throw 一个 ended 的错误，用来指示故事结束。
    * 不希望结束的 catch 一下即可。
    */
-  private async getNext(): Promise<string | Options | null> {
+  private async getNext(): Promise<StoryLine[] | null> {
     const ip = this.getIp();
     const path = this.copyIp();
     const current = await this.getCurrent();
@@ -523,7 +583,7 @@ export class InkStoryRunner {
     if (typeof ip[ip.length - 1] !== 'number') {
       throw new Error('Invalid IP');
     }
-    if (!current) {
+    if (current === undefined) {
       let last: string | number = '';
       do {
         last = ip.pop()!;
@@ -534,7 +594,7 @@ export class InkStoryRunner {
       }
       (ip[ip.length - 1] as number) += 1;
       if (last === 'cycle' || last === 'sequence') {
-        this.output('debug', ` <span class="end">${last}</span>`);
+        this.debug(` <span class="end">${last}</span>`);
       }
       return null;
     }
@@ -548,11 +608,15 @@ export class InkStoryRunner {
           console.log(`@ ${ip.join('.')}:`, typed.value);
           (ip[ip.length - 1] as number) += 1;
         }
-        this.output('output', typed.value as string);
-        return this.collectOutputBuffer() ?? '';
+        this.output(typed.value as string);
+        return this.collectOutputBuffer();
       }
       case 'condition': {
-        const condition = await this.evaluateExpr(typed.join(path, 'condition'));
+        const condition = await this.evaluateCondition(
+          typed.join(path, 'condition'),
+          typed.value.condition,
+          typed.value.otherwise ? 'has_otherwise' : '',
+        );
         if (condition) {
           (ip[ip.length - 1] as number) -= 1;
           ip.push('then', 0);
@@ -560,29 +624,23 @@ export class InkStoryRunner {
           (ip[ip.length - 1] as number) -= 1;
           ip.push('otherwise', 0);
         }
-        this.outputDebugCondition(
-          condition,
-          typed.value.condition,
-          typed.value.otherwise ? 'has_otherwise' : '',
-        );
         return null;
       }
       case 'building': {
         const name = escapeHtml(typed.value.buildingBlock);
-        this.output('debug', `<span class="call">${name}(${
+        this.debug(`<span class="call">${name}(${
           Object.entries(typed.value.params)
             .map(([, v]) => `${this.decompiler.serializeExpr(v ?? 'undefined')}`)
             .join(', ')
         })</span> `);
         const output = await this.evaluateExpr(path);
-        this.output('output', `${output}`);
-        this.output('debug', `<span class="return">${name}</span>`);
+        this.output(`${output}`);
+        this.debug(`<span class="return">${name}</span>`);
         return this.collectOutputBuffer();
       }
       case 'do': {
         await this.evaluateExpr(typed.join(path, 'doFuncs'));
-        this.output(
-          'debug',
+        this.debug(
           `<span class="expr">${escapeHtml(this.decompiler.serializeDoFuncsNode(typed.value))}</span>
           <br>`,
         );
@@ -590,7 +648,7 @@ export class InkStoryRunner {
       }
       case 'divert': {
         await this.divertTo(typed.value.divert);
-        this.output('debug', `<span class="divert">-&gt; ${escapeHtml(typed.value.divert)}</span>`);
+        this.debug(`<span class="divert">-&gt; ${escapeHtml(typed.value.divert)}</span>`);
         return null;
       }
       case 'cycle':
@@ -599,55 +657,82 @@ export class InkStoryRunner {
         const key = typed.type;
         (ip[ip.length - 1] as number) -= 1;
         ip.push(key, cycleI, 0);
-        this.output('debug', `<span class="start">${typed.type}<span class="count">(${cycleI + 1}/${contents.length})</span></span> `);
+        this.debug(`<span class="start">${
+          typed.type
+        }<span class="count">(${cycleI + 1}/${contents.length})</span></span> `);
         return null;
       }
       case 'option': {
         const option = typed.value;
-        const options: Options = [{
-          text: '',
+        const thisOption = {
+          text: option.option,
           link: option.linkPath,
           inline: option.inlineOption ?? false,
           condition: true,
           default: false,
-        }];
+          debug: [],
+        };
+        const options: Options = [thisOption];
+        const output: StoryLine[] = [];
+        // 第一个选项的时候先把之前没有输出的都一股脑输出出去。
+        // 如果是之后跟的选项那么把输出放在选项内的 debug 里。
+        const isProcessingFirstOption = !this.collectingOptions;
+        if (isProcessingFirstOption) {
+          output.push(...this.collectOutputBuffer(true));
+          this.collectingOptions = true;
+        }
+        output.push(options);
+
         if (option.condition) {
-          const condition = await this.evaluateExpr(typed.join(path, 'condition'));
-          options[0].condition = !!condition;
-          this.outputDebugCondition(
-            condition,
+          const condition = await this.evaluateCondition(
+            typed.join(path, 'condition'),
             option.condition,
             '',
           );
+          options[0].condition = !!condition;
         }
-        this.output('output', option.option);
-        options[0].text = this.collectOutputBuffer() ?? '';
+        // 这里的 collectOutputBuffer 都需要加 force=true。
+        options[0].debug = this.collectOutputBuffer(true);
         // 开始 options 时已经没必要注意恢复现场了，因为之后必定会 divert。
         const next = await this.getUntilNext();
         if (!next) {
-          return options;
+          // 已经收集了到故事结束为止的选项，这里递归调用开始返回。
+          return output;
         }
-        if (Array.isArray(next)) {
-          options.push(...next);
+        const last = next[0];
+        if (Array.isArray(last)) {
+          // 如果是选项则加到候选列表中。
+          options.push(...last);
+          // 除了最外层的第一个选项其它都应该只返回单个选项。
+          if (next.length !== 1) {
+            throw new Error('Expecting a single `Options`');
+          }
         } else {
-          // 这个时候输出的值是默认选项，在递归完之后再处理。
-          this.output('output', next);
+          // 如果不是选项，则这个时候输出的值是默认选项，在递归完之后再处理。
+          if (next.some((e) => Array.isArray(e))) {
+            throw new Error('Expecting no option when visiting a default option');
+          }
+          this.dumbBuffer.push(
+            ...(next as (string | DebugInfo)[]),
+          );
         }
-        // 递归完了，如果 options 全部不可选的话输出默认选项。
-        if (options.every((o) => !o.condition)) {
-          options.push({
-            text: this.collectOutputBuffer() ?? '',
-            link: '',
-            inline: options[0].inline,
-            condition: false,
-            default: true,
-          });
+        if (isProcessingFirstOption) {
+          // 恢复现场。
+          this.collectingOptions = false;
+          // 递归完了，如果 options 全部不可选的话输出默认选项。
+          if (options.every((o) => !o.condition)) {
+            output.push(...this.collectOutputBuffer());
+          } else {
+            // 否则的话把这期间的输出丢弃。
+            // TODO: 其实还是有点问题，例如默认选项的一个元素是带有副作用的函数调用的话那就麻烦了……
+            this.collectOutputBuffer(true);
+          }
         }
-        return options;
+        return output;
       }
       default:
-        this.output('output', `<br><br>${JSON.stringify(typed.value)}`);
-        return this.collectOutputBuffer() ?? '';
+        this.output(`<br><br>${JSON.stringify(typed.value)}`);
+        return this.collectOutputBuffer();
     }
   }
 
@@ -696,11 +781,11 @@ export class InkStoryRunner {
   /**
    * @returns 返回 null 时必定是故事已经结束了
    */
-  private async getUntilNext(): Promise<string | Options | null> {
+  private async getUntilNext(): Promise<StoryLine[] | null> {
     await this.init();
     try {
       const text = await this.getNext();
-      if (!text) {
+      if (!text || text.length === 0) {
         return await this.getUntilNext();
       }
       return text;
@@ -715,17 +800,19 @@ export class InkStoryRunner {
     }
   }
 
-  async next(): Promise<string | Options | null> {
-    const text = await this.getUntilNext();
-    if (Array.isArray(text) && text.length === 0) {
-      return [{
-        text: '>>> No option offered. Please report this bug. <<<',
-        link: this.getIp()[0] as string,
-        inline: false,
-        condition: false,
-        default: false,
-      }];
-    }
-    return text;
+  async next(): Promise<StoryLine[] | null> {
+    const output = await this.getUntilNext();
+    return output?.map((o) => {
+      if (Array.isArray(o) && o.length === 0) {
+        return [{
+          text: '>>> No option offered. Please report this bug. <<<',
+          link: this.getIp()[0] as string,
+          inline: false,
+          condition: false,
+          debug: [],
+        }] as Options;
+      }
+      return o;
+    }) ?? null;
   }
 }

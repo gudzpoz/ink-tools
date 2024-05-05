@@ -31,6 +31,10 @@
         <input type="checkbox" v-model="debug.conditions" /> ❗ 条件
       </label>
       <label>
+        <input type="checkbox" v-model="debug.conditionDetails" :disabled="!debug.conditions" />
+        🌸 显示条件有关变量
+      </label>
+      <label>
         <input type="checkbox" v-model="debug.cycles" /> ♻️ 循环文本（Cycles/Sequences）
       </label>
       <label>
@@ -99,7 +103,7 @@
     </TransitionGroup>
     <TransitionGroup name="list" tag="ul">
       <li v-for="option, i in options" :key="option.link">
-        <button type="button" @click="select(i)" v-html="option.text" :disabled="!option.condition" />
+        <button type="button" @click="select(i)" v-html="getOptionText(option)" :disabled="!option.condition" />
       </li>
     </TransitionGroup>
   </div>
@@ -193,7 +197,9 @@ import {
 import JSZip from 'jszip';
 
 import useStore from './store';
-import { InkStoryRunner, InkVariableType, Options } from './story';
+import {
+  DebugInfo, InkStoryRunner, InkVariableType, Options,
+} from './story';
 import { InkChunkNode, InkChunkWithStitches, InkRootNode } from '../types';
 
 import rootJson from '../../data/80days.json';
@@ -256,8 +262,40 @@ function saveStory() {
 const storyUniqueId = ref(0);
 let timeOutHandle: ReturnType<typeof setTimeout> | null = null;
 function schedule(delay: number) {
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  timeOutHandle = setTimeout(() => { fetchMore().catch(console.log); }, delay);
+  if (debug.value.stepping) {
+    return;
+  }
+  timeOutHandle = setTimeout(() => {
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define, no-void
+    void fetchMore();
+  }, delay);
+}
+function outputText(l: string) {
+  const [first, ...rest] = l.split('<br><br>');
+  lines.value[lines.value.length - 1] += first;
+  lines.value.push(...rest);
+}
+function getConditionDetails(l: DebugInfo) {
+  let text = l.info;
+  if (l.usedVariables || l.usedFunctions || l.usedKnots) {
+    text += '<div class="details">';
+    if (l.usedVariables?.length) {
+      text += `<div class="variables">涉及变量：${l.usedVariables.join(', ')}</div>`;
+    }
+    if (l.usedFunctions?.length) {
+      text += `<div class="functions">涉及函数：${l.usedFunctions.join(', ')}</div>`;
+    }
+    if (l.usedKnots?.length) {
+      text += `<div class="functions">涉及节点：${l.usedKnots.join(', ')}</div>`;
+    }
+    text += '</div>';
+  }
+  return text;
+}
+function getOptionText(o: Options[number]) {
+  return `${
+    o.debug.map((d) => (typeof d === 'string' ? d : getConditionDetails(d))).join('')
+  }${o.text}`;
 }
 async function fetchMore(delay: number = 20) {
   ip.value = story.copyIp() as never[];
@@ -272,37 +310,35 @@ async function fetchMore(delay: number = 20) {
   if (saveSelect.value) {
     saveSelect.value.selectedIndex = -1;
   }
-  if (typeof line === 'string') {
-    const [first, ...rest] = line.split('<br><br>');
-    lines.value[lines.value.length - 1] += first;
-    lines.value.push(...rest);
-    if (debug.value.stepping) {
+  if (!line) {
+    lines.value.push('Story Ended');
+    return;
+  }
+  line.forEach((l) => {
+    if (typeof l === 'string') {
+      // 普通输出
+      outputText(l);
       return;
     }
-    schedule(delay);
-  } else if (Array.isArray(line)) {
-    // 全部不可选的情况下应该会有一个默认选项的。
-    if (line.every((e) => !e.condition)) {
-      // 默认选项当成普通文本来处理。
-      const otherOptions = line.filter((e) => !e.default);
-      const option = line.find((e) => e.default);
-      if (option) {
-        lines.value.push(`<ul>${
-          otherOptions.map((e) => `<li><button disabled>${e.text}</button></li>`).join('')
+    // 选项
+    if (Array.isArray(l)) {
+      if (l.every((e) => !e.condition)) {
+        // 全部不可选的情况下当成普通内容处理。
+        outputText(`<ul>${
+          l.map((e) => `<li><button disabled>${getOptionText(e)}</button></li>`).join('')
         }</ul>`);
-        lines.value.push(option.text);
-        if (debug.value.stepping) {
-          return;
-        }
-        schedule(delay);
         return;
       }
+      lines.value[lines.value.length - 1] += ' ';
+      options.value = l;
+      saveStory();
+      return;
     }
-    lines.value[lines.value.length - 1] += ' ';
-    options.value = line;
-    saveStory();
-  } else {
-    lines.value.push('Story Ended');
+    // Debug 信息
+    outputText(getConditionDetails(l));
+  });
+  if (options.value.length === 0) {
+    schedule(delay);
   }
 }
 
@@ -562,6 +598,10 @@ watch(() => debug.value.logPaths, () => {
 });
 
 const displayConditions = computed(() => (debug.value.conditions ? 'inline-flex' : 'none'));
+const displayConditionDetails = computed(
+  () => (debug.value.conditions && debug.value.conditionDetails ? 'inline-block' : 'none'),
+);
+
 const displayCycles = computed(() => (debug.value.cycles ? 'inline-flex' : 'none'));
 const displayDiverts = computed(() => (debug.value.diverts ? 'inline-flex' : 'none'));
 const displayFunctions = computed(() => (debug.value.functions ? 'inline-flex' : 'none'));
@@ -590,8 +630,8 @@ div.inline > ul, div.inline > ul > li {
   padding-left: 0;
 }
 
-div.body span {
-  font-size: 0.7em;
+div.body span, div.body div.details {
+  font-size: 0.6rem;
   color: var(--span-color);
 }
 div.body span.condition {
@@ -600,7 +640,6 @@ div.body span.condition {
   flex-direction: column;
   text-align: center;
   vertical-align: top;
-  font-size: 1em;
 }
 span.condition > span {
   display: block;
@@ -630,6 +669,28 @@ div.body span.result.false {
 div.body span.result.false.has_otherwise {
   color: orange;
 }
+div.body div.details div.variables::before {
+  background-color: red;
+  content: "";
+  width: 2px;
+  height: 1em;
+  display: inline-block;
+}
+div.body div.details div.variables,
+div.body div.details div.functions,
+div.body div.details div.knots {
+  background-color: #fff8;
+  padding: 0.2em;
+  border-radius: 3px;
+  min-width: 8em;
+}
+div.body div.details div.variables {
+  display: inline-block;
+}
+div.body div.details div.functions,
+div.body div.details div.knots {
+  display: block;
+}
 
 span.start::before {
   content: "{{";
@@ -642,7 +703,6 @@ span.start {
 }
 div.body span.count {
   padding-left: 1em;
-  font-size: 1em;
   position: absolute;
   top: -1em;
   font-family: monospace;
@@ -658,8 +718,11 @@ span.return::before {
   top: -1em;
 }
 
-div.body > div span.condition {
+div.body span.condition {
   display: v-bind(displayConditions);
+}
+div.body div.details {
+  display: v-bind(displayConditionDetails);
 }
 div.body > div span.start, div.body > div span.end {
   display: v-bind(displayCycles);
@@ -678,11 +741,18 @@ label.file, label.select {
   flex-direction: column;
   justify-content: left;
   flex-wrap: wrap;
-  margin: 0.2em 3em;
   background-color: white;
   padding: 0.2em;
   border-radius: 0.2em;
   border: 1px solid #ccc;
+}
+label.select {
+  width: 100%;
+  height: fit-content;
+  overflow: hidden;
+}
+label.select > select {
+  width: 100%;
 }
 label.file:hover {
   background-color: #ddd;
@@ -719,7 +789,7 @@ label.file > input {
 
 p.ip {
   height: 1.5em;
-  width: fit-content;
+  width: 100%;
   overflow-x: auto;
   text-wrap: nowrap;
 }

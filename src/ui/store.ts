@@ -14,6 +14,7 @@ export default defineStore('saves', () => {
   const globalReadCounts = ref<Record<string, number>>({});
   const debug = ref({
     conditions: false,
+    conditionDetails: false,
     cycles: false,
     functions: false,
     diverts: false,
