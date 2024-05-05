@@ -2,13 +2,21 @@
   <div class="header">
     <div class="sticky">
       <div>
-        <label class="select">
+        <label class="select" for="knotSelector">
           ⤷ 选择故事起点：
-          <select v-model="store.selectedKnot">
-            <option v-for="knot, i in stories" :key="knot" :value="knot">
-              {{ String(i + 1).padStart(4, '0') }}-{{ knot }}
-            </option>
-          </select>
+          <Dropdown
+            id="knotSelector"
+            v-model="store.selectedKnot"
+            :options="stories.map((knot, i) => ({
+              label: `${String(i + 1).padStart(4, '0')}-${knot}`,
+              value: knot,
+            }))"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="选择故事起点"
+            filter
+            :virtualScrollerOptions="{ itemSize: 38 }"
+          />
         </label>
         <button type="button" @click="selectNewKnot()">
           ⟳ 从头再来
@@ -149,13 +157,21 @@
       </TabPanel>
       <TabPanel header="节点">
         <div class="knot-browser">
-          <label class="select">
+          <label class="select" for="knotBrowserSelector">
             Knot 文件名：
-            <select v-model="browserSelectedKnot">
-              <option v-for="knot in stories" :key="knot" :value="knot">
-                :{{ knot }}
-              </option>
-            </select>
+            <Dropdown
+              id="knotBrowserSelector"
+              v-model="browserSelectedKnot"
+              :options="stories.map((knot) => ({
+                label: `:${knot}`,
+                value: knot,
+              }))"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Knot 名称"
+              filter
+              :virtualScrollerOptions="{ itemSize: 38 }"
+            />
           </label>
           <label>
             :{{ browserSelectedKnot }} 访问次数
@@ -166,13 +182,21 @@
               @change="inkHistory[`:${browserSelectedKnot}`] = Number(($event.target as HTMLInputElement).value)"
             />
           </label>
-          <label class="select">
+          <label class="select" for="stitchBrowserSelector">
             Stitch 名称：
-            <select v-model="browserSelectedStitch">
-              <option v-for="stitch in stitchesShown" :key="stitch" :value="stitch">
-                :{{ stitch }}
-              </option>
-            </select>
+            <Dropdown
+              id="stitchBrowserSelector"
+              v-model="browserSelectedStitch"
+              :options="stitchesShown.map((stitch) => ({
+                label: `:${stitch}`,
+                value: stitch,
+              }))"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Stitch 名称"
+              filter
+              :virtualScrollerOptions="{ itemSize: 38 }"
+            />
           </label>
           <label>
             :{{ browserSelectedKnot }}:{{
@@ -201,6 +225,7 @@
 
 <script setup lang="ts">
 import Dialog from 'primevue/dialog';
+import Dropdown from 'primevue/dropdown';
 import TabPanel from 'primevue/tabpanel';
 import TabView from 'primevue/tabview';
 
@@ -238,8 +263,12 @@ const shouldShowVariableBrowser = ref(false);
 
 const variablesShown = ref<Record<string, InkVariableType>>({});
 const filteredVariables = computed(() => {
-  const regex = RegExp(store.variableFilter);
-  return Object.entries(variablesShown.value).filter(([k]) => regex.test(k));
+  try {
+    const regex = RegExp(store.variableFilter);
+    return Object.entries(variablesShown.value).filter(([k]) => regex.test(k));
+  } catch (_) {
+    return Object.entries(variablesShown.value);
+  }
 });
 const browserSelectedKnot = ref('');
 const browserSelectedStitch = ref('');
