@@ -1,99 +1,101 @@
 <template>
   <div class="header">
-    <div>
-      <label class="select">
-        ⤷ 选择故事起点：
-        <select v-model="store.selectedKnot">
-          <option v-for="knot, i in stories" :key="knot" :value="knot">
-            {{ String(i + 1).padStart(4, '0') }}-{{ knot }}
-          </option>
-        </select>
-      </label>
-      <button type="button" @click="selectNewKnot()">
-        ⟳ 从头再来
-      </button>
-      <button type="button" @click="selectNewKnot('test')" v-if="DEVELOPMENTAL">
-        运行上传的 test.json（不上传就运行的话应该会出很多错）
-      </button>
+    <div class="sticky">
+      <div>
+        <label class="select">
+          ⤷ 选择故事起点：
+          <select v-model="store.selectedKnot">
+            <option v-for="knot, i in stories" :key="knot" :value="knot">
+              {{ String(i + 1).padStart(4, '0') }}-{{ knot }}
+            </option>
+          </select>
+        </label>
+        <button type="button" @click="selectNewKnot()">
+          ⟳ 从头再来
+        </button>
+        <button type="button" @click="selectNewKnot('test')" v-if="DEVELOPMENTAL">
+          运行上传的 test.json（不上传就运行的话应该会出很多错）
+        </button>
+      </div>
+      <div>
+        <label class="file">
+          📤 上传翻译后的 JSON/CSV/ZIP 以替换文本
+          <input type="file" @change="(e) => updateStoryWithTranslation(e)" />
+        </label>
+        <label>
+          <input type="checkbox" v-model="debug.original" /> 📄 显示原文
+        </label>
+      </div>
+      <div>
+        显示附加信息：
+        <label>
+          <input type="checkbox" v-model="debug.conditions" /> ❗ 条件
+        </label>
+        <label>
+          <input type="checkbox" v-model="debug.conditionDetails" :disabled="!debug.conditions" />
+          🌸 显示条件有关变量
+        </label>
+        <label>
+          <input type="checkbox" v-model="debug.cycles" /> ♻️ 循环文本（Cycles/Sequences）
+        </label>
+        <label>
+          <input type="checkbox" v-model="debug.diverts" /> 🦘 跳转（Diverts）
+        </label>
+        <label>
+          <input type="checkbox" v-model="debug.functions" /> ⚙️ 表达式与函数
+        </label>
+        <label>
+          <input type="checkbox" v-model="debug.logPaths" /> 📝 在 F12 的 Console 中记录路径
+        </label>
+        <label>
+          <input type="checkbox" v-model="debug.stepping" /> 🐌 步进
+        </label>
+        <button type="button" @click="fetchMore()" :disabled="!debug.stepping">
+          👣 步进
+        </button>
+      </div>
+      <div>
+        变量控制：
+        <button type="button" @click="alertUsage">
+          🐞 如何使用
+        </button>
+        <button type="button" @click="showVariableBrowser()">
+          🔍 变量查看器
+        </button>
+        <button type="button" @click="resetVariables">
+          🗑️ 重置 {{
+            Object.keys(store.globalVariables).length
+          }} 个变量以及 {{
+            Object.keys(store.globalReadCounts).length
+          }} 个读取计数器
+        </button>
+      </div>
+      <div>
+        存盘与读取：
+        <label class="select">
+          ⋙ 选择之前选项点
+          <select ref="saveSelect" @change="(e) => loadStory((e.target as HTMLSelectElement).value)">
+            <option
+              v-for="save, i in store.saves"
+              :key="i"
+              :value="i"
+            >
+              #{{ store.saves.length - i }}@{{ save.title }}
+            </option>
+          </select>
+        </label>
+        <button type="button" @click="quickLoad">
+          ⤴️ 上一个选项点
+        </button>
+        <button type="button" @click="clearSaves">
+          🗑️ 清除存盘
+        </button>
+        <label>
+          <input type="checkbox" v-model="debug.keepCycles" /> 💫 重开/读取存档保留 Cycle 计数
+        </label>
+      </div>
+      <p class="ip">你现在处在：{{ ip.join('.') }}</p>
     </div>
-    <div>
-      <label class="file">
-        📤 上传翻译后的 JSON/CSV/ZIP 以替换文本
-        <input type="file" @change="(e) => updateStoryWithTranslation(e)" />
-      </label>
-      <label>
-        <input type="checkbox" v-model="debug.original" /> 📄 显示原文
-      </label>
-    </div>
-    <div>
-      显示附加信息：
-      <label>
-        <input type="checkbox" v-model="debug.conditions" /> ❗ 条件
-      </label>
-      <label>
-        <input type="checkbox" v-model="debug.conditionDetails" :disabled="!debug.conditions" />
-        🌸 显示条件有关变量
-      </label>
-      <label>
-        <input type="checkbox" v-model="debug.cycles" /> ♻️ 循环文本（Cycles/Sequences）
-      </label>
-      <label>
-        <input type="checkbox" v-model="debug.diverts" /> 🦘 跳转（Diverts）
-      </label>
-      <label>
-        <input type="checkbox" v-model="debug.functions" /> ⚙️ 表达式与函数
-      </label>
-      <label>
-        <input type="checkbox" v-model="debug.logPaths" /> 📝 在 F12 的 Console 中记录路径
-      </label>
-      <label>
-        <input type="checkbox" v-model="debug.stepping" /> 🐌 步进
-      </label>
-      <button type="button" @click="fetchMore()" :disabled="!debug.stepping">
-        👣 步进
-      </button>
-    </div>
-    <div>
-      变量控制：
-      <button type="button" @click="alertUsage">
-        🐞 如何使用
-      </button>
-      <button type="button" @click="showVariableBrowser()">
-        🔍 变量查看器
-      </button>
-      <button type="button" @click="resetVariables">
-        🗑️ 重置 {{
-          Object.keys(store.globalVariables).length
-        }} 个变量以及 {{
-          Object.keys(store.globalReadCounts).length
-        }} 个读取计数器
-      </button>
-    </div>
-    <div>
-      存盘与读取：
-      <label class="select">
-        ⋙ 选择之前选项点
-        <select ref="saveSelect" @change="(e) => loadStory((e.target as HTMLSelectElement).value)">
-          <option
-            v-for="save, i in store.saves"
-            :key="i"
-            :value="i"
-          >
-            #{{ store.saves.length - i }}@{{ save.title }}
-          </option>
-        </select>
-      </label>
-      <button type="button" @click="quickLoad">
-        ⤴️ 上一个选项点
-      </button>
-      <button type="button" @click="clearSaves">
-        🗑️ 清除存盘
-      </button>
-      <label>
-        <input type="checkbox" v-model="debug.keepCycles" /> 💫 重开/读取存档保留 Cycle 计数
-      </label>
-    </div>
-    <p class="ip">你现在处在：{{ ip.join('.') }}</p>
   </div>
   <div class="body" :class="{ inline: options[0]?.inline }">
     <TransitionGroup name="list">
@@ -632,7 +634,7 @@ div.header {
   flex-direction: column;
   justify-content: left;
   flex-wrap: wrap;
-  margin: 0.2em 3em;
+  padding: 0.2em 3em;
 }
 div.inline > div:nth-last-child(2), div.inline > div:nth-last-child(2) > p {
   display: inline;
@@ -804,5 +806,20 @@ p.ip {
   width: 100%;
   overflow-x: auto;
   text-wrap: nowrap;
+}
+
+#app {
+  display: grid;
+  justify-content: center;
+  grid-template-columns: 1fr 1fr;
+}
+#app > div.header {
+  grid-column: 2;
+  grid-row: 1;
+}
+div.header > div.sticky {
+  position: sticky;
+  top: 30px;
+  width: 40vw;
 }
 </style>
