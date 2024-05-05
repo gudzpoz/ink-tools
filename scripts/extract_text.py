@@ -235,13 +235,12 @@ class Main:
         with ThreadPoolExecutor(max_workers=threads) as executor:
             for i, (key, value) in enumerate(ranges.items()):
                 futures.append(executor.submit(process, i + 1, key, value))
-        for future in futures:
+        for future, key in zip(futures, ranges.keys()):
             data = future.result()
             output_bytes = to_json_bytes(data) + b'\n'
-            output_bytes_len = len(output_bytes)
             output_content.write(output_bytes)
-            current_bytes += output_bytes_len
             ranges[key] = f'{current_bytes} {len(output_bytes)}'
+            current_bytes += len(output_bytes)
         output_content.close()
         import_meta(metadata, input_path, verbose)
         output_meta_file.write_bytes(to_json_bytes(metadata))
