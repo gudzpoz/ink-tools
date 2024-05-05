@@ -586,10 +586,10 @@ div.inline > ul, div.inline > ul > li {
 }
 
 div.body span {
-  font-size: 0.5em;
+  font-size: 0.7em;
   color: var(--span-color);
 }
-span.condition {
+div.body span.condition {
   font-family: monospace;
   display: inline-flex;
   flex-direction: column;
@@ -616,13 +616,13 @@ span.condition > span.result.true::after {
   text-align: right;
   content: "- then:";
 }
-span.result.true {
+div.body span.result.true {
   color: green;
 }
-span.result.false {
+div.body span.result.false {
   color: red;
 }
-span.result.false.has_otherwise {
+div.body span.result.false.has_otherwise {
   color: orange;
 }
 
@@ -635,11 +635,12 @@ span.end::after {
 span.start {
   position: relative;
 }
-span.count {
+div.body span.count {
   padding-left: 1em;
   font-size: 1em;
   position: absolute;
   top: -1em;
+  font-family: monospace;
 }
 
 span.return {

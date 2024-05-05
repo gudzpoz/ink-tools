@@ -48,6 +48,10 @@ function escapeHtml(html: string): string {
   return p.innerHTML;
 }
 
+export function isParameterName(name: string): boolean {
+  return name.startsWith('__bb');
+}
+
 /**
  * 因为 JS 里的 Promise 并没有 back-pressure 的概念，所以只能再用一层函数来包装。
  *
@@ -227,14 +231,18 @@ export class InkStoryRunner {
   }
 
   setVar(name: string, value: boolean | string | number) {
-    if (this.listener) {
+    if (this.listener && !isParameterName(name)) {
       this.listener({
         type: 'variable',
         name,
         value,
       });
     }
-    this.environment.variables[name] = value;
+    if (value === undefined) {
+      delete this.environment.variables[name];
+    } else {
+      this.environment.variables[name] = value;
+    }
   }
 
   private getAbsKnotStitch(divert: string): [string, string | undefined] {
