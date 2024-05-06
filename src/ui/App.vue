@@ -839,7 +839,7 @@ label.file > input {
 }
 
 p.ip {
-  height: 1.5em;
+  height: auto;
   width: 100%;
   overflow-x: auto;
   text-wrap: nowrap;
