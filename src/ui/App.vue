@@ -358,7 +358,7 @@ async function fetchMore(delay: number = 20) {
     saveSelect.value.selectedIndex = -1;
   }
   if (!line) {
-    lines.value.push('Story Ended');
+    lines.value.push('<i>Story Ended</i><hr>');
     return;
   }
   line.forEach((l) => {
@@ -636,7 +636,12 @@ async function updateStoryWithTranslation(e: Event) {
     return;
   }
   const [file] = files;
-  const [stem, extension] = file.name.split('.');
+  const [stem, extension, extra] = file.name.split('.');
+  if (extra === 'json' && extension === 'csv') {
+    // Paratranz 导出的原始格式，处理不了。
+    alert('目前无法处理 Paratranz 导出的原始格式，请上传 CSV 或经脚本处理的 JSON。');
+    return;
+  }
   if (await updateStoryWithFile(stem, extension, await file.arrayBuffer(), true)) {
     await selectNewKnot();
   }
