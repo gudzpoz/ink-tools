@@ -620,7 +620,7 @@ export class InkStoryRunner {
       case 'do': {
         await this.evaluateExpr(typed.join(path, 'doFuncs'));
         this.debug(
-          `<span class="expr">${escapeHtml(this.decompiler.serializeDoFuncsNode(typed.value).toString())}</span>
+          `<span class="expr">${escapeHtml(this.decompiler.serializeDoFuncsNode(typed.value, path).toString())}</span>
           <br>`,
         );
         return this.collectOutputBuffer();
@@ -746,10 +746,13 @@ export class InkStoryRunner {
       this.throwError('ended');
     } else {
       const knot = chunk as InkChunkWithStitches;
-      const stitch = absStitch ?? knot.initial;
+      if (!absStitch) {
+        await this.divertTo(`:${absKnot}:${knot.initial}`);
+        return;
+      }
       ip.splice(1);
       ip[0] = absKnot;
-      ip.push('stitches', stitch, 'content', 0);
+      ip.push('stitches', absStitch, 'content', 0);
     }
   }
 

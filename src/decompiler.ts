@@ -13,7 +13,6 @@ import {
 import {
   InkBlock, InkChunkNode, InkChunkWithStitches, InkFuncType, InkRootNode,
   JSONPath,
-  annotateAllWithJsonPath,
   annotateInkBlockType,
 } from './types';
 
@@ -231,21 +230,20 @@ class PoorOldInkSerializer {
     }
   }
 
-  serializeDoFuncsNode(node: Type_doFuncsNode): SourceNode {
-    const position = annotateInkBlockType(node).position!;
+  serializeDoFuncsNode(node: Type_doFuncsNode, path: JSONPath): SourceNode {
     return this.sourceNode(
-      position,
+      path,
       node.doFuncs
         .map((func, i) => {
           const set = func as { set: Type_set };
           const nl = i === 0 ? '' : this.nl();
           if (set.set) {
-            const setter = set.set.map((s, j) => this.serializeExpr(s, [...position, 'doFuncs', i, 'set', j]));
+            const setter = set.set.map((s, j) => this.serializeExpr(s, [...path, 'doFuncs', i, 'set', j]));
             return [nl, '~ ', setter[0], ' = ', setter[1]];
           }
           return [nl, '~ ', this.serializeExpr(
             func as Type_funcWithParams | Type_buildingBlockWithParams,
-            [...position, 'doFuncs', i],
+            [...path, 'doFuncs', i],
           )];
         }).flat(),
     );
@@ -283,7 +281,7 @@ class PoorOldInkSerializer {
       case 'do':
         return this.sourceNode(path, [
           this.nl(),
-          this.serializeDoFuncsNode(typed.value),
+          this.serializeDoFuncsNode(typed.value, path),
           this.nl(),
         ]);
       case 'return':
@@ -442,7 +440,6 @@ class PoorOldInkSerializer {
 
   decompileMeta() {
     this.reset('');
-    annotateAllWithJsonPath(this.root.buildingBlocks, ['buildingBlocks']);
     const { root } = this;
     return {
       content: `
@@ -474,7 +471,6 @@ INCLUDE indexed-content.ink
 
   decompile(name: string, file: InkChunkNode): SourceNode {
     this.reset(name);
-    annotateAllWithJsonPath(file, []);
     this.indentation -= 1;
     if (!Array.isArray(file) && Object.keys(file).filter((f) => f !== 'position').length === 0) {
       // Notorious ENDFLOW
