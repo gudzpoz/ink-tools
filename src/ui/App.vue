@@ -598,8 +598,13 @@ async function updateStoryWithFile(
       }
       const segments = path.split('/');
       const filename = segments.pop()!;
-      let [entryStem, entryExt] = filename.split('.');
+      // eslint-disable-next-line prefer-const
+      let [entryStem, entryExt, extra] = filename.split('.');
       if (!entryStem || !entryExt) {
+        return;
+      }
+      if (extra === 'json' && entryExt === 'csv') {
+        // Paratranz 导出的原始格式，处理不了。
         return;
       }
       if (filename.includes('buildingBlocks')) {
