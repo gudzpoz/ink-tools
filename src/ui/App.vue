@@ -68,7 +68,7 @@
           🐞 如何使用
         </button>
         <button type="button" @click="showVariableBrowser()">
-          🔍 变量查看器
+          🔍 操作变量
         </button>
         <button type="button" @click="resetVariables">
           🗑️ 重置 {{
@@ -99,7 +99,7 @@
           🗑️ 清除存盘
         </button>
         <label>
-          <input type="checkbox" v-model="debug.keepCycles" /> 💫 重开/读取存档保留 Cycle 计数
+          <input type="checkbox" v-model="debug.keepCycles" /> 💫 重开/读取存档保留 Cycle 计数，不恢复随机数种子
         </label>
       </div>
       <p class="ip">你现在处在：{{ ip.join('.') }}</p>
@@ -154,6 +154,36 @@
             <div v-else>出错啦！（{{ k }}={{ v }}）请向开发者汇报～</div>
           </label>
         </div>
+      </TabPanel>
+      <TabPanel header="变量常用操作">
+        <p>下面是一些常用操作以及它们的相关变量。如果觉得有其它常用操作的话欢迎在群里反馈～</p>
+        <button type="button" @click="ink.seednum = Math.floor(1e6 + Math.random() * 1e4)">
+          🌱 随机化随机数种子（seednum）
+        </button>
+        <button type="button" @click="ink.money = 10 * 10000 * 240 + (ink.money as number)">
+          💵 给我来 10 万英镑（money）
+        </button>
+        <button type="button" @click="ink.withoutfogg = false">
+          🤡 获得 Monsieur Fogg（源码是这么写的）（withoutfogg）
+        </button>
+        <button type="button" @click="ink.withoutfogg = true">
+          🎩 失去 Monsieur Fogg（withoutfogg）
+        </button>
+        <p>一些小提示：</p>
+        <ul>
+          <li>
+            网页模拟的 Ink 都是伪随机数，意思是从同样的条件/存档开始的话，只要选择的选项一样（或者甚至不一样）
+            最后的结构仍然会是相同的。这对于测试来说可能不太友好，请善用随机化随机数种子以及读档时不恢复随机数种子的功能。
+          </li>
+          <li>
+            如果看到 alt() 函数的话，它其实在现在的 Ink 里叫做 Shuffles，会（伪）随机地展示两片文本中的一条。
+            如果发现只能看到其中一条，或是想测试另外一条的话，请尝试随机化随机数种子。
+          </li>
+          <li>
+            0779-play_poker 打牌时需要 Monsieur Fogg 在场（withoutfogg=false）。
+            另外打牌也是受到随机数种子控制的，请按需随机化随机数种子。
+          </li>
+        </ul>
       </TabPanel>
       <TabPanel header="节点">
         <div class="knot-browser">
@@ -395,35 +425,6 @@ function clearContents() {
   options.value = [];
 }
 
-async function selectNewKnot(knot?: string) {
-  if (timeOutHandle !== null) {
-    clearTimeout(timeOutHandle);
-    timeOutHandle = null;
-  }
-  store.saves = [];
-  clearContents();
-  const cycleCounts = debug.value.keepCycles && story.save().cycleCounts;
-  await story.init(knot ?? store.selectedKnot);
-  if (cycleCounts) {
-    story.environment.cycleCounts = cycleCounts;
-  }
-  Object.entries(store.globalVariables).forEach(([k, v]) => {
-    story.setVar(k, v);
-  });
-  Object.entries(store.globalReadCounts).forEach(([k, v]) => {
-    story.setReadCount(k, v);
-  });
-  await fetchMore();
-}
-watch(() => store.selectedKnot, () => selectNewKnot(store.selectedKnot));
-
-declare global {
-  interface Window {
-    ink: Record<string, string | number | boolean>;
-    inkHistory: Record<string, number>;
-  }
-}
-
 const ink = new Proxy<Record<string, InkVariableType>>({}, {
   get(_: never, p: string) {
     return story.getVar(p);
@@ -451,10 +452,42 @@ const inkHistory = new Proxy<Record<string, number>>({}, {
   },
 });
 onMounted(async () => {
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   await selectNewKnot();
   window.ink = ink;
   window.inkHistory = inkHistory;
 });
+
+async function selectNewKnot(knot?: string) {
+  if (timeOutHandle !== null) {
+    clearTimeout(timeOutHandle);
+    timeOutHandle = null;
+  }
+  store.saves = [];
+  clearContents();
+  const cycleCounts = debug.value.keepCycles && story.save().cycleCounts;
+  const seedNum = debug.value.keepCycles && ink.seednum;
+  await story.init(knot ?? store.selectedKnot);
+  if (cycleCounts) {
+    story.environment.cycleCounts = cycleCounts;
+    ink.seednum = seedNum;
+  }
+  Object.entries(store.globalVariables).forEach(([k, v]) => {
+    story.setVar(k, v);
+  });
+  Object.entries(store.globalReadCounts).forEach(([k, v]) => {
+    story.setReadCount(k, v);
+  });
+  await fetchMore();
+}
+watch(() => store.selectedKnot, () => selectNewKnot(store.selectedKnot));
+
+declare global {
+  interface Window {
+    ink: Record<string, string | number | boolean>;
+    inkHistory: Record<string, number>;
+  }
+}
 
 async function select(i: number) {
   const { value } = options;
@@ -469,9 +502,11 @@ async function loadStory(i: string) {
   clearContents();
   store.saves = store.saves.splice(to);
   const cycleCounts = debug.value.keepCycles && story.save().cycleCounts;
+  const seedNum = debug.value.keepCycles && ink.seednum;
   await story.load(save as never);
   if (cycleCounts) {
     story.environment.cycleCounts = cycleCounts;
+    ink.seednum = seedNum;
   }
   lines.value = savedLines;
   options.value = savedOptions;
@@ -500,7 +535,7 @@ function clearSaves() {
 
 function alertUsage() {
   // eslint-disable-next-line no-alert
-  alert(`你当然可以直接使用右边的变量查看器。
+  alert(`你当然可以直接使用右边的 🔍 变量查看器。
 如果用控制台的话，请按 F12 打开浏览器的开发者工具，并点击进入控制台（Console）。
 在 Console 里输入下面内容来改变变量值：
     ink.<variable> = newValue;
