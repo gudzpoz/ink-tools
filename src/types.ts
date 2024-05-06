@@ -140,6 +140,7 @@ export type JSONPath = (string | number)[];
 export interface TypedInkBlockWithKeys<T extends string, V extends (InkBlock | InkExpr)> {
   type: T;
   value: V;
+  position?: JSONPath;
   /**
    * 极致的类型体操……
    *
@@ -216,6 +217,31 @@ export function annotateInkBlockType(node: InkBlock | InkExpr): TypedInkBlock {
   return {
     type: types[0],
     value: node,
+    position: (node as { position?: JSONPath }).position,
     join,
   } as TypedInkBlock;
+}
+
+/**
+ * 用于反编译时生成类似 source map 的东西。
+ */
+export function annotateAllWithJsonPath(root: unknown, start: JSONPath): void {
+  const annotate = (node: Record<string, unknown> | unknown[], path: JSONPath): void => {
+    if (typeof node !== 'object') {
+      return;
+    }
+    if (Array.isArray(node)) {
+      node.forEach((item, index) => annotate(item as never, [...path, index]));
+      return;
+    }
+    Object.entries(node).forEach(([key, value]) => {
+      annotate(value as never, [...path, key]);
+    });
+    const target = node as { position?: JSONPath };
+    if (target.position) {
+      throw new Error('Position already set');
+    }
+    target.position = path;
+  };
+  annotate(root as never, start);
 }

@@ -136,7 +136,7 @@ export class InkStoryRunner {
     this.returnStack = [];
     this.conditionTrackStack = [];
     this.dumbBuffer = [];
-    this.decompiler = new PoorOldInkSerializer(root);
+    this.decompiler = new PoorOldInkSerializer(root, () => 1);
     this.environment = this.newEnvironment();
   }
 
@@ -537,7 +537,7 @@ export class InkStoryRunner {
     const cond = condition ? 'true' : 'false';
     this.debug(
       `<span class="condition"><span class="${cond}">${
-        escapeHtml(this.decompiler.serializeExpr(expr))
+        escapeHtml(this.decompiler.serializeExpr(expr, []).toString())
       }</span><span class="result ${cond} ${
         elseClass
       }">=${escapeHtml(JSON.stringify(condition))}</span></span>`,
@@ -609,7 +609,7 @@ export class InkStoryRunner {
         const name = escapeHtml(typed.value.buildingBlock);
         this.debug(`<span class="call">${name}(${
           Object.entries(typed.value.params)
-            .map(([, v]) => `${this.decompiler.serializeExpr(v ?? 'undefined')}`)
+            .map(([, v]) => `${this.decompiler.serializeExpr(v ?? 'undefined', []).toString()}`)
             .join(', ')
         })</span> `);
         const output = await this.evaluateExpr(path);
@@ -620,7 +620,7 @@ export class InkStoryRunner {
       case 'do': {
         await this.evaluateExpr(typed.join(path, 'doFuncs'));
         this.debug(
-          `<span class="expr">${escapeHtml(this.decompiler.serializeDoFuncsNode(typed.value))}</span>
+          `<span class="expr">${escapeHtml(this.decompiler.serializeDoFuncsNode(typed.value).toString())}</span>
           <br>`,
         );
         return this.collectOutputBuffer();

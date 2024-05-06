@@ -1,21 +1,20 @@
+import { SourceNode } from 'source-map-js';
 import {
   Type_actionTag,
   Type_buildingBlockWithParams,
-  Type_conditionThen,
   Type_customDictionary,
-  Type_cycleNode,
-  Type_divertNode,
   Type_doFuncsNode,
   Type_funcWithParams,
   Type_get,
-  Type_optionLink,
   Type_paramsForFuncs,
-  Type_returnNode,
-  Type_sequenceNode,
   Type_set,
+  Type_then,
 } from './auto-types';
 import {
   InkBlock, InkChunkNode, InkChunkWithStitches, InkFuncType, InkRootNode,
+  JSONPath,
+  annotateAllWithJsonPath,
+  annotateInkBlockType,
 } from './types';
 
 /**
@@ -26,30 +25,55 @@ import {
  * 虽然想弄成无状态的，但是记录缩进太麻烦了。
  */
 class PoorOldInkSerializer {
-  root: InkRootNode;
-
   indentation: number;
+
+  nested: boolean;
 
   argStack: { args: Set<string>, refs: Set<string> }[];
 
-  constructor(root: InkRootNode) {
-    this.root = root;
+  private currentName: string;
+
+  constructor(
+    private root: InkRootNode,
+    private jsonPathMapper: (name: string, path: JSONPath) => number,
+  ) {
+    this.currentName = '';
     this.indentation = 0;
+    this.nested = false;
     this.argStack = [];
   }
 
-  reset() {
+  reset(name: string) {
+    this.nested = false;
     this.indentation = 0;
+    this.currentName = name;
   }
 
-  serializeActionTag(tag: Type_actionTag) {
-    return `${this.nl()}#${tag.action} // ${
-      tag.userInfo ? JSON.stringify(tag.userInfo) : ''
-    }`;
+  serializeActionTag(path: JSONPath, tag: Type_actionTag): SourceNode {
+    return this.sourceNode(
+      path,
+      [
+        this.nl(),
+        '#',
+        tag.action,
+        ' // ',
+        ...(tag.userInfo
+          ? Object.entries(tag.userInfo).map(
+            ([k, v]) => this.sourceNode([...path, 'userInfo', k], JSON.stringify(v)),
+          )
+          : []
+        ),
+      ],
+    );
   }
 
   nl() {
     return `\n${'  '.repeat(this.indentation)}`;
+  }
+
+  getSourceLocation(path: JSONPath) {
+    const line = this.jsonPathMapper(this.currentName, path);
+    return line;
   }
 
   checkIfIsArg(name: Type_paramsForFuncs[number], nestLevel: number): string {
@@ -86,25 +110,75 @@ class PoorOldInkSerializer {
     return divert.replace(/:/g, '.');
   }
 
-  serializeExpr(expr: Type_set[number]): string {
+  isSimplyNested(node: Type_then, level: number): boolean {
+    if (level === 0) {
+      return false;
+    }
+    return node.every((block) => {
+      const typed = annotateInkBlockType(block);
+      switch (typed.type) {
+        case 'value':
+          return typed.value !== '<br><br>';
+        case 'cycle':
+          return typed.value.cycle.every((n) => this.isSimplyNested(n, level - 1));
+        case 'sequence':
+          return typed.value.sequence.every((n) => this.isSimplyNested(n, level - 1));
+        case 'condition':
+          return this.isSimplyNested(typed.value.then, level - 1)
+            && (!typed.value.otherwise || this.isSimplyNested(typed.value.otherwise, level - 1));
+        case 'building':
+          return true;
+        default:
+          return false;
+      }
+    });
+  }
+
+  checkNestable(node: Type_then, level?: number) {
+    if (!this.nested && this.isSimplyNested(node, 2 + (level ?? 0))) {
+      this.nested = true;
+      return true;
+    }
+    return false;
+  }
+
+  sourceNode(path: JSONPath, s: string | (string | SourceNode)[]) {
+    return new SourceNode(this.getSourceLocation(path), 0, '<input>', s as never);
+  }
+
+  serializeExpr(expr: Type_set[number], path: JSONPath): SourceNode {
     if (typeof expr !== 'object') {
       if (typeof expr === 'string') {
         this.checkIfIsArg(expr, 0);
-        return expr;
+        return this.sourceNode(path, expr);
       }
-      return JSON.stringify(expr);
+      return this.sourceNode(path, JSON.stringify(expr));
     }
-    if ((expr as { get: Type_get }).get !== undefined) {
-      return this.checkIfIsArg(expr as { get: Type_get }, 0);
-    }
-    if ((expr as Type_buildingBlockWithParams).buildingBlock !== undefined) {
-      const { buildingBlock, params } = expr as Type_buildingBlockWithParams;
-      const paramList = Array.isArray(params)
-        ? params
-        : Object.keys(params).sort()
-          .filter((k) => params[k as never])
-          .map((k) => params[k as never]!);
-      return `${buildingBlock}(${paramList.map((p) => this.serializeExpr(p as never)).join(', ')})`;
+    const typed = annotateInkBlockType(expr);
+    switch (typed.type) {
+      case 'get':
+        return this.sourceNode(path, this.checkIfIsArg(expr, 0));
+      case 'building': {
+        const { buildingBlock, params } = typed.value;
+        const paramList = Object.keys(params).sort()
+          .filter((k) => params[k as never] && k !== 'position')
+          .map((k) => [k, params[k as never]!]);
+        return this.sourceNode(
+          path,
+          [
+            `${buildingBlock}(`,
+            ...paramList.map(
+              ([k, v], i) => [i === 0 ? '' : ', ', this.serializeExpr(
+                v as never,
+                typed.join(path, 'params', k as never),
+              )],
+            ).flat(),
+            ')',
+          ],
+        );
+      }
+      default:
+        break;
     }
     const { func, params } = expr as Type_funcWithParams;
     const op = func as InkFuncType;
@@ -112,20 +186,20 @@ class PoorOldInkSerializer {
     switch (op) {
       case 'FlagIsSet':
       case 'HasRead':
-        return `${this.fixDivertFormat(param1)}`;
+        return this.sourceNode(path, `${this.fixDivertFormat(param1)}`);
       case 'FlagIsNotSet':
       case 'HasNotRead':
-        return `not ${this.fixDivertFormat(param1)}`;
+        return this.sourceNode(path, `not ${this.fixDivertFormat(param1)}`);
       case 'Not':
-        return `not ${this.serializeExpr(param1)}`;
+        return this.sourceNode(path, ['not ', this.serializeExpr(param1, [...path, 'params', 0])]);
       case 'Log10':
         // TODO: 啥啥啥？
-        return `${this.serializeExpr(param1)}`;
+        return this.sourceNode(path, ['Log10(', this.serializeExpr(param1, [...path, 'params', 0]), ')']);
       // Increment 和 Decrement 都不会用作其它表达式的输入
       case 'Increment':
-        return `${this.checkIfIsArg(param1, 0)} += 1`;
+        return this.sourceNode(path, [`${this.checkIfIsArg(param1, 0)}`, ' += 1']);
       case 'Decrement':
-        return `${this.checkIfIsArg(param1, 0)} -= 1`;
+        return this.sourceNode(path, [`${this.checkIfIsArg(param1, 0)}`, ' -= 1']);
       // 其它的似乎都是双参数（见 80days.enum.json）
       default: {
         const mapping: Record<typeof op, string> = {
@@ -143,124 +217,232 @@ class PoorOldInkSerializer {
           Or: '||',
           Subtract: '-',
         };
-        return `(${this.serializeExpr(param1)} ${mapping[op]} ${this.serializeExpr(param2)})`;
+        return this.sourceNode(
+          path,
+          [
+            '(',
+            this.serializeExpr(param1, [...path, 'params', 0]),
+            ` ${mapping[op]} `,
+            this.serializeExpr(param2, [...path, 'params', 1]),
+            ')',
+          ],
+        );
       }
     }
   }
 
-  serializeDoFuncsNode(node: Type_doFuncsNode) {
-    return node.doFuncs
-      .map((func) => {
-        if ((func as { set: Type_set }).set) {
-          const set = (func as { set: Type_set }).set.map((s) => this.serializeExpr(s));
-          return `~ ${set[0]} = ${set[1]}`;
-        }
-        return `~ ${this.serializeExpr(
-          func as Type_funcWithParams | Type_buildingBlockWithParams,
-        )}`;
-      })
-      .join(this.nl());
+  serializeDoFuncsNode(node: Type_doFuncsNode): SourceNode {
+    const position = annotateInkBlockType(node).position!;
+    return this.sourceNode(
+      position,
+      node.doFuncs
+        .map((func, i) => {
+          const set = func as { set: Type_set };
+          const nl = i === 0 ? '' : this.nl();
+          if (set.set) {
+            const setter = set.set.map((s, j) => this.serializeExpr(s, [...position, 'doFuncs', i, 'set', j]));
+            return [nl, '~ ', setter[0], ' = ', setter[1]];
+          }
+          return [nl, '~ ', this.serializeExpr(
+            func as Type_funcWithParams | Type_buildingBlockWithParams,
+            [...position, 'doFuncs', i],
+          )];
+        }).flat(),
+    );
   }
 
-  serializeBlocks(blocks: InkBlock[]) {
+  serializeBlocks(blocks: InkBlock[], path: JSONPath): SourceNode {
+    const prev = this.nested;
+    this.checkNestable(blocks, 1);
     this.indentation += 1;
-    const s = blocks.map((block) => this.serializeInkBlock(block)).join(' ');
+    const ss = this.sourceNode(
+      path,
+      blocks.map((block, i) => [this.nested ? '' : ' ', this.serializeInkBlock(block, [...path, i])]).flat(),
+    );
+    this.nested = prev;
     this.indentation -= 1;
-    return s;
+    return ss;
   }
 
-  serializeInkBlock(block: InkBlock): string {
+  serializeInkBlock(block: InkBlock, path: JSONPath): SourceNode {
     if (typeof block === 'string') {
+      if (this.nested) {
+        return this.sourceNode(path, block);
+      }
       const s = block.replace(/^-/, '\\-');
       if (s.indexOf('<br><br>') !== -1) {
-        return s.replace('<br><br>', `<br><br>${this.nl().repeat(2)}`);
+        return this.sourceNode(path, s.replace('<br><br>', `<br><br>${this.nl().repeat(2)}`));
       }
-      return `${s} <>`;
+      return this.sourceNode(path, `${s} <>`);
     }
 
-    if ((block as Type_actionTag).action !== undefined) {
-      return this.serializeActionTag(block as Type_actionTag);
-    }
-
-    if ((block as Type_doFuncsNode).doFuncs !== undefined) {
-      return this.nl() + this.serializeDoFuncsNode(block as Type_doFuncsNode) + this.nl();
-    }
-
-    if ((block as Type_returnNode).return !== undefined) {
-      return `${this.nl()}~ return ${this.serializeExpr(
-        (block as Type_returnNode).return,
-      )}${this.nl()}`;
-    }
-
-    if ((block as Type_customDictionary).dictionary !== undefined) {
-      const { dictionary, storyCustomContentClass } = block as Type_customDictionary;
-      return `${this.nl()}# ${storyCustomContentClass}: ${JSON.stringify(dictionary)}`;
-    }
-
-    if ((block as Type_buildingBlockWithParams).buildingBlock !== undefined) {
-      return `${this.nl()}~ ${this.serializeExpr(block as Type_buildingBlockWithParams)}${this.nl()}`;
-    }
-
-    if ((block as Type_optionLink).option !== undefined) {
-      const {
-        option, linkPath, condition, inlineOption,
-      } = block as Type_optionLink;
-      const postfix = inlineOption ? ' <>' : '';
-      const marker = '+ ';
-      const cond = condition ? `{${this.serializeExpr(condition)}} ` : '';
-      return `${this.nl()}${marker}${cond}${option}${postfix}${
-        this.nl()
-      }  -> ${this.fixDivertFormat(linkPath)}${this.nl()}`;
-    }
-
-    if ((block as Type_conditionThen).condition !== undefined) {
-      const { condition, then, otherwise } = block as Type_conditionThen;
-      let s = `{${this.nl()}  - ${this.serializeExpr(condition)}:${this.nl()}${
-        this.serializeBlocks(then)
-      }`;
-      if (otherwise && otherwise.filter((ss) => typeof ss !== 'string' || ss.trim() !== '').length > 0) {
-        s += `${this.nl()}  - else:${this.nl()}${this.serializeBlocks(otherwise)}`;
+    const typed = annotateInkBlockType(block);
+    switch (typed.type) {
+      case 'action':
+        return this.serializeActionTag(path, typed.value);
+      case 'do':
+        return this.sourceNode(path, [
+          this.nl(),
+          this.serializeDoFuncsNode(typed.value),
+          this.nl(),
+        ]);
+      case 'return':
+        return this.sourceNode(path, [this.nl(), '~ return ', this.serializeExpr(
+          typed.value.return,
+          typed.join(path, 'return'),
+        ), this.nl()]);
+      case 'custom': {
+        const { dictionary, storyCustomContentClass } = block as Type_customDictionary;
+        return this.sourceNode(
+          path,
+          [
+            this.nl(),
+            '# ',
+            storyCustomContentClass,
+            ': ',
+            ...Object.entries(dictionary).map(
+              ([k, v]) => this.sourceNode([...path, 'dictionary', k], JSON.stringify(v)),
+            ),
+            this.nl(),
+          ],
+        );
       }
-      s += `${this.nl()}}${this.nl()}`;
-      return s;
+      case 'building':
+        return this.sourceNode(
+          path,
+          this.nested
+            ? ['{', this.serializeExpr(typed.value, path), '}']
+            : [this.nl(), '~ ', this.serializeExpr(typed.value, path), this.nl()],
+        );
+      case 'option': {
+        const {
+          option, linkPath, condition, inlineOption,
+        } = typed.value;
+        const postfix = inlineOption ? ' <>' : '';
+        const marker = '+ ';
+        const cond = condition
+          ? ['{', this.serializeExpr(condition, typed.join(path, 'condition')), '} '] : [''];
+        return this.sourceNode(
+          path,
+          [this.nl(), marker, ...cond, this.sourceNode(typed.join(path, 'option'), option), postfix, this.nl(),
+            '}  -> ', this.fixDivertFormat(linkPath), this.nl()],
+        );
+      }
+      case 'condition': {
+        const { condition, then, otherwise } = typed.value;
+        const prev = this.nested;
+        const nl = this.checkNestable([typed.value], 1) ? this.nl() : '';
+        if (this.nested) {
+          const result = this.sourceNode(
+            path,
+            [nl, '{', this.serializeExpr(condition, typed.join(path, 'condition')),
+              ':', this.serializeBlocks(then, typed.join(path, 'then')),
+              ...(otherwise ? ['|', this.serializeBlocks(otherwise, typed.join(path, 'otherwise'))] : []),
+              '}', nl],
+          );
+          this.nested = prev;
+          return result;
+        }
+        const s = [
+          this.nl(),
+          this.nl(),
+          '{',
+          this.nl(),
+          '- ',
+          this.serializeExpr(condition, typed.join(path, 'condition')),
+          ':',
+          this.nl(),
+          '  ',
+          this.serializeBlocks(then, typed.join(path, 'then')),
+        ];
+        if (otherwise && otherwise.filter((ss) => typeof ss !== 'string' || ss.trim() !== '').length > 0) {
+          s.push(
+            this.nl(),
+            '- else:',
+            this.nl(),
+            '  ',
+            this.serializeBlocks(otherwise, typed.join(path, 'otherwise')),
+          );
+        }
+        s.push(this.nl(), '}', this.nl());
+        return this.sourceNode(path, s);
+      }
+      case 'cycle':
+      case 'sequence': {
+        const key = typed.type === 'sequence' ? 'stopping' : typed.type;
+        const nested: InkBlock[][] = typed.type === 'cycle'
+          ? typed.value.cycle
+          : typed.value.sequence;
+        const prev = this.nested;
+        const nl = this.checkNestable([typed.value], 1) ? this.nl() : '';
+        if (this.nested) {
+          const prefix = typed.type === 'cycle' ? '&' : '';
+          const result = [nl, '{', prefix,
+            ...nested.map((blocks, i) => [i === 0 ? '' : '|', this.serializeBlocks(
+              blocks,
+              typed.join(path, typed.type as never, i),
+            )]).flat(),
+            '}', nl];
+          this.nested = prev;
+          return this.sourceNode(path, result);
+        }
+        return this.sourceNode(
+          path,
+          [
+            this.nl(),
+            '{ ',
+            key,
+            ':',
+            this.nl(),
+            '  - ',
+            ...nested.map(
+              (blocks, i) => [i === 0 ? '' : `${this.nl()}  - `, this.serializeBlocks(
+                blocks,
+                typed.join(path, typed.type as never, i),
+              )],
+            ).flat(),
+            this.nl(),
+            '}',
+          ],
+        );
+      }
+      case 'divert': {
+        const { divert } = typed.value;
+        return this.sourceNode(path, `${this.nl()}-> ${this.fixDivertFormat(divert)}${this.nl()}`);
+      }
+      default:
+        throw new Error(`Unknown block type: ${Object.keys(block).join(', ')}`);
     }
-
-    if ((block as Type_cycleNode).cycle !== undefined
-      || (block as Type_sequenceNode).sequence !== undefined) {
-      const isCycle = (block as Type_cycleNode).cycle;
-      const key = isCycle ? 'cycle' : 'stopping';
-      const nested: InkBlock[][] = isCycle
-        ? (block as Type_cycleNode).cycle
-        : (block as Type_sequenceNode).sequence;
-      return `{ ${key}:${this.nl()}  - ${
-        nested.map((blocks) => this.serializeBlocks(blocks)).join(`${this.nl()}  - `)
-      }${this.nl()}}`;
-    }
-
-    if ((block as Type_divertNode).divert !== undefined) {
-      const { divert } = block as Type_divertNode;
-      return `-> ${this.fixDivertFormat(divert)}${this.nl()}`;
-    }
-
-    throw new Error(`Unknown block type: ${Object.keys(block).join(', ')}`);
   }
 
-  serializeBuildingBlock(name: string, content: InkBlock[]) {
+  serializeBuildingBlock(name: string, content: InkBlock[], path: JSONPath): SourceNode {
     this.argStack.push({ args: new Set(), refs: new Set() });
     this.indentation -= 1;
     // 不知道为什么 have_raced 函数是空白的，总之应付一下先。
-    const serialization = content.length === 0 ? '\n~ return 0\n' : this.serializeBlocks(content);
+    const serialization = content.length === 0
+      ? this.sourceNode(path, '\n~ return 0\n')
+      : this.serializeBlocks(content, path);
     const args = this.argStack.pop()!;
     this.indentation += 1;
-    return `=== function ${name} (${
-      [...args.args].sort()
-        .filter((arg) => arg.startsWith(`__bb${name}`))
-        .map((arg) => (args.refs.has(arg) ? `ref ${arg}` : arg))
-        .join(', ')
-    }) ===${this.nl()}${serialization}`;
+    return this.sourceNode(
+      path,
+      [
+        '=== function ',
+        name,
+        ' (',
+        [...args.args].sort()
+          .filter((arg) => arg.startsWith(`__bb${name}`))
+          .map((arg) => (args.refs.has(arg) ? `ref ${arg}` : arg))
+          .join(', '),
+        ') ===\n',
+        serialization,
+      ],
+    );
   }
 
   decompileMeta() {
+    this.reset('');
+    annotateAllWithJsonPath(this.root.buildingBlocks, ['buildingBlocks']);
     const { root } = this;
     return {
       content: `
@@ -277,29 +459,53 @@ INCLUDE indexed-content.ink
             ([name], i) => `INCLUDE content/${String(i + 1).padStart(4, '0')}-${name}.ink`,
           )
           .join('\n'),
-        'buildingBlocks.ink': Object.entries(root.buildingBlocks)
-          .map(([name, value]) => this.serializeBuildingBlock(name, value))
-          .join('\n'),
+        'buildingBlocks.ink': this.sourceNode(
+          ['buildingBlocks'],
+          Object.entries(root.buildingBlocks)
+            .filter(([k]) => k !== 'position')
+            .map(([name, value]) => [
+              this.serializeBuildingBlock(name, value, ['buildingBlocks', name]),
+              '\n',
+            ]).flat(),
+        ),
       },
     };
   }
 
-  decompile(name: string, file: InkChunkNode) {
-    if (!Array.isArray(file) && Object.keys(file).length === 0) {
+  decompile(name: string, file: InkChunkNode): SourceNode {
+    this.reset(name);
+    annotateAllWithJsonPath(file, []);
+    this.indentation -= 1;
+    if (!Array.isArray(file) && Object.keys(file).filter((f) => f !== 'position').length === 0) {
       // Notorious ENDFLOW
-      return `=== ${name} ===`;
+      return this.sourceNode([], `=== ${name} ===`);
     }
 
     if (Array.isArray(file)) {
-      return `=== ${name} ===${this.nl()}${this.serializeBlocks(file as InkBlock[])}`;
+      return this.sourceNode(
+        [],
+        [
+          `=== ${name} ===\n`,
+          this.serializeBlocks(file as InkBlock[], []),
+        ],
+      );
     }
 
     const content = file as InkChunkWithStitches;
-    return `=== ${name} ===${this.nl()}${this.nl()}${
-      Object.entries(content.stitches).map(
-        ([stitch, blocks]) => `= ${stitch}${this.nl()}${this.serializeBlocks(blocks.content)}`,
-      ).join(this.nl())
-    }`;
+    return this.sourceNode(
+      [],
+      [
+        `=== ${name} ===\n`,
+        ...Object.entries(content.stitches)
+          .filter(([k]) => k !== 'position')
+          .map(
+            ([stitch, blocks]) => [
+              `\n= ${stitch}\n`,
+              this.serializeBlocks(blocks.content, ['stitches', stitch, 'content']),
+            ],
+          ).flat(),
+      ],
+    );
   }
 }
 
