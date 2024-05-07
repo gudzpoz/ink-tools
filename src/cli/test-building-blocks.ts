@@ -1,35 +1,23 @@
-import assert from 'assert';
-import { NEW_BUILDING_BLOCK_DEFINITIONS, InkyJsCompiler } from '../js2ijson';
 import { InkStoryRunner } from '../story';
 
-const compiler = new InkyJsCompiler();
-const compiled = Object.fromEntries(Object.entries(NEW_BUILDING_BLOCK_DEFINITIONS).map(
-  ([name, code]) => [name, compiler.compile(code)],
-));
+import root from '../../data/80days.json';
 
-assert(compiled.print_num);
-async function testPrintNum(n: number, expected: string) {
-  const runner = new InkStoryRunner({
-    initial: 'test',
-    buildingBlocks: compiled.print_num,
-    variables: {},
-    'indexed-content': {
-      filename: '',
-      ranges: {
-        test: '',
-      },
-    },
-  }, () => Promise.resolve(JSON.stringify([{
-    buildingBlock: 'print_num',
-    params: {
-      __bbprint_num0: n,
-    },
+async function test(name: string, args: never[], expected: string) {
+  const runner = new InkStoryRunner(root as never, () => Promise.resolve(JSON.stringify([{
+    buildingBlock: name,
+    params: Object.fromEntries(args.map((arg, i) => [`__bb${name}${i}`, arg])),
   }, '<br><br>'])));
+  runner.useExternal = true;
+  runner.useReplacementFunctions = true;
   await runner.init();
   const result = (await runner.next())!.filter((s) => typeof s === 'string').join('');
   if (result !== expected) {
     throw new Error(`Expected ${expected}, got ${result}`);
   }
+}
+
+async function testPrintNum(n: number, expected: string) {
+  await test('print_num', [n as never], expected);
 }
 const printNumTests = [
   [1, '一'],
@@ -118,4 +106,32 @@ const printNumTests = [
 ];
 await Promise.all(
   printNumTests.map(([n, expected]) => testPrintNum(n as number, expected as string)),
+);
+
+async function testSayCard(n: number, expected: string) {
+  await test('say_card', [n as never], expected);
+}
+const sayCardTests = [
+  [0, ' Hearts  二'],
+  [1, ' Hearts  三'],
+  [2, ' Hearts  四'],
+  [3, ' Hearts  五'],
+  [4, ' Hearts  六'],
+  [5, ' Hearts  七'],
+  [6, ' Hearts  八'],
+  [7, ' Hearts  九'],
+  [8, ' Hearts  十'],
+  [9, ' Hearts  Jack'],
+  [10, ' Hearts   Queen'],
+  [11, ' Hearts  King'],
+  [12, ' Hearts  Ace'],
+  [13, ' Diamonds  二'],
+  [25, ' Diamonds  Ace'],
+  [26, '  Spades  二'],
+  [38, '  Spades  Ace'],
+  [39, '  Clubs  二'],
+  [51, '  Clubs  Ace'],
+];
+await Promise.all(
+  sayCardTests.map(([n, expected]) => testSayCard(n as number, expected as string)),
 );

@@ -253,6 +253,19 @@
           </label>
         </div>
       </TabPanel>
+      <TabPanel header="函数级别汉化危险区域">
+        <p>
+          这是用于直接替换某些不可能简单汉化的 buildingBlocks 类 JavaScript 脚本。
+          我也不知道这可能弄出什么东西来。请密切关注浏览器控制台，如有问题请尝试刷新。
+        </p>
+        <label>
+          代码内容：
+          <br>
+          <Textarea v-model="inkyJs" />
+        </label>
+        <br>
+        <button type="button" @click="applyInkyJs">💥 应用！</button>
+      </TabPanel>
     </TabView>
   </Dialog>
 </template>
@@ -262,6 +275,7 @@ import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import TabPanel from 'primevue/tabpanel';
 import TabView from 'primevue/tabview';
+import Textarea from 'primevue/textarea';
 
 import { parse as parseCsv } from 'csv-parse/browser/esm/sync';
 import {
@@ -274,9 +288,10 @@ import {
   DebugInfo, InkStoryRunner, InkVariableType, Options,
 } from '../story';
 import { InkChunkNode, InkChunkWithStitches, InkRootNode } from '../types';
+import { yieldToMain } from '../utils';
 
 import rootJson from '../../data/80days.json';
-import { yieldToMain } from '../utils';
+import { InkyJsCompiler, NEW_BUILDING_BLOCK_DEFINITIONS } from '../js2ijson';
 
 const DEVELOPMENTAL = import.meta.env.DEV;
 
@@ -309,6 +324,7 @@ const filteredVariables = computed(() => {
 const browserSelectedKnot = ref('');
 const browserSelectedStitch = ref('');
 const stitchesShown = ref<string[]>([]);
+const inkyJs = ref(NEW_BUILDING_BLOCK_DEFINITIONS);
 function showVariableBrowser() {
   variablesShown.value = Object.fromEntries(
     story.getVariableNames().map((name) => [name, story.getVar(name)]),
@@ -331,6 +347,15 @@ watch(browserSelectedKnot, async (name) => {
   }
   stitchesShown.value = Object.keys((chunk as InkChunkWithStitches).stitches);
 });
+const compiler = new InkyJsCompiler();
+function applyInkyJs() {
+  try {
+    const buildingBlocks = compiler.compile(inkyJs.value);
+    story.replacementFunctions.buildingBlocks = buildingBlocks;
+  } catch (e) {
+    console.error('编译失败，请检查语法：', (e as Error).message);
+  }
+}
 
 function saveStory() {
   const save = story.save();
@@ -568,6 +593,9 @@ type CsvTranslation = {
 function patchChunkWithTranslation(obj: unknown, translations: CsvTranslation[], isRoot: boolean) {
   const chunk = isRoot ? (obj as InkRootNode).buildingBlocks : obj;
   translations.forEach(({ json_path, translated }) => {
+    if (translated === '') {
+      return;
+    }
     const path = json_path.split('.');
     const last = path.pop();
     const parent = path.reduce((acc, key) => (acc as Record<string, unknown>)?.[key], chunk);
@@ -904,5 +932,10 @@ div.header > div.sticky {
   position: sticky;
   top: 30px;
   width: 40vw;
+}
+
+textarea {
+  font-family: monospace;
+  font-size: 0.8em;
 }
 </style>

@@ -34,14 +34,21 @@ export class InkyJsCompiler {
     this.params = {};
   }
 
-  compile(code: string) {
+  compile(code: string): InkRootNode['buildingBlocks'] {
     const program = parseJs(code, { ecmaVersion: 2020 });
     const { body } = program;
-    if (body.length !== 1 || body[0].type !== 'FunctionDeclaration') {
-      throw new Error('Expecting a single function declaration');
+    if (body.some((n) => n.type !== 'FunctionDeclaration')) {
+      throw new Error('Expecting function declarations');
     }
     this.params = {};
-    return this.compileFunction(body[0]);
+    const results: InkRootNode['buildingBlocks'] = {};
+    body.forEach((node) => {
+      Object.entries(this.compileFunction(node as FunctionDeclaration))
+        .forEach(([name, value]) => {
+          results[name] = value;
+        });
+    });
+    return results;
   }
 
   compileFunction(node: FunctionDeclaration): InkRootNode['buildingBlocks'] {
@@ -199,14 +206,12 @@ export class InkyJsCompiler {
   }
 }
 
-export const NEW_BUILDING_BLOCK_DEFINITIONS = {
-  say_card: `
+export const NEW_BUILDING_BLOCK_DEFINITIONS = `
 function say_card(p) {
   suit(p);
   say_value(p);
 }
-`,
-  say_hand_of_two: `
+
 function say_hand_of_two(p1, p2, p3) {
   if (card_value(p1) === card_value(p2)) {
     _('一对');
@@ -242,8 +247,7 @@ function say_hand_of_two(p1, p2, p3) {
     }
   }
 }
-`,
-  _say_hand: `
+
 function _say_hand(p1, p2, p3, p4) {
   if (p2 === -1) {
     say_card(p1);
@@ -289,8 +293,13 @@ function _say_hand(p1, p2, p3, p4) {
     }
   }
 }
-`,
-  print_num: `
+
+function Cprint_num(p) {
+  _('<i>');
+  print_num(p);
+  _('</i>');
+}
+
 function print_num(p) {
   if (p >= 10000) {
     print_num(p / 10000);
@@ -375,5 +384,4 @@ function print_num(p) {
     }
   }
 }
-`,
-};
+`;

@@ -112,7 +112,7 @@ export class InkStoryRunner {
 
   useReplacementFunctions: boolean;
 
-  private replacementFunctions: InkRootNode['buildingBlocks'];
+  replacementFunctions: { buildingBlocks: InkRootNode['buildingBlocks'] };
 
   logPaths: boolean;
 
@@ -133,11 +133,9 @@ export class InkStoryRunner {
     this.useExternal = true;
     this.useReplacementFunctions = false;
     const compiler = new InkyJsCompiler();
-    this.replacementFunctions = Object.fromEntries(
-      Object.entries(NEW_BUILDING_BLOCK_DEFINITIONS).map(
-        ([name, code]) => [name, compiler.compile(code)[name]],
-      ),
-    );
+    this.replacementFunctions = {
+      buildingBlocks: compiler.compile(NEW_BUILDING_BLOCK_DEFINITIONS),
+    };
     this.logPaths = false;
     this.chunkCaches = {
       original: {
@@ -145,7 +143,7 @@ export class InkStoryRunner {
       },
       external: {
         '': JSON.parse(JSON.stringify(root)) as InkRootNode,
-        _: { buildingBlocks: this.replacementFunctions },
+        _: this.replacementFunctions,
       },
     };
     this.collectingOptions = false;
@@ -351,7 +349,8 @@ export class InkStoryRunner {
         try {
           await this.evaluateBuildingBlocks([
             (this.useExternal
-              && this.useReplacementFunctions && this.replacementFunctions[buildingBlock])
+              && this.useReplacementFunctions
+              && this.replacementFunctions.buildingBlocks[buildingBlock])
               ? '_' : '',
             'buildingBlocks',
             buildingBlock,
