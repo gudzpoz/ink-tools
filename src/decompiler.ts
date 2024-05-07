@@ -58,8 +58,8 @@ class PoorOldInkSerializer {
         ' // ',
         ...(tag.userInfo
           ? Object.entries(tag.userInfo).map(
-            ([k, v]) => this.sourceNode([...path, 'userInfo', k], JSON.stringify(v)),
-          )
+            ([k, v]) => this.sourceNode([...path, 'userInfo', k], [k, ' = ', JSON.stringify(v), '; ']),
+          ).flat()
           : []
         ),
       ],
@@ -299,8 +299,8 @@ class PoorOldInkSerializer {
             storyCustomContentClass,
             ': ',
             ...Object.entries(dictionary).map(
-              ([k, v]) => this.sourceNode([...path, 'dictionary', k], JSON.stringify(v)),
-            ),
+              ([k, v]) => this.sourceNode([...path, 'dictionary', k], [k, ' = ', JSON.stringify(v), '; ']),
+            ).flat(),
             this.nl(),
           ],
         );

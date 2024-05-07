@@ -50,17 +50,17 @@ await Promise.all(files.filter((file) => file.endsWith('.csv'))
         throw new Error(`Line ${lineNumber} has multiple positions in source map`);
       }) - 1;
       const contextBefore = destLines.slice(
-        Math.max(0, destLine - 4),
+        Math.max(0, destLine - 7),
         destLine,
       ).map((s) => `    ${s}`);
       const contextAfter = destLines.slice(
         destLine + 1,
-        Math.max(0, destLine + 5),
+        Math.max(0, destLine + 8),
       ).map((s) => `    ${s}`);
       const theLine = `>>> ${destLines[destLine]}`;
       return {
         ...translation,
-        comment: `${translation.comment ? `关联：${translation.comment}\n\n` : ''}上下文：${
+        comment: `${translation.comment ? `关联：${translation.comment}\n\n` : ''}上下文：\n${
           [...contextBefore, theLine, ...contextAfter].join('\n').replace(/\n\s+\n/g, '\n')
         }`,
       };
