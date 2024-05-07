@@ -568,9 +568,6 @@ type CsvTranslation = {
 function patchChunkWithTranslation(obj: unknown, translations: CsvTranslation[], isRoot: boolean) {
   const chunk = isRoot ? (obj as InkRootNode).buildingBlocks : obj;
   translations.forEach(({ json_path, translated }) => {
-    if (translated.trim() === '') {
-      return;
-    }
     const path = json_path.split('.');
     const last = path.pop();
     const parent = path.reduce((acc, key) => (acc as Record<string, unknown>)?.[key], chunk);
