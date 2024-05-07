@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-import { InkVariableType, Options } from './story';
+import { InkVariableType, Options } from '../story';
 
 export default defineStore('saves', () => {
   const saves = ref<{
@@ -22,6 +22,7 @@ export default defineStore('saves', () => {
     logPaths: false,
     stepping: false,
     keepCycles: false,
+    replaceFunctions: true,
   });
   return {
     saves,

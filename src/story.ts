@@ -1,8 +1,10 @@
+import escapeHtml from 'escape-html';
+
 import type {
   Type_funcWithParams,
   Type_sequence,
   Type_set,
-} from '../auto-types';
+} from './auto-types';
 import {
   TypedInkBlockWithKeys,
   annotateInkBlockType,
@@ -13,9 +15,10 @@ import {
   type InkRootNode,
   type JSONPath,
   type TypedCycleNode,
-} from '../types';
-import PoorOldInkSerializer from '../decompiler';
+} from './types';
+import PoorOldInkSerializer from './decompiler';
 import { evaluateSequentially } from './utils';
+import { NEW_BUILDING_BLOCK_DEFINITIONS, InkyJsCompiler } from './js2ijson';
 
 export type InkVariableType = string | number | boolean;
 
@@ -49,13 +52,6 @@ interface InkReturnValue {
   returned: boolean;
   value: InkVariableType;
   name: string;
-}
-
-function escapeHtml(html: string): string {
-  const text = document.createTextNode(html);
-  const p = document.createElement('p');
-  p.appendChild(text);
-  return p.innerHTML;
 }
 
 export function isParameterName(name: string): boolean {
@@ -98,8 +94,6 @@ export class InkStoryRunner {
 
   private conditionTrackStack: ConditionTrack[];
 
-  private debugExprIp: JSONPath;
-
   private collectingOptions: boolean;
 
   /**
@@ -116,12 +110,34 @@ export class InkStoryRunner {
 
   useExternal: boolean;
 
+  useReplacementFunctions: boolean;
+
+  private replacementFunctions: InkRootNode['buildingBlocks'];
+
   logPaths: boolean;
 
   listener?: RunnerListener;
 
-  constructor(root: InkRootNode) {
+  private fetcher: (name: string) => Promise<string>;
+
+  constructor(root: InkRootNode, fetcher?: (name: string) => Promise<string>) {
+    if (fetcher) {
+      this.fetcher = fetcher;
+    } else {
+      this.fetcher = async (name: string) => {
+        const chunkUrl = new URL(`../data/chunks/${name}.json`, import.meta.url).href;
+        const text = await fetch(chunkUrl).then((r) => r.text());
+        return text;
+      };
+    }
     this.useExternal = true;
+    this.useReplacementFunctions = false;
+    const compiler = new InkyJsCompiler();
+    this.replacementFunctions = Object.fromEntries(
+      Object.entries(NEW_BUILDING_BLOCK_DEFINITIONS).map(
+        ([name, code]) => [name, compiler.compile(code)[name]],
+      ),
+    );
     this.logPaths = false;
     this.chunkCaches = {
       original: {
@@ -129,9 +145,9 @@ export class InkStoryRunner {
       },
       external: {
         '': JSON.parse(JSON.stringify(root)) as InkRootNode,
+        _: { buildingBlocks: this.replacementFunctions },
       },
     };
-    this.debugExprIp = [];
     this.collectingOptions = false;
     this.returnStack = [];
     this.conditionTrackStack = [];
@@ -187,13 +203,11 @@ export class InkStoryRunner {
     return JSON.parse(await this.getChunkText(name)) as InkBlock | InkRootNode;
   }
 
-  async getChunkText(name: string): Promise<string> {
+  getChunkText(name: string): Promise<string> {
     if (name === '') {
-      return JSON.stringify(this.getRoot());
+      return Promise.resolve(JSON.stringify(this.getRoot()));
     }
-    const chunkUrl = new URL(`../../data/chunks/${name}.json`, import.meta.url).href;
-    const text = await fetch(chunkUrl).then((r) => r.text());
-    return text;
+    return this.fetcher(name);
   }
 
   private async getChunk(name: string): Promise<InkChunkNode> {
@@ -284,7 +298,6 @@ export class InkStoryRunner {
   private async evaluateExpr(
     path: JSONPath,
   ): Promise<string | number | boolean> {
-    this.debugExprIp = path;
     const expr: InkBlock | InkBlock[] | undefined = await this.getCurrent(path);
     if (expr === undefined) {
       return '';
@@ -336,7 +349,13 @@ export class InkStoryRunner {
         const callerSaved = params.map(([name]) => [name, this.getVar(name as string)]);
         params.forEach(([name, value]) => this.setVar(name as string, value));
         try {
-          await this.evaluateBuildingBlocks(['', 'buildingBlocks', buildingBlock]);
+          await this.evaluateBuildingBlocks([
+            (this.useExternal
+              && this.useReplacementFunctions && this.replacementFunctions[buildingBlock])
+              ? '_' : '',
+            'buildingBlocks',
+            buildingBlock,
+          ]);
         } catch (e) {
           if (!this.expectError(e, 'return')) {
             this.returnStack.pop();

@@ -33,6 +33,10 @@
         <label>
           <input type="checkbox" v-model="debug.original" /> 📄 显示原文
         </label>
+        <label>
+          <input type="checkbox" v-model="debug.replaceFunctions" :disabled="debug.original" />
+          ㉆ 使用试验性函数翻译
+        </label>
       </div>
       <div>
         显示附加信息：
@@ -268,11 +272,11 @@ import JSZip from 'jszip';
 import useStore from './store';
 import {
   DebugInfo, InkStoryRunner, InkVariableType, Options,
-} from './story';
+} from '../story';
 import { InkChunkNode, InkChunkWithStitches, InkRootNode } from '../types';
 
 import rootJson from '../../data/80days.json';
-import { yieldToMain } from './utils';
+import { yieldToMain } from '../utils';
 
 const DEVELOPMENTAL = import.meta.env.DEV;
 
@@ -289,6 +293,8 @@ const options = ref<Options>([]);
 
 const store = useStore();
 const debug = computed(() => store.debug);
+story.useExternal = !debug.value.original;
+story.useReplacementFunctions = debug.value.replaceFunctions;
 const shouldShowVariableBrowser = ref(false);
 
 const variablesShown = ref<Record<string, InkVariableType>>({});
@@ -683,6 +689,9 @@ async function updateStoryWithTranslation(e: Event) {
 }
 watch(() => debug.value.original, () => {
   story.useExternal = !debug.value.original;
+});
+watch(() => debug.value.replaceFunctions, () => {
+  story.useReplacementFunctions = debug.value.replaceFunctions;
 });
 watch(() => debug.value.logPaths, () => {
   story.logPaths = !debug.value.logPaths;
