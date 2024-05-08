@@ -323,7 +323,7 @@ class PoorOldInkSerializer {
         return this.sourceNode(
           path,
           [this.nl(), marker, ...cond, this.sourceNode(typed.join(path, 'option'), option), postfix, this.nl(),
-            '}  -> ', this.fixDivertFormat(linkPath), this.nl()],
+            '  -> ', this.fixDivertFormat(linkPath), this.nl()],
         );
       }
       case 'condition': {
