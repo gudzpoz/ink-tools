@@ -26,6 +26,7 @@
   ],
   "rules": {
     "class-methods-use-this": "off",
-    "require-await": "error"
+    "require-await": "error",
+    "@typescript-eslint/no-use-before-define": "off"
   }
 }

@@ -31,6 +31,7 @@ export default defineStore('saves', () => {
     debug,
     variableFilter: ref(''),
     selectedKnot: ref(''),
+    selectedStitch: ref(''),
   };
 }, {
   persist: true,
