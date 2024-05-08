@@ -1,6 +1,8 @@
 import escapeHtml from 'escape-html';
 
 import type {
+  Type_actionTag,
+  Type_customDictionary,
   Type_funcWithParams,
   Type_sequence,
   Type_set,
@@ -79,6 +81,9 @@ export type RunnerListener = (
     type: 'read_count',
     knot: string,
     stitch?: string,
+  } | {
+    type: 'coverage',
+    path: JSONPath,
   },
 ) => void;
 
@@ -166,6 +171,13 @@ export class InkStoryRunner {
 
   copyIp(): JSONPath {
     return [...this.getIp()];
+  }
+
+  // 如果经过了可翻译路径则记录下来。
+  cover(path: JSONPath) {
+    if (this.listener) {
+      this.listener({ type: 'coverage', path });
+    }
   }
 
   async load(environment: InkEnvironment) {
@@ -387,6 +399,7 @@ export class InkStoryRunner {
     switch (typed.type) {
       case 'value': {
         this.output(typed.value as string);
+        this.cover(path);
         if (this.logPaths) {
           console.log(`@ ${this.returnStack[this.returnStack.length - 1].name}:`, typed.value);
         }
@@ -416,7 +429,9 @@ export class InkStoryRunner {
       }
       case 'action':
       case 'custom': {
-        return `<br><br>${JSON.stringify(typed.value)}`;
+        const s = this.stringifyCustom(path, typed);
+        this.output(s);
+        return s;
       }
       case 'divert': {
         // 函数里面出现了 divert，不知道怎么处理。总之就清空 stack 然后跳转吧……
@@ -427,6 +442,23 @@ export class InkStoryRunner {
       default:
         throw new Error(`Unknown node: ${typed.type} (${Object.keys(blocks).join(', ')})`);
     }
+  }
+
+  private stringifyCustom(
+    path: JSONPath,
+    typed: TypedInkBlockWithKeys<'action', Type_actionTag>
+    | TypedInkBlockWithKeys<'custom', Type_customDictionary>,
+  ) {
+    if (typed.type === 'action' && typed.value.userInfo) {
+      Object.keys(typed.value.userInfo).forEach((key) => {
+        this.cover(typed.join(path, 'userInfo', key as never));
+      });
+    } else if (typed.type === 'custom') {
+      Object.keys(typed.value.dictionary).forEach((key) => {
+        this.cover(typed.join(path, 'dictionary', key as never));
+      });
+    }
+    return `<br><br>${JSON.stringify(typed.value)}`;
   }
 
   private getCycleDetails(block: TypedCycleNode, path: JSONPath): [Type_sequence, number] {
@@ -578,7 +610,10 @@ export class InkStoryRunner {
     const current = await this.getCurrent();
     // IP 自动推进到下一各元素
     if (typeof ip[ip.length - 1] !== 'number') {
-      throw new Error('Invalid IP');
+      if (ip[0] === 'ENDFLOW') {
+        this.throwError('ended');
+      }
+      throw new Error(`Invalid IP: ${ip.join('.')}`);
     }
     if (current === undefined) {
       let last: string | number = '';
@@ -600,6 +635,7 @@ export class InkStoryRunner {
     const typed = annotateInkBlockType(current);
     switch (typed.type) {
       case 'value': {
+        this.cover(path);
         if (this.logPaths) {
           (ip[ip.length - 1] as number) -= 1;
           console.log(`@ ${ip.join('.')}:`, typed.value);
@@ -661,6 +697,7 @@ export class InkStoryRunner {
       }
       case 'option': {
         const option = typed.value;
+        this.cover(typed.join(path, 'option'));
         const thisOption = {
           text: option.option,
           link: option.linkPath,
@@ -728,7 +765,11 @@ export class InkStoryRunner {
         return output;
       }
       default:
-        this.output(`<br><br>${JSON.stringify(typed.value)}`);
+        if (typed.type === 'action' || typed.type === 'custom') {
+          this.output(this.stringifyCustom(path, typed));
+        } else {
+          this.output(`<br><br>${JSON.stringify(typed.value)}`);
+        }
         return this.collectOutputBuffer();
     }
   }
@@ -761,7 +802,8 @@ export class InkStoryRunner {
       ip[0] = absKnot;
       ip.push(0);
     } else if (Object.keys(chunk).length === 0) {
-      this.throwError('ended');
+      ip.splice(1);
+      ip[0] = absKnot;
     } else {
       const knot = chunk as InkChunkWithStitches;
       if (!absStitch) {

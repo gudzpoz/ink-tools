@@ -7,6 +7,7 @@
           <Dropdown
             id="knotSelector"
             v-model="store.selectedKnot"
+            @update:modelValue="(knot) => story.selectNewKnot(knot)"
             :options="story.knots.map((knot, i) => ({
               label: `${String(i + 1).padStart(4, '0')}-${knot}`,
               value: knot,
@@ -234,6 +235,28 @@
           </label>
         </div>
       </TabPanel>
+      <TabPanel header="覆盖率统计">
+        <p>
+          这里可以看到运行过程中有没有运行过翻译中的某一行，避免没有测试到某些翻译的情况。
+          其实理想来说可能测总共排列组合的覆盖率会好些，但实现起来太复杂了，测试起来也难；
+          所以这里测试的其实还只是翻译文本的覆盖率。
+        </p>
+        <label class="file">
+          📤 上传当前测试的 CSV 翻译文件
+          <input type="file" @change="(e) => story.setupCoverage(e)" />
+        </label>
+        <DataTable
+          :value="Object.entries(story.coverage.value).map(([path, data]) => ({
+            path,
+            covered: data.covered ? '✅' : '❌',
+            text: data.text,
+          }))"
+        >
+          <Column field="covered" header="" />
+          <Column field="path" header="位置" />
+          <Column field="text" header="翻译文本" />
+        </DataTable>
+      </TabPanel>
       <TabPanel header="函数级别汉化危险区域">
         <p>
           这是用于直接替换某些不可能简单汉化的 buildingBlocks 类 JavaScript 脚本。
@@ -252,6 +275,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
 import Dropdown from 'primevue/dropdown';
 import TabPanel from 'primevue/tabpanel';
 import TabView from 'primevue/tabview';
@@ -302,13 +327,7 @@ async function updateStoryWithTranslation(e: Event) {
     return;
   }
   const [file] = files;
-  const [stem, extension, extra] = file.name.split('.');
-  if (extra === 'json' && extension === 'csv') {
-    // Paratranz 导出的原始格式，处理不了。
-    alert('目前无法处理 Paratranz 导出的原始格式，请上传 CSV 或经脚本处理的 JSON。');
-    return;
-  }
-  if (await story.updateStoryWithFile(stem, extension, await file.arrayBuffer(), true)) {
+  if (await story.updateStoryWithFile(file.name, await file.arrayBuffer(), true)) {
     await story.selectNewKnot();
   }
 }

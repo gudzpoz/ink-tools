@@ -32,16 +32,48 @@ function newStory(store: ReturnType<typeof useStore>) {
   watch(store, updateFromStore, { deep: true });
   updateFromStore();
 
+  const coverage = ref<{
+    [path: string]: {
+      covered: boolean,
+      text: string,
+    },
+  }>({});
   const variables = ref<Record<string, InkVariableType>>({});
   const stitchesInSelectedKnot = ref<string[]>([]);
   story.listener = (event) => {
-    if (event.type === 'variable') {
-      variables.value[event.name] = event.value;
-    } else {
-      store.selectedKnot = event.knot;
-      store.selectedStitch = event.stitch ?? '';
+    switch (event.type) {
+      case 'variable':
+        variables.value[event.name] = event.value;
+        break;
+      case 'read_count':
+        store.selectedKnot = event.knot;
+        store.selectedStitch = event.stitch ?? '';
+        break;
+      case 'coverage': {
+        const path = event.path.join('.');
+        if (coverage.value[path] !== undefined) {
+          coverage.value[path].covered = true;
+        }
+        break;
+      }
+      default:
+        break;
     }
   };
+  async function setupCoverage(e: Event) {
+    const [file] = (e.target as HTMLInputElement).files!;
+    const [name, ext] = parseFileName(file.name, true);
+    if (ext !== 'csv') {
+      return;
+    }
+    const translations = decodeCsvTranslations(await file.arrayBuffer());
+    coverage.value = Object.fromEntries(
+      translations.map((item) => {
+        const { json_path: path, translated } = item;
+        return [`${name}.${path}`, { covered: false, text: translated }];
+      }),
+    );
+  }
   watch(() => store.selectedKnot, async (name) => {
     const chunk = await story.copyChunk(name) as InkChunkNode;
     if (Array.isArray(chunk) || Object.keys(chunk).length === 0) {
@@ -226,7 +258,6 @@ function newStory(store: ReturnType<typeof useStore>) {
     flushVariables();
     await fetchMore();
   }
-  watch(() => store.selectedKnot, () => selectNewKnot(store.selectedKnot));
 
   function saveStory() {
     const save = story.save();
@@ -287,7 +318,7 @@ function newStory(store: ReturnType<typeof useStore>) {
     });
   }
 
-  function parseTranslationCsv(content: ArrayBuffer) {
+  function decodeCsvTranslations(content: ArrayBuffer) {
     const csv = new TextDecoder('utf-8').decode(content);
     const translations = parseCsv(csv, {
       bom: true,
@@ -297,6 +328,11 @@ function newStory(store: ReturnType<typeof useStore>) {
       relax_column_count_less: true,
       relax_column_count_more: true,
     }) as CsvTranslation[];
+    return translations;
+  }
+
+  function parseTranslationCsv(content: ArrayBuffer) {
+    const translations = decodeCsvTranslations(content);
     return translations.map((item) => {
       const { json_path: path, original, translated } = item;
       if (path && original && translated) {
@@ -310,20 +346,36 @@ function newStory(store: ReturnType<typeof useStore>) {
     });
   }
 
-  async function updateStoryWithFile(
-    stem: string,
-    extension: string,
-    content: ArrayBuffer,
-    shouldAlert: boolean,
-  ): Promise<boolean> {
+  function parseFileName(filename: string, shouldAlert: boolean) {
+    const [stem, extension, extra] = filename.split('.');
+    if (stem === undefined || extension === undefined) {
+      return [];
+    }
+    if (extra === 'json' && extension === 'csv') {
+      // Paratranz 导出的原始格式，处理不了。
+      (shouldAlert ? alert : console.log)('目前无法处理 Paratranz 导出的原始格式，请上传 CSV 或经脚本处理的 JSON。');
+      return [];
+    }
     const ext = extension.toLowerCase();
     if (ext !== 'json' && ext !== 'csv' && ext !== 'zip') {
       (shouldAlert ? alert : console.log)(`请上传 .json/.csv/.zip 文件：实际上传了 ${ext}（${stem}）`);
-      return false;
+      return [];
     }
     const [, name] = /^.*[0-9]{4}-(.+)$/.exec(stem) ?? ['', stem];
     if (ext !== 'zip' && name !== '' && name !== 'test' && root['indexed-content'].ranges[name] === undefined) {
       (shouldAlert ? alert : console.log)(`JSON/CSV 的文件名不符合：无对应 ${stem} 的 Ink 节点`);
+      return [];
+    }
+    return [name, ext];
+  }
+
+  async function updateStoryWithFile(
+    filename: string,
+    content: ArrayBuffer,
+    shouldAlert: boolean,
+  ): Promise<boolean> {
+    const [name, ext] = parseFileName(filename, shouldAlert);
+    if (name === undefined) {
       return false;
     }
     // 操作可能较为费时，优先保证 UI 响应。
@@ -331,7 +383,7 @@ function newStory(store: ReturnType<typeof useStore>) {
     if (ext === 'csv') {
       const translations = parseTranslationCsv(content);
       const chunk = await story.copyChunk(name);
-      patchChunkWithTranslation(chunk, translations, stem === '');
+      patchChunkWithTranslation(chunk, translations, name === '');
       story.loadExternalChunk(name, chunk);
     } else if (ext === 'json') {
       const json = new TextDecoder('utf-8').decode(content);
@@ -344,24 +396,14 @@ function newStory(store: ReturnType<typeof useStore>) {
           return;
         }
         const segments = path.split('/');
-        const filename = segments.pop()!;
-        // eslint-disable-next-line prefer-const
-        let [entryStem, entryExt, extra] = filename.split('.');
-        if (!entryStem || !entryExt) {
-          return;
-        }
-        if (extra === 'json' && entryExt === 'csv') {
-          // Paratranz 导出的原始格式，处理不了。
-          return;
-        }
-        if (filename.includes('buildingBlocks')) {
-          entryStem = '';
-          entryExt = 'csv';
+        let f = segments[segments.length - 1];
+        if (f.includes('buildingBlocks')) {
+          f = '.csv';
         }
         promises.push(
           (async () => {
             try {
-              return await updateStoryWithFile(entryStem, entryExt, await data.async('arraybuffer'), false);
+              return await updateStoryWithFile(f, await data.async('arraybuffer'), false);
             } catch (e) {
               console.log('导入错误：', path, e);
               return false;
@@ -407,6 +449,9 @@ function newStory(store: ReturnType<typeof useStore>) {
     exportInkyJsToJson,
 
     updateStoryWithFile,
+
+    coverage,
+    setupCoverage,
   };
 }
 
