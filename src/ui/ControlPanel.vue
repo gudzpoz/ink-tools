@@ -91,9 +91,9 @@
           <input type="checkbox" v-model="debug.keepCycles" /> 💫 重开/读取存档保留 Cycle 计数，不恢复随机数种子
         </label>
       </div>
-      <p class="ip">你现在处在：{{ ip.join('.') }}</p>
+      <p class="ip">你现在处在：{{ story.ip.value.join('.') }}</p>
     </div>
-    <TabView>
+    <TabView scrollable>
       <TabPanel header="变量">
         <button type="button" @click="story.resetVariables">
           🗑️ 重置 {{
@@ -295,7 +295,6 @@ import useStory from './teller';
 
 const DEVELOPMENTAL = import.meta.env.DEV;
 
-const ip = ref([]);
 const saveSelect = ref<HTMLSelectElement>();
 
 const store = useStore();

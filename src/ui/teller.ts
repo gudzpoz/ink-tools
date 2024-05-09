@@ -27,7 +27,7 @@ function newStory(store: ReturnType<typeof useStore>) {
   function updateFromStore() {
     story.useExternal = !store.debug.original;
     story.useReplacementFunctions = store.debug.replaceFunctions;
-    story.logPaths = !store.debug.logPaths;
+    story.logPaths = store.debug.logPaths;
   }
   watch(store, updateFromStore, { deep: true });
   updateFromStore();
