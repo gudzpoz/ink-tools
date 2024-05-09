@@ -301,8 +301,16 @@ function Cprint_num(p) {
 }
 
 function print_num(p) {
+  if (p === 2) {
+    _('两');
+  } else {
+    _print_num(p);
+  }
+}
+
+function _print_num(p) {
   if (p >= 10000) {
-    print_num(p / 10000);
+    _print_num(p / 10000);
     _('万');
     if (p % 10000 > 0) {
       if (p % 10000 < 1000) {
@@ -311,11 +319,11 @@ function print_num(p) {
           _('一');
         }
       }
-      print_num(p % 10000);
+      _print_num(p % 10000);
     }
   } else {
     if (p >= 1000) {
-      print_num(p / 1000);
+      _print_num(p / 1000);
       _('千');
       if (p % 1000 > 0) {
         if (p % 1000 < 100) {
@@ -324,11 +332,11 @@ function print_num(p) {
             _('一');
           }
         }
-        print_num(p % 1000);
+        _print_num(p % 1000);
       }
     } else {
       if (p >= 100) {
-        print_num(p / 100);
+        _print_num(p / 100);
         _('百');
         if (p % 100 > 0) {
           if (p % 100 < 10) {
@@ -338,16 +346,16 @@ function print_num(p) {
               _('一');
             }
           }
-          print_num(p % 100);
+          _print_num(p % 100);
         }
       } else {
         if (p >= 10) {
           if (p >= 20) {
-            print_num(p / 10);
+            _print_num(p / 10);
           }
           _('十');
           if (p % 10 > 0) {
-            print_num(p % 10);
+            _print_num(p % 10);
           }
         } else {
           switch (p) {
