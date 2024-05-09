@@ -72,19 +72,21 @@ type ConditionTrack = {
 
 type Message = 'return' | 'ended' | 'divert_in_function';
 
+export type ListenerEvent = {
+  type: 'variable',
+  name: string,
+  value: InkVariableType,
+} | {
+  type: 'read_count',
+  knot: string,
+  stitch?: string,
+} | {
+  type: 'coverage',
+  path: JSONPath,
+};
+
 export type RunnerListener = (
-  event: {
-    type: 'variable',
-    name: string,
-    value: InkVariableType,
-  } | {
-    type: 'read_count',
-    knot: string,
-    stitch?: string,
-  } | {
-    type: 'coverage',
-    path: JSONPath,
-  },
+  event: ListenerEvent,
 ) => void;
 
 export class InkStoryRunner {

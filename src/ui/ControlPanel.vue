@@ -116,27 +116,30 @@
             />
           </label>
         </p>
-        <div class="variable-browser-inner">
-          <label
-            v-for="[k, v] in filteredVariables"
-            :key="k"
-          >
-            {{ k }}<span v-if="store.globalVariables[k] !== undefined">（已修改）</span>=
-            <input
-              v-if="typeof v === 'number'"
-              type="number"
-              :value="v"
-              @change="ink[k] = Number(($event.target as HTMLInputElement).value)"
-            />
-            <input
-              v-else-if="typeof v === 'boolean'"
-              type="checkbox"
-              :checked="!!v"
-              @change="ink[k] = Boolean(($event.target as HTMLInputElement).checked)"
-            />
-            <div v-else>出错啦！（{{ k }}={{ v }}）请向开发者汇报～</div>
-          </label>
-        </div>
+        <VirtualScroller
+          class="variable-browser-inner"
+          :itemSize="24"
+          :items="filteredVariables"
+        >
+          <template v-slot:item="{ item }">
+            <label :key="item[0]">
+              {{ item[0] }}<span v-if="store.globalVariables[item[1]] !== undefined">（已修改）</span>=
+              <input
+                v-if="typeof item[1] === 'number'"
+                type="number"
+                :value="item[1]"
+                @change="ink[item[1]] = Number(($event.target as HTMLInputElement).value)"
+              />
+              <input
+                v-else-if="typeof item[1] === 'boolean'"
+                type="checkbox"
+                :checked="item[1]"
+                @change="ink[item[0]] = Boolean(($event.target as HTMLInputElement).checked)"
+              />
+              <div v-else>出错啦！（{{ item[0] }}={{ item[1] }}）请向开发者汇报～</div>
+            </label>
+          </template>
+        </VirtualScroller>
       </TabPanel>
       <TabPanel header="变量常用操作">
         <p>下面是一些常用操作以及它们的相关变量。如果觉得有其它常用操作的话欢迎在群里反馈～</p>
@@ -187,19 +190,19 @@
             />
           </label>
           <label>
-            :{{ store.selectedKnot }} 访问次数
-            <span v-if="store.globalReadCounts[`:${store.selectedKnot}`] !== undefined">（已修改）</span>：
+            :{{ store.browsingKnot }} 访问次数
+            <span v-if="store.globalReadCounts[`:${store.browsingKnot}`] !== undefined">（已修改）</span>：
             <input
               type="number"
-              :value="story.story.getReadCount(`:${store.selectedKnot}`)"
-              @change="inkHistory[`:${store.selectedKnot}`] = Number(($event.target as HTMLInputElement).value)"
+              :value="story.story.getReadCount(`:${store.browsingKnot}`)"
+              @change="inkHistory[`:${store.browsingKnot}`] = Number(($event.target as HTMLInputElement).value)"
             />
           </label>
           <label class="select" for="stitchBrowserSelector">
             Stitch 名称：
             <Dropdown
               id="stitchBrowserSelector"
-              v-model="store.selectedStitch"
+              v-model="store.browsingStitch"
               :options="story.stitchesInSelectedKnot.value.map((stitch) => ({
                 label: `:${stitch}`,
                 value: stitch,
@@ -212,24 +215,24 @@
             />
           </label>
           <label>
-            :{{ store.selectedKnot }}:{{
+            :{{ store.browsingKnot }}:{{
               story.stitchesInSelectedKnot.value.includes(
-                store.selectedStitch,
-              ) ? store.selectedStitch : '???'
+                store.browsingStitch,
+              ) ? store.browsingStitch : '???'
             }} 访问次数
             <span
               v-if="store.globalReadCounts[
-                `:${store.selectedKnot}:${store.selectedStitch}`
+                `:${store.browsingKnot}:${store.browsingStitch}`
               ] !== undefined">（已修改）</span>：
             <input
               type="number"
-              :disabled="!story.stitchesInSelectedKnot.value.includes(store.selectedStitch)"
-              :value="story.story.getReadCount(`:${store.selectedKnot}:${
-                story.stitchesInSelectedKnot.value.includes(store.selectedStitch)
-                  ? store.selectedStitch : '???'
+              :disabled="!story.stitchesInSelectedKnot.value.includes(store.browsingStitch)"
+              :value="story.story.getReadCount(`:${store.browsingKnot}:${
+                story.stitchesInSelectedKnot.value.includes(store.browsingStitch)
+                  ? store.browsingStitch : '???'
               }`)"
               @change="inkHistory[
-                `:${store.selectedKnot}:${store.selectedStitch}`
+                `:${store.browsingKnot}:${store.browsingStitch}`
               ] = Number(($event.target as HTMLInputElement).value)"
             />
           </label>
@@ -246,6 +249,8 @@
           <input type="file" @change="(e) => story.setupCoverage(e)" />
         </label>
         <DataTable
+          class="coverage-table"
+          :virtualScrollerOptions="{ itemSize: 46 }"
           :value="Object.entries(story.coverage.value).map(([path, data]) => ({
             path,
             covered: data.covered ? '✅' : '❌',
@@ -281,6 +286,7 @@ import Dropdown from 'primevue/dropdown';
 import TabPanel from 'primevue/tabpanel';
 import TabView from 'primevue/tabview';
 import Textarea from 'primevue/textarea';
+import VirtualScroller from 'primevue/virtualscroller';
 
 import { computed, ref } from 'vue';
 
@@ -380,10 +386,10 @@ label.file > input {
 .variable-browser {
   max-width: 50vw;
 }
-.variable-browser-inner > label {
+.variable-browser-inner label {
   display: flex;
   justify-content: space-between;
-  height: 1.5em;
+  height: 24px;
 }
 .knot-browser {
   display: flex;
@@ -391,5 +397,11 @@ label.file > input {
   justify-content: left;
   flex-wrap: wrap;
   text-align: center;
+}
+
+.coverage-table, .variable-browser-inner {
+  height: 30em;
+  max-height: 60vh;
+  overflow: auto;
 }
 </style>

@@ -40,26 +40,44 @@ function newStory(store: ReturnType<typeof useStore>) {
   }>({});
   const variables = ref<Record<string, InkVariableType>>({});
   const stitchesInSelectedKnot = ref<string[]>([]);
+  // 因为会卡……Listener 涉及到的变量后面接的 UI 更新太多了，结束之后统一更新吧。
+  const listenerEventBuffer = {
+    variables: {} as Record<string, InkVariableType>,
+    coverage: {} as Record<string, boolean>,
+  };
   story.listener = (event) => {
     switch (event.type) {
       case 'variable':
-        variables.value[event.name] = event.value;
+        listenerEventBuffer.variables[event.name] = event.value;
         break;
       case 'read_count':
-        store.selectedKnot = event.knot;
-        store.selectedStitch = event.stitch ?? '';
+        // 这个相对更新较少，所以可以直接更新，不经 buffer。
+        store.browsingKnot = event.knot;
+        store.browsingStitch = event.stitch ?? '';
         break;
       case 'coverage': {
         const path = event.path.join('.');
-        if (coverage.value[path] !== undefined) {
-          coverage.value[path].covered = true;
-        }
+        listenerEventBuffer.coverage[path] = true;
         break;
       }
       default:
         break;
     }
   };
+  function flushListenerEvents() {
+    Object.entries(listenerEventBuffer.variables).forEach(
+      ([name, value]) => { variables.value[name] = value; },
+    );
+    listenerEventBuffer.variables = {};
+    Object.entries(listenerEventBuffer.coverage).forEach(
+      ([path, covered]) => {
+        if (coverage.value[path] !== undefined) {
+          coverage.value[path].covered = covered;
+        }
+      },
+    );
+    listenerEventBuffer.coverage = {};
+  }
   async function setupCoverage(e: Event) {
     const [file] = (e.target as HTMLInputElement).files!;
     const [name, ext] = parseFileName(file.name, true);
@@ -194,6 +212,7 @@ function newStory(store: ReturnType<typeof useStore>) {
     }
     const startingId = storyUniqueId.value;
     const line = await story.next();
+    flushListenerEvents();
     if (startingId !== storyUniqueId.value) {
       return;
     }
@@ -240,6 +259,7 @@ function newStory(store: ReturnType<typeof useStore>) {
       clearTimeout(timeOutHandle);
       timeOutHandle = null;
     }
+    await story.init();
     store.saves = [];
     clearContents();
     const cycleCounts = store.debug.keepCycles && story.save().cycleCounts;
