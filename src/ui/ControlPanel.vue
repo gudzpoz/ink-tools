@@ -155,6 +155,33 @@
         <button type="button" @click="ink.withoutfogg = true">
           🎩 失去 Monsieur Fogg（withoutfogg）
         </button>
+        <details>
+          <summary>📊 使某变量符合 up/down/mid/high/low/top/bottom 条件</summary>
+          <ul>
+            <li
+              v-for="([name, up, down]) in [
+                ['top', 1, 9],
+                ['high', 3, 7],
+                ['up', 4, 6],
+                ['mid', 5, 5],
+                ['down', 6, 4],
+                ['low', 7, 3],
+                ['bottom', 9, 1],
+              ]"
+              :key="name"
+            >
+              📈 使某变量符合 <code>{{ name }}(变量)</code> 的条件
+              <button
+                type="button"
+                v-for="varName in upDownVariables"
+                @click="ink[varName] = ((down as number) + 1000 * (up as number)) * 2"
+                :key="varName"
+              >
+                <code>{{ varName }}</code>
+              </button>
+            </li>
+          </ul>
+        </details>
         <p>一些小提示：</p>
         <ul>
           <li>
@@ -312,6 +339,15 @@ const filteredVariables = computed(() => {
     return Object.entries(story.variables.value);
   }
 });
+const upDownVariables = [
+  'adriamanelo',
+  'internal_story_counter',
+  'scratch',
+  'skill',
+  'style',
+  'sybil',
+  'tension',
+];
 
 async function quickLoad() {
   if (story.options.value.length === 0 && store.saves.length >= 1) {
