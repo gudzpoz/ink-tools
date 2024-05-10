@@ -128,7 +128,7 @@
                 v-if="typeof item[1] === 'number'"
                 type="number"
                 :value="item[1]"
-                @change="ink[item[1]] = Number(($event.target as HTMLInputElement).value)"
+                @change="ink[item[0]] = Number(($event.target as HTMLInputElement).value)"
               />
               <input
                 v-else-if="typeof item[1] === 'boolean'"
