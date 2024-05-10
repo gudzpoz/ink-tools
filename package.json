@@ -53,6 +53,7 @@
     "acorn": "^8.11.3",
     "csv-parse": "^5.5.5",
     "csv-stringify": "^6.4.6",
+    "debounce": "^2.0.0",
     "escape-html": "^1.0.3",
     "jszip": "^3.10.1",
     "pinia": "^2.1.7",

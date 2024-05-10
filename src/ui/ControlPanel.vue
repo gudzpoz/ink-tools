@@ -275,14 +275,18 @@
           📤 上传当前测试的 CSV 翻译文件
           <input type="file" @change="(e) => story.setupCoverage(e)" />
         </label>
+        <p>当前测试覆盖率：
+          {{ Math.round(
+            story.coverage.value.filter((data) => data.covered === '✅').length
+              / story.coverage.value.length * 10000) / 100
+          }}%
+        </p>
         <DataTable
           class="coverage-table"
+          data-key="path"
+          :filters="{ covered: { value: '❌', matchMode: FilterMatchMode.EQUALS } }"
           :virtualScrollerOptions="{ itemSize: 46 }"
-          :value="Object.entries(story.coverage.value).map(([path, data]) => ({
-            path,
-            covered: data.covered ? '✅' : '❌',
-            text: data.text,
-          }))"
+          :value="story.coverage.value"
         >
           <Column field="covered" header="" />
           <Column field="path" header="位置" />
@@ -307,6 +311,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { FilterMatchMode } from 'primevue/api';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Dropdown from 'primevue/dropdown';
@@ -384,7 +389,7 @@ label.textarea, textarea {
 p.ip {
   height: auto;
   width: 100%;
-  overflow-x: auto;
+  overflow-x: scroll;
   text-wrap: nowrap;
 }
 

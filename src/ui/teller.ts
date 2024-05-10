@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { parse as parseCsv } from 'csv-parse/browser/esm/sync';
+import debounce from 'debounce';
 import JSZip from 'jszip';
 import { ref, watch } from 'vue';
 
@@ -32,12 +33,14 @@ function newStory(store: ReturnType<typeof useStore>) {
   watch(store, updateFromStore, { deep: true });
   updateFromStore();
 
+  let coverageIndices: {
+    [path: string]: number,
+  } = {};
   const coverage = ref<{
-    [path: string]: {
-      covered: boolean,
-      text: string,
-    },
-  }>({});
+    path: string,
+    covered: string,
+    text: string,
+  }[]>([]);
   const variables = ref<Record<string, InkVariableType>>({});
   const stitchesInSelectedKnot = ref<string[]>([]);
   // 因为会卡……Listener 涉及到的变量后面接的 UI 更新太多了，结束之后统一更新吧。
@@ -45,6 +48,7 @@ function newStory(store: ReturnType<typeof useStore>) {
     variables: {} as Record<string, InkVariableType>,
     coverage: {} as Record<string, boolean>,
   };
+  let coverageName = '!';
   story.listener = (event) => {
     switch (event.type) {
       case 'variable':
@@ -56,6 +60,9 @@ function newStory(store: ReturnType<typeof useStore>) {
         store.browsingStitch = event.stitch ?? '';
         break;
       case 'coverage': {
+        if (event.path[0] !== coverageName) {
+          break;
+        }
         const path = event.path.join('.');
         listenerEventBuffer.coverage[path] = true;
         break;
@@ -64,20 +71,21 @@ function newStory(store: ReturnType<typeof useStore>) {
         break;
     }
   };
-  function flushListenerEvents() {
+  const flushListenerEvents = debounce(() => {
     Object.entries(listenerEventBuffer.variables).forEach(
       ([name, value]) => { variables.value[name] = value; },
     );
     listenerEventBuffer.variables = {};
-    Object.entries(listenerEventBuffer.coverage).forEach(
-      ([path, covered]) => {
-        if (coverage.value[path] !== undefined) {
-          coverage.value[path].covered = covered;
+    Object.keys(listenerEventBuffer.coverage).forEach(
+      (path) => {
+        const i = coverageIndices[path];
+        if (i !== undefined) {
+          coverage.value[i].covered = '✅';
         }
       },
     );
     listenerEventBuffer.coverage = {};
-  }
+  }, 500);
   async function setupCoverage(e: Event) {
     const [file] = (e.target as HTMLInputElement).files!;
     const [name, ext] = parseFileName(file.name, true);
@@ -85,12 +93,16 @@ function newStory(store: ReturnType<typeof useStore>) {
       return;
     }
     const translations = decodeCsvTranslations(await file.arrayBuffer());
-    coverage.value = Object.fromEntries(
-      translations.map((item) => {
-        const { json_path: path, translated } = item;
-        return [`${name}.${path}`, { covered: false, text: translated }];
-      }),
-    );
+    coverageName = name;
+    coverage.value = translations.map((item) => {
+      const { json_path: path, translated } = item;
+      return {
+        path: `${name}.${path}`,
+        covered: '❌',
+        text: translated,
+      };
+    });
+    coverageIndices = Object.fromEntries(coverage.value.map((entry, i) => [entry.path, i]));
   }
   watch(() => store.selectedKnot, async (name) => {
     const chunk = await story.copyChunk(name) as InkChunkNode;
@@ -245,6 +257,8 @@ function newStory(store: ReturnType<typeof useStore>) {
     });
     if (options.value.length === 0) {
       schedule(delay);
+    } else {
+      flushListenerEvents.flush();
     }
   }
   async function select(i: number) {
