@@ -8,6 +8,8 @@ import type {
   Type_set,
 } from './auto-types';
 import {
+  InkActionType,
+  InkStoryCustomContentClassType,
   TypedInkBlockWithKeys,
   annotateInkBlockType,
   type InkBlock,
@@ -452,15 +454,47 @@ export class InkStoryRunner {
     | TypedInkBlockWithKeys<'custom', Type_customDictionary>,
   ) {
     if (typed.type === 'action' && typed.value.userInfo) {
-      Object.keys(typed.value.userInfo).forEach((key) => {
+      const action = typed.value.action as InkActionType;
+      if (!typed.value.userInfo) {
+        return `<br><br><span class="info">旅行记录：${action}</span><br>`;
+      }
+      const info = typed.value.userInfo as {
+        title?: string,
+        speaker?: string,
+        text?: string,
+        retelling?: string,
+      };
+      Object.keys(info).forEach((key) => {
         this.cover(typed.join(path, 'userInfo', key as never));
       });
-    } else if (typed.type === 'custom') {
-      Object.keys(typed.value.dictionary).forEach((key) => {
-        this.cover(typed.join(path, 'dictionary', key as never));
-      });
+      return `<br><br><span class="info">旅行记录：${action}</span>${
+        info.title ? `<br><span class="info">#标题：</span>${info.title}` : ''
+      }${
+        info.speaker ? `<br><span class="info">#人物：</span>${info.speaker}` : ''
+      }${
+        info.text ? `<br><span class="info">#内容：</span>${info.text}` : ''
+      }${
+        info.retelling ? `<br><span class="info">#重述：</span>${info.retelling}` : ''
+      }<br>`;
     }
-    return `<br><br>${JSON.stringify(typed.value)}`;
+    if (typed.type === 'custom') {
+      const type = typed.value.storyCustomContentClass as InkStoryCustomContentClassType;
+      const { dictionary } = typed.value;
+      if (type === 'NextHeadingStyleContent') {
+        const style = dictionary as { styleName: 'NewspaperTitle' | 'NewspaperHeadline' };
+        return `<br><br><span class="info">${
+          style.styleName === 'NewspaperTitle' ? '报纸' : '新闻标题'
+        }</span>`;
+      }
+      const speaker = dictionary as { speaker?: string };
+      if (speaker.speaker) {
+        this.cover(typed.join(path, 'dictionary', 'speaker' as never));
+      }
+      return `<br><br><span class="info">${
+        speaker.speaker ? `来自</span> ${speaker.speaker} <span class="info">的` : ''
+      }系统提示：</span>...<br>`;
+    }
+    throw new Error(`Unknown node: ${typed.type} (${Object.keys(typed.value).join(', ')})`);
   }
 
   private getCycleDetails(block: TypedCycleNode, path: JSONPath): [Type_sequence, number] {

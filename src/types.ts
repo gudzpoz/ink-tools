@@ -82,6 +82,41 @@ export type InkFuncType =
   | 'Subtract';
 
 /**
+ * `storyCustomContentClass` 里可能出现的值。
+ */
+export type InkStoryCustomContentClassType =
+  | 'InsertClueFromGenericLocalContent'
+  | 'NextHeadingStyleContent';
+
+/**
+ * `userInfo.action` 里可能出现的值。
+ */
+export type InkActionType =
+  | 'AbandonJourney'
+  | 'ChangeArrivalTime'
+  | 'ChangeAudioScape'
+  | 'ChangeDestination'
+  | 'ChangeJourneyLength'
+  | 'ChangeTransportGraphic'
+  | 'ChangeTransportTitle'
+  | 'CrossDateLine'
+  | 'DecreaseJourneyLengthBy'
+  | 'DisableAllTravel'
+  | 'DisableLocalBank'
+  | 'ExtendJourneyLengthBy'
+  | 'ForceArrival'
+  | 'GiveAchievement'
+  | 'Incident'
+  | 'LoseASuitcase'
+  | 'LoseAllSuitcases'
+  | 'LoseDaysInCity'
+  | 'LostFogg'
+  | 'SetClue'
+  | 'ShowClockUI'
+  | 'StartBankTimer'
+  | 'Teleport';
+
+/**
  * 从 `auto-types.ts` 里手动汇总的除数组元素外的可翻译字段名称。
  *
  * 但是，一般用 `UNTRANSLATABLE_FIELD_KEYS` 判断会更好一些。

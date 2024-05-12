@@ -11,7 +11,9 @@ import {
   Type_then,
 } from './auto-types';
 import {
+  InkActionType,
   InkBlock, InkChunkNode, InkChunkWithStitches, InkFuncType, InkRootNode,
+  InkStoryCustomContentClassType,
   JSONPath,
   annotateInkBlockType,
 } from './types';
@@ -49,20 +51,49 @@ class PoorOldInkSerializer {
   }
 
   serializeActionTag(path: JSONPath, tag: Type_actionTag): SourceNode {
+    const action = tag.action as InkActionType;
+    const content: (string | SourceNode)[] = [
+      this.nl(),
+      '#JourneyEvent: ', tag.action,
+      this.nl(),
+    ];
+    if (tag.userInfo) {
+      const titled = tag.userInfo as { title?: string };
+      const texted = tag.userInfo as { text?: string, speaker?: string, retelling?: string };
+      if (titled.title !== undefined) {
+        if (Object.keys(titled).length !== 1 || action !== 'ChangeTransportTitle') {
+          throw new Error('Titled action tag must have only one key.');
+        }
+        content.push(
+          '##TransportTitle: ',
+          this.sourceNode([...path, 'userInfo', 'title'], titled.title),
+          this.nl(),
+        );
+      } else if (texted.text !== undefined) {
+        if (texted.speaker) {
+          content.push(
+            '##Speaker: ',
+            this.sourceNode([...path, 'userInfo', 'speaker'], texted.speaker),
+            this.nl(),
+          );
+        }
+        content.push(
+          '##Text: ',
+          this.sourceNode([...path, 'userInfo', 'text'], texted.text),
+          this.nl(),
+        );
+        if (texted.retelling) {
+          content.push(
+            '##Retelling: ',
+            this.sourceNode([...path, 'userInfo', 'retelling'], texted.retelling),
+            this.nl(),
+          );
+        }
+      }
+    }
     return this.sourceNode(
       path,
-      [
-        this.nl(),
-        '#',
-        tag.action,
-        ' // ',
-        ...(tag.userInfo
-          ? Object.entries(tag.userInfo).map(
-            ([k, v]) => this.sourceNode([...path, 'userInfo', k], [k, ' = ', JSON.stringify(v), '; ']),
-          ).flat()
-          : []
-        ),
-      ],
+      content,
     );
   }
 
@@ -291,19 +322,33 @@ class PoorOldInkSerializer {
         ), this.nl()]);
       case 'custom': {
         const { dictionary, storyCustomContentClass } = block as Type_customDictionary;
-        return this.sourceNode(
-          path,
-          [
-            this.nl(),
-            '# ',
-            storyCustomContentClass,
-            ': ',
-            ...Object.entries(dictionary).map(
-              ([k, v]) => this.sourceNode([...path, 'dictionary', k], [k, ' = ', JSON.stringify(v), '; ']),
-            ).flat(),
-            this.nl(),
-          ],
-        );
+        const contentType = storyCustomContentClass as InkStoryCustomContentClassType;
+        if (contentType === 'NextHeadingStyleContent') {
+          if (Object.keys(dictionary).length !== 1) {
+            throw new Error('NextHeadingStyleContent must have exactly one property');
+          }
+          const style = dictionary as { styleName: 'NewspaperTitle' | 'NewspaperHeadline' };
+          if (style.styleName !== 'NewspaperTitle' && style.styleName !== 'NewspaperHeadline') {
+            throw new Error(`Unsupported style: ${style.styleName as string}`);
+          }
+          return this.sourceNode(
+            path,
+            `${this.nl()}#${style.styleName}: `,
+          );
+        }
+        if (contentType === 'InsertClueFromGenericLocalContent') {
+          const speaker = dictionary as { speaker?: string };
+          return this.sourceNode(
+            path,
+            [this.nl(), '#SystemClue',
+              speaker.speaker ? ' from ' : '',
+              speaker.speaker
+                ? this.sourceNode(typed.join(path, 'dictionary', 'speaker' as never), speaker.speaker)
+                : '',
+              ': <RandomClue>', this.nl()],
+          );
+        }
+        throw new Error(`Unsupported custom content type: ${contentType as string}`);
       }
       case 'building':
         return this.sourceNode(
