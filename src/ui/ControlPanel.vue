@@ -204,7 +204,7 @@
             Knot 文件名：
             <Dropdown
               id="knotBrowserSelector"
-              v-model="store.selectedKnot"
+              v-model="store.browsingKnot"
               :options="story.knots.map((knot) => ({
                 label: `:${knot}`,
                 value: knot,
