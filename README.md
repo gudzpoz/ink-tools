@@ -1,5 +1,11 @@
 # Translation Tools for Ink
 
+> These tools are designed to be used internally in a fan translation community around 80 Days,
+> the game made by Inkle, and are not intended for general use.
+> If you, too, want to use these tools, please contact the maintainer.
+>
+> 如果是群里的想要参与开发的群友，请看群里的 Trello 链接里的 `ink-tools 使用及开发文档` 来了解开发流程。
+
 This is a collection of tools for helping with the translation of
 [Ink](https://github.com/inkle/ink) files. Currently only support old version of Ink.
 

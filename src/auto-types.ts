@@ -2,6 +2,8 @@
 // 下面的类型信息原本是由 `unpack.ts` 生成的，生成的类型信息是能够通过 TypeScript 校验的。
 // 但是为了更精确一些，这里手动改了类型信息。请之后慎重改动。
 
+// 阅读时推荐从 `types.ts` 开始阅读。从 `InkRootNode` 和 `InkChunkNode` 这些根节点开始。
+
 /**
  * `buildingBlock` 是自定义的函数。
  */
@@ -28,9 +30,6 @@ export type Type_somethingWithParams =
 export type Type_conditionThen = {
   condition: Type_condition;
   then: Type_then;
-  /**
-   * 程序提取的类型定义和 `Type_then` 一模一样，手动合并了。
-   */
   otherwise?: Type_then;
 };
 
