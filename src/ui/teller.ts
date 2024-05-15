@@ -376,7 +376,7 @@ function newStory(store: ReturnType<typeof useStore>) {
       return {
         json_path: path ?? '',
         original: original ?? '',
-        translated: translated ?? original ?? '',
+        translated: translated ?? '',
       };
     });
   }
