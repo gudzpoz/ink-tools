@@ -165,7 +165,7 @@ class PoorOldInkSerializer {
   }
 
   checkNestable(node: Type_then, level?: number) {
-    if (!this.nested && this.isSimplyNested(node, 2 + (level ?? 0))) {
+    if (!this.nested && this.isSimplyNested(node, 1 + (level ?? 0))) {
       this.nested = true;
       return true;
     }
