@@ -88,7 +88,8 @@
           🗑️ 清除存盘
         </button>
         <label>
-          <input type="checkbox" v-model="debug.keepCycles" /> 💫 重开/读取存档保留 Cycle 计数，不恢复随机数种子
+          <input type="checkbox" v-model="debug.keepCycles" /> 💫 重开/读取存档保留 Cycle 计数
+          <input type="checkbox" v-model="debug.keepRandomSeed" /> 🎲 重开/读取存档不恢复随机数种子
         </label>
       </div>
       <p class="ip">你现在处在：{{ story.ip.value.join('.') }}</p>
