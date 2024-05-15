@@ -12,8 +12,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import { defineEmits, defineProps } from 'vue';
-
 defineProps<{
   modelValue: boolean,
   title: string,

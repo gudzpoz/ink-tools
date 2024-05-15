@@ -8,7 +8,9 @@ import {
 } from 'acorn';
 import { InkBuildingBlockExpr, InkFuncType, InkRootNode } from './types';
 import {
-  Type_buildingBlockWithParams, Type_conditionThen, Type_funcWithParams, Type_set,
+  Type_buildingBlockWithParams, Type_conditionThen, Type_cycleNode, Type_funcWithParams,
+  Type_get, Type_sequenceNode, Type_set,
+  Type_somethingWithParams,
 } from './auto-types';
 
 const BINARY_OPERATOR_MAP: Partial<Record<BinaryOperator | LogicalOperator, InkFuncType>> = {
@@ -25,6 +27,16 @@ const BINARY_OPERATOR_MAP: Partial<Record<BinaryOperator | LogicalOperator, InkF
   '!==': 'NotEquals',
   '||': 'Or',
   '-': 'Subtract',
+};
+
+const UNARY_OPERATOR_SET: Set<InkFuncType> = new Set([
+  'FlagIsSet',
+  'FlagIsNotSet',
+]);
+
+const CYCLE_FLAG_MAP: Record<string, keyof (Type_cycleNode & Type_sequenceNode)> = {
+  '': 'sequence',
+  '&': 'cycle',
 };
 
 export class InkyJsCompiler {
@@ -81,10 +93,48 @@ export class InkyJsCompiler {
           };
         case 'ExpressionStatement': {
           const { expression } = statement;
-          if (expression.type !== 'CallExpression') {
-            throw new Error(`Unsupported expression type: ${expression.type}`);
+          switch (expression.type) {
+            case 'CallExpression': {
+              const { callee } = expression;
+              const { name } = this.requireIdentifier(callee);
+              if (name === '_') {
+                if (expression.arguments.length === 0) {
+                  throw new Error(`Expecting more than one argument to _(): ${
+                    expression.arguments.join(', ')
+                  }`);
+                }
+                if (expression.arguments.length > 1) {
+                  const flag = expression.arguments[0];
+                  if (flag.type !== 'Literal' || typeof flag.value !== 'string'
+                    || CYCLE_FLAG_MAP[flag.value] === undefined) {
+                    throw new Error(`Expecting the first argument to _() to be a string literal with value "": ${
+                      JSON.stringify(flag)
+                    }`);
+                  }
+                  return {
+                    [CYCLE_FLAG_MAP[flag.value]]: expression.arguments.slice(1).map(
+                      (expr) => [this.requireLiteral(expr) as string],
+                    ),
+                  } as Type_sequenceNode | Type_cycleNode;
+                }
+                return this.requireLiteral(expression.arguments[0]) as string;
+              }
+              return this.compileExpression(expression) as Type_buildingBlockWithParams;
+            }
+            case 'AssignmentExpression': {
+              const identifier = this.requireIdentifier(expression.left);
+              return {
+                doFuncs: [{
+                  set: [
+                    (this.compileExpression(identifier) as { get: Type_get }).get,
+                    this.compileExpression(expression.right) as Type_somethingWithParams,
+                  ],
+                }],
+              };
+            }
+            default:
+              throw new Error(`Unsupported expression type: ${expression.type}`);
           }
-          return this.compileExpression(expression) as Type_buildingBlockWithParams;
         }
         case 'SwitchStatement': {
           const { discriminant, cases } = statement;
@@ -140,9 +190,9 @@ export class InkyJsCompiler {
     return expr;
   }
 
-  requireLiteral(expr: Literal | Expression) {
+  requireLiteral(expr: Literal | Expression | SpreadElement) {
     if (expr.type !== 'Literal') {
-      throw new Error(`Expecting a literal, got ${expr.type}`);
+      throw new Error(`Expecting a literal, got ${JSON.stringify(expr)}`);
     }
     const { value } = expr;
     if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
@@ -155,11 +205,13 @@ export class InkyJsCompiler {
     switch (node.type) {
       case 'CallExpression': {
         const { name } = this.requireIdentifier(node.callee);
-        if (name === '_') {
-          if (node.arguments.length !== 1) {
-            throw new Error(`Expecting exactly one argument to _(): ${node.arguments.join(', ')}`);
-          }
-          return this.compileExpression(this.requireExpression(node.arguments[0]));
+        if (UNARY_OPERATOR_SET.has(name as InkFuncType)) {
+          return {
+            func: name,
+            params: [(this.compileExpression(
+              this.requireIdentifier(node.arguments[0] as Expression),
+            ) as { get: Type_get }).get],
+          };
         }
         return {
           buildingBlock: name,
@@ -193,12 +245,17 @@ export class InkyJsCompiler {
       }
       case 'Identifier': {
         const { name } = node;
-        if (this.params[name]) {
+        if (name.startsWith('$')) {
           return {
-            get: this.params[name],
+            get: this.compileExpression({
+              ...node,
+              name: name.slice(1),
+            }) as { get: Type_get },
           };
         }
-        throw new Error(`Unknown variable: ${name}`);
+        return {
+          get: this.params[name] ? this.params[name] : name,
+        };
       }
       default:
         throw new Error(`Unsupported expression type: ${node.type}: ${JSON.stringify(node)}`);
@@ -207,6 +264,64 @@ export class InkyJsCompiler {
 }
 
 export const NEW_BUILDING_BLOCK_DEFINITIONS = `
+function _report_tension(p1) {
+  if (fully_initalised(tension) && FlagIsNotSet(withoutfogg)) {
+    scratch = (
+      (upness(tension) - upness(last_tension))
+      - (downness(tension) - downness(last_tension))
+    );
+    if (scratch !== 0) {
+      if (p1 === true) {
+        _('<t>');
+      }
+      _('', 'Your relationship with Fogg has', 'Relations with Fogg have');
+      _(' ');
+      if (scratch > 0) {
+        if (up(last_tension)) {
+          _('grown ');
+          quantifier(p1, scratch);
+          _(' worse');
+        } else {
+          _('deteriorated ');
+          quantifier(p1, scratch);
+        }
+      } else {
+        if (down(last_tension)) {
+          _('strengthened');
+        } else {
+          _('improved');
+        }
+        quantifier(p1, -1 * scratch);
+      }
+      if (p1 === true) {
+        _('.</t>');
+      }
+    }
+  }
+  last_tension = tension;
+}
+
+function value_for_index(p1, p2) {
+  if (p1 === 12) {
+    _('A');
+  } else {
+    if (p1 === 11) {
+      _('K');
+    } else {
+      if (p1 === 10) {
+        _('Q');
+      } else {
+        if (p1 === 9) {
+          _('J');
+        } else {
+          // 需要使用 _print_num 来避免出现“方块两”的情况
+          _print_num(p1 + 2);
+        }
+      }
+    }
+  }
+}
+
 function say_card(p) {
   suit(p);
   say_value(p);
