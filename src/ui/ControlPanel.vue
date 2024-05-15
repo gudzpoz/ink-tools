@@ -149,12 +149,20 @@
         <button type="button" @click="ink.money = 10 * 10000 * 240 + (ink.money as number)">
           💵 给我来 10 万英镑（money）
         </button>
-        <button type="button" @click="ink.withoutfogg = false">
-          🤡 获得 Monsieur Fogg（源码是这么写的）（withoutfogg）
-        </button>
-        <button type="button" @click="ink.withoutfogg = true">
-          🎩 失去 Monsieur Fogg（withoutfogg）
-        </button>
+        <BooleanRadio
+          title="失去 Monsieur Fogg（withoutfogg）"
+          active-label="🎩 已失去"
+          inactive-label="🤡 已获得"
+          :model-value="(variables.withoutfogg as boolean)"
+          @update:model-value="variables.withoutfogg = ink.withoutfogg = $event"
+        />
+        <BooleanRadio
+          title="当前地点是否已度过一夜（overnight）"
+          active-label="🌃 已过夜"
+          inactive-label="☀️ 未过夜"
+          :model-value="(variables.overnight as boolean)"
+          @update:model-value="variables.overnight = ink.overnight = $event"
+        />
         <details>
           <summary>📊 使某变量符合 up/down/mid/high/low/top/bottom 条件</summary>
           <ul>
@@ -322,6 +330,7 @@ import VirtualScroller from 'primevue/virtualscroller';
 
 import { computed, ref } from 'vue';
 
+import BooleanRadio from './BooleanRadio.vue';
 import useStore from './store';
 import useStory from './teller';
 
@@ -333,7 +342,7 @@ const store = useStore();
 const debug = computed(() => store.debug);
 const story = useStory(store);
 const {
-  ink, inkHistory,
+  ink, inkHistory, variables,
 } = story;
 
 const filteredVariables = computed(() => {
