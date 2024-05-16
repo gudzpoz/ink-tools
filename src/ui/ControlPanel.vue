@@ -32,7 +32,11 @@
           <input type="file" @change="(e) => updateStoryWithTranslation(e)" />
         </label>
         <label>
-          <input type="checkbox" v-model="debug.original" /> 📄 显示原文
+          <input type="checkbox" v-model="debug.original" /> 🇬🇧 运行未翻译的 JSON
+        </label>
+        <label>
+          <input type="checkbox" v-model="debug.showOriginal" :disabled="debug.original" />
+          📄 在 CSV 翻译文本旁显示原文
         </label>
         <label>
           <input type="checkbox" v-model="debug.replaceFunctions" :disabled="debug.original" />

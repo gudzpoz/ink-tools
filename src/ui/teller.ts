@@ -132,15 +132,18 @@ function newStory(store: ReturnType<typeof useStore>) {
       console.error('编译失败，请检查语法：', (e as Error).message);
     }
   }
-  function exportInkyJsToJson() {
-    applyInkyJs();
-    const json = JSON.stringify(story.replacementFunctions, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
+  function downloadSomething(content: string, type: string, name: string) {
+    const blob = new Blob([content], { type });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'buildingBlocks.json';
+    a.download = name;
     a.click();
+  }
+  function exportInkyJsToJson() {
+    applyInkyJs();
+    const json = JSON.stringify(story.replacementFunctions, null, 2);
+    downloadSomething(json, 'application/json', 'buildingBlocks.json');
   }
 
   const ink = new Proxy<Record<string, InkVariableType>>({}, {
@@ -342,14 +345,16 @@ function newStory(store: ReturnType<typeof useStore>) {
     isRoot: boolean,
   ) {
     const chunk = isRoot ? (obj as InkRootNode).buildingBlocks : obj;
-    translations.forEach(({ json_path, translated }) => {
+    translations.forEach(({ json_path, original, translated }) => {
       const path = json_path.split('.');
       const last = path.pop();
       const parent = path.reduce((acc, key) => (acc as Record<string, unknown>)?.[key], chunk);
       if (parent === undefined || last === undefined) {
         return;
       }
-      (parent as Record<string, unknown>)[last] = translated;
+      (parent as Record<string, unknown>)[last] = `<span class="original">${
+        original
+      }</span>${translated}`;
     });
   }
 

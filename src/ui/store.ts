@@ -19,6 +19,7 @@ export default defineStore('saves', () => {
     functions: false,
     diverts: false,
     original: false,
+    showOriginal: false,
     logPaths: false,
     stepping: false,
     keepCycles: false,

@@ -49,6 +49,7 @@ const displayConditionDetails = computed(
 const displayCycles = computed(() => (debug.value.cycles ? 'inline-flex' : 'none'));
 const displayDiverts = computed(() => (debug.value.diverts ? 'inline-flex' : 'none'));
 const displayFunctions = computed(() => (debug.value.functions ? 'inline-flex' : 'none'));
+const displayOriginal = computed(() => (debug.value.showOriginal ? 'inline-block' : 'none'));
 </script>
 <style>
 body {
@@ -158,6 +159,10 @@ span.return::before {
   top: -1em;
 }
 
+span.original {
+  text-decoration: underline;
+}
+
 div.body span.condition {
   display: v-bind(displayConditions);
 }
@@ -172,6 +177,9 @@ div.body > div span.divert {
 }
 div.body > div span.expr, div.body > div span.call, div.body > div span.return {
   display: v-bind(displayFunctions);
+}
+div.body span.original {
+  display: v-bind(displayOriginal);
 }
 
 .list-enter-active,
