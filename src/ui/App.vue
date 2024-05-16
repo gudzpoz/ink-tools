@@ -7,7 +7,7 @@
       </div>
     </TransitionGroup>
     <TransitionGroup name="list" tag="ul">
-      <li v-for="option, i in options" :key="option.link">
+      <li v-for="option, i in options" :key="option.link" class="option">
         <button type="button" @click="story.select(i)" v-html="story.getOptionText(option)" :disabled="!option.condition" />
       </li>
     </TransitionGroup>
@@ -162,6 +162,10 @@ span.return::before {
 div.body span.original {
   font-size: 0.9em;
   text-decoration: underline;
+}
+
+ul > li.option button::after {
+  content: "...";
 }
 
 div.body span.condition {
