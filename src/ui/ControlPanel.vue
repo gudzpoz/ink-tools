@@ -65,7 +65,16 @@
           <input type="checkbox" v-model="debug.logPaths" /> 📝 在 F12 的 Console 中记录路径
         </label>
         <label>
-          <input type="checkbox" v-model="debug.stepping" /> 🐌 步进
+          <input
+            type="checkbox"
+            v-model="debug.stepping"
+            @change="(e) => {
+              if (!(e.target as HTMLInputElement)!.checked) {
+                story.fetchMore();
+              }
+            }"
+          />
+          🐌 步进
         </label>
         <button type="button" @click="story.fetchMore()" :disabled="!debug.stepping">
           👣 步进

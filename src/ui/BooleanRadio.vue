@@ -13,7 +13,7 @@
 </template>
 <script setup lang="ts">
 defineProps<{
-  modelValue: boolean,
+  modelValue?: boolean,
   title: string,
   activeLabel: string,
   inactiveLabel: string,
