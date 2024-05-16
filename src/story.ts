@@ -710,8 +710,9 @@ export class InkStoryRunner {
       case 'do': {
         await this.evaluateExpr(typed.join(path, 'doFuncs'));
         this.debug(
-          `<span class="expr">${escapeHtml(this.decompiler.serializeDoFuncsNode(typed.value, path).toString())}</span>
-          <br>`,
+          `<span class="expr">${
+            escapeHtml(this.decompiler.serializeDoFuncsNode(typed.value, path).toString())
+          }<br></span>`,
         );
         return this.collectOutputBuffer();
       }
