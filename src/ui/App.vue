@@ -159,7 +159,8 @@ span.return::before {
   top: -1em;
 }
 
-span.original {
+div.body span.original {
+  font-size: 0.9em;
   text-decoration: underline;
 }
 
