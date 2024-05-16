@@ -211,6 +211,25 @@
             0779-play_poker 打牌时需要 Monsieur Fogg 在场（withoutfogg=false）。
             另外打牌也是受到随机数种子控制的，请按需随机化随机数种子。
           </li>
+          <li>
+            0779-play_poker 打牌里如何打出皇家同花顺？
+            请使用步进功能，在看到 <code>deal_cards</code> 函数执行完毕之后，更改 <code>cards_dealt_*</code> 系列变量。
+            （因为不可能适配所有牌的可能性，所以只能请各位手动更改了。）
+            <ul>
+              <li>这些变量里面都是两位数字对应一张牌。0~12 是红桃二到红桃A，13~25、26~38、39~51 分别对应方块、黑桃、草花。</li>
+              <li>
+                <code>cards_dealt_players</code> 对应的是发到手中的牌，例如 <code>11250544</code>
+                里面的 <code>0544</code> 对应的是玩家手中的牌，<code>1125</code> 对应的是亨利手中的牌。
+              </li>
+              <li>
+                <code>cards_dealt_flop</code> 是翻牌，似乎只用到了前三张（即例如 <code>35502911</code>
+                里的 <code>502911</code>）
+              </li>
+              <li>
+                <code>cards_dealt_spare</code> 是交换的牌。从最低位开始换的。
+              </li>
+            </ul>
+          </li>
         </ul>
       </TabPanel>
       <TabPanel header="节点">
