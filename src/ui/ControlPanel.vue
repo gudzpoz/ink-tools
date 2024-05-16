@@ -89,6 +89,8 @@
         </button>
         <label>
           <input type="checkbox" v-model="debug.keepCycles" /> 💫 重开/读取存档保留 Cycle 计数
+        </label>
+        <label>
           <input type="checkbox" v-model="debug.keepRandomSeed" /> 🎲 重开/读取存档不恢复随机数种子
         </label>
       </div>
