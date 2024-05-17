@@ -1,3 +1,6 @@
+/* eslint-disable import/first */
+/* eslint-disable import/newline-after-import */
+/* eslint-disable no-console */
 import { InkChunkNode } from './types';
 import testeeJson0 from '../data/chunks/storycrashed.json';
 const testeeJson0Typed: InkChunkNode = testeeJson0;

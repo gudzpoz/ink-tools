@@ -17,7 +17,12 @@ async function splitChunks() {
   const indexedContent = index['indexed-content'];
   const content = await fs.readFile('./data/80days.inkcontent.txt');
   await fs.mkdir('./data/chunks', { recursive: true });
-  const typeCheckers = ['import { InkChunkNode } from \'./types\';'];
+  const typeCheckers = [
+    '/* eslint-disable import/first */',
+    '/* eslint-disable import/newline-after-import */',
+    '/* eslint-disable no-console */',
+    'import { InkChunkNode } from \'./types\';',
+  ];
   const chunks: Record<string, object> = {};
   await Promise.all(Object.entries(indexedContent.ranges).map(([key, value], i) => {
     const filename = `${key}.json`;
