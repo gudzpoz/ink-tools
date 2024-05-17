@@ -486,12 +486,12 @@ export class InkStoryRunner {
           style.styleName === 'NewspaperTitle' ? '报纸' : '新闻标题'
         }</span>`;
       }
-      const speaker = dictionary as { speaker?: string };
-      if (speaker.speaker) {
+      const speaker = dictionary as { speakerName?: string };
+      if (speaker.speakerName) {
         this.cover(typed.join(path, 'dictionary', 'speaker' as never));
       }
       return `<br><br><span class="info">${
-        speaker.speaker ? `来自</span> ${speaker.speaker} <span class="info">的` : ''
+        speaker.speakerName ? `来自</span> ${speaker.speakerName} <span class="info">的` : ''
       }系统提示：</span>...<br>`;
     }
     throw new Error(`Unknown node: ${typed.type} (${Object.keys(typed.value).join(', ')})`);

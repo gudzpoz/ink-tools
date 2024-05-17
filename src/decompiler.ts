@@ -172,7 +172,10 @@ class PoorOldInkSerializer {
     return false;
   }
 
-  sourceNode(path: JSONPath, s: string | (string | SourceNode)[]) {
+  sourceNode(path: JSONPath | number, s: string | (string | SourceNode)[]) {
+    if (typeof path === 'number') {
+      return new SourceNode(1, path + 1, '<input>', s as never);
+    }
     return new SourceNode(this.getSourceLocation(path), 0, '<input>', s as never);
   }
 
@@ -337,13 +340,13 @@ class PoorOldInkSerializer {
           );
         }
         if (contentType === 'InsertClueFromGenericLocalContent') {
-          const speaker = dictionary as { speaker?: string };
+          const speaker = dictionary as { speakerName?: string };
           return this.sourceNode(
             path,
             [this.nl(), '#SystemClue',
-              speaker.speaker ? ' from ' : '',
-              speaker.speaker
-                ? this.sourceNode(typed.join(path, 'dictionary', 'speaker' as never), speaker.speaker)
+              speaker.speakerName ? ' from ' : '',
+              speaker.speakerName
+                ? this.sourceNode(typed.join(path, 'dictionary', 'speakerName' as never), speaker.speakerName)
                 : '',
               ': <RandomClue>', this.nl()],
           );
@@ -526,7 +529,7 @@ INCLUDE indexed-content.ink
       return this.sourceNode(
         [],
         [
-          `=== ${name} ===\n`,
+          this.sourceNode(0, `=== ${name} ===\n`),
           this.serializeBlocks(file as InkBlock[], []),
         ],
       );
@@ -536,12 +539,15 @@ INCLUDE indexed-content.ink
     return this.sourceNode(
       [],
       [
-        `=== ${name} ===\n`,
+        this.sourceNode(0, `=== ${name} ===`),
+        '\n',
         ...Object.entries(content.stitches)
           .filter(([k]) => k !== 'position')
           .map(
-            ([stitch, blocks]) => [
-              `\n= ${stitch}\n`,
+            ([stitch, blocks], i) => [
+              '\n',
+              this.sourceNode(i + 1, `= ${stitch}`),
+              '\n',
               this.serializeBlocks(blocks.content, ['stitches', stitch, 'content']),
             ],
           ).flat(),
