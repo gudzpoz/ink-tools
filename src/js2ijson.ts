@@ -264,6 +264,7 @@ export class InkyJsCompiler {
 }
 
 export const NEW_BUILDING_BLOCK_DEFINITIONS = `
+// 群里已经讨论出不需要改语序也挺好的翻译了，这里暂时保留覆盖的代码，但应该可以删掉。
 function _report_tension(p1) {
   if (fully_initalised(tension) && FlagIsNotSet(withoutfogg)) {
     scratch = (
@@ -301,6 +302,8 @@ function _report_tension(p1) {
   last_tension = tension;
 }
 
+// value_for_index 显示扑克牌的面值，0 到 12 分别是从最小的 2 到最大的 A。
+// 第二个参数是原来英文里用到的复数，翻译后不需要但是还是保留着以防出 bug。
 function value_for_index(p1, p2) {
   if (p1 === 12) {
     _('A');
@@ -322,11 +325,16 @@ function value_for_index(p1, p2) {
   }
 }
 
+// 显示扑克牌，原来是 <面值> of <花色>，译成中文需要变换语序 <花色><面值>。
 function say_card(p) {
   suit(p);
   say_value(p);
 }
 
+// 显示两张扑克牌。
+// 英文里会有各种特殊情况，但中文似乎就是一对红桃五黑桃五、黑桃五和黑桃六就可以了，
+// 似乎不需要合并面值或是花色。（另外下面的第一个 else 分支里应该可以再简化一下。）
+// 然后可能需要讨论一下中文里是不是说“一对五”会更多一些，可以直接把花色省略掉或者括号标出来？
 function say_hand_of_two(p1, p2, p3) {
   if (card_value(p1) === card_value(p2)) {
     _('一对');
@@ -363,6 +371,7 @@ function say_hand_of_two(p1, p2, p3) {
   }
 }
 
+// say_hand 似乎没有什么没法翻译的内容，同样这里暂时保留覆盖的代码，但应该可以删掉。
 function _say_hand(p1, p2, p3, p4) {
   if (p2 === -1) {
     say_card(p1);
@@ -409,12 +418,17 @@ function _say_hand(p1, p2, p3, p4) {
   }
 }
 
+// 看起来 Cprint_num（打印大写数字如 ONE HUNDRED）只在 0695-read_newspaper 里用到。
+// 上下文是 FOGG - DAY {Cprint_num(day)} AND STILL {(day < 50):GOING|NOT HOME}。
+// 总之只看这里的上下文的话，需要用 _print_num 来避免出现“第两天”的情况，
+// 然后中文也没有大写就只能这样了。
 function Cprint_num(p) {
-  _('<i>');
-  print_num(p);
-  _('</i>');
+  _print_num(p);
 }
 
+// 打印数字。英文里 two 可以使用较多情形，但中文里有二/两之分，这里选了“两”，
+// 其它需要“二”的地方只能手动使用 _print_num 了。
+// 当然也可以不特殊处理，其实“二英镑”“二只”都勉强可以接受？（不，后者好像不太行。）
 function print_num(p) {
   if (p === 2) {
     _('两');
@@ -423,6 +437,9 @@ function print_num(p) {
   }
 }
 
+// 打印数字的主要逻辑，处理了以下情况：
+// - 各位之间有时需要加“零”：一百一十/一百“零”一
+// - 十位是最高位且小于二十的时候不需要“一”：十一/一百“一”十一
 function _print_num(p) {
   if (p >= 10000) {
     _print_num(p / 10000);
