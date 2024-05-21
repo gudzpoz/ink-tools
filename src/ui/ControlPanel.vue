@@ -84,13 +84,18 @@
         存盘与读取：
         <label class="select">
           ⋙ 选择之前选项点
-          <select ref="saveSelect" @change="(e) => story.load((e.target as HTMLSelectElement).value)">
+          <select
+            ref="saveSelect"
+            @change="(e) => story.load(
+              parseInt((e.target as HTMLSelectElement).value, 10),
+            )"
+          >
             <option
-              v-for="save, i in store.saves"
+              v-for="save, i in story.saves.value"
               :key="i"
               :value="i"
             >
-              #{{ store.saves.length - i }}@{{ save.title }}
+              #{{ story.saves.value.length - i }}@{{ save.title }}
             </option>
           </select>
         </label>
@@ -100,7 +105,7 @@
         <button type="button" @click="story.clearSaves">
           🗑️ 清除存盘
         </button>
-        <button type="button" @click="exportLastSave" v-if="store.saves.length > 0">
+        <button type="button" @click="exportLastSave" v-if="story.saves.value.length > 0">
           🐞 导出最后一次存档给程序员 debug
         </button>
         <label class="file" v-if="DEVELOPMENTAL">
@@ -406,15 +411,15 @@ const upDownVariables = [
 ];
 
 async function quickLoad() {
-  if (story.options.value.length === 0 && store.saves.length >= 1) {
-    await story.load('0');
+  if (story.options.value.length === 0 && story.saves.value.length >= 1) {
+    await story.load(0);
     return;
   }
-  if (store.saves.length >= 2) {
-    await story.load('1');
+  if (story.saves.value.length >= 2) {
+    await story.load(1);
     return;
   }
-  store.saves = [];
+  story.saves.value = [];
   await story.selectNewKnot(store.selectedKnot);
 }
 
@@ -430,10 +435,10 @@ async function updateStoryWithTranslation(e: Event) {
 }
 
 function exportLastSave() {
-  if (store.saves.length === 0) {
+  if (story.saves.value.length === 0) {
     return;
   }
-  const save = store.saves[0];
+  const save = story.saves.value[0];
   const json = JSON.stringify(save, null, 2);
   story.downloadSomething(json, 'application/json', `${save.title}.json`);
 }
@@ -443,9 +448,9 @@ async function importSave(e: Event) {
     return;
   }
   const [file] = files;
-  const save = JSON.parse(await file.text()) as typeof store.saves[number];
-  store.saves = [save];
-  await story.load('0');
+  const save = JSON.parse(await file.text()) as typeof story.saves.value[number];
+  story.saves.value = [save];
+  await story.load(0);
 }
 </script>
 <style scoped>

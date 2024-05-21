@@ -271,13 +271,19 @@ function newStory(store: ReturnType<typeof useStore>) {
     await fetchMore();
   }
 
+  const saves = ref<{
+    save: object,
+    lines: string[],
+    options: Options,
+    title: string,
+  }[]>([]);
   async function selectNewKnot(knot?: string) {
     if (timeOutHandle !== null) {
       clearTimeout(timeOutHandle);
       timeOutHandle = null;
     }
     await story.init();
-    store.saves = [];
+    saves.value = [];
     clearContents();
     const cycleCounts = store.debug.keepCycles && story.save().cycleCounts;
     const seedNum = store.debug.keepRandomSeed && ink.seednum;
@@ -300,18 +306,19 @@ function newStory(store: ReturnType<typeof useStore>) {
 
   function saveStory() {
     const save = story.save();
-    store.saves.unshift({
+    saves.value.unshift({
       save,
       lines: lines.value.map((e) => e),
       options: options.value.map((e) => e),
       title: story.copyIp().join('.'),
     });
   }
-  async function loadStory(i: string) {
-    const to = parseInt(i, 10);
-    const { save, lines: savedLines, options: savedOptions } = store.saves[to];
+  async function loadStory(to: number) {
+    const { save, lines: savedLines, options: savedOptions } = JSON.parse(
+      JSON.stringify(saves.value[to]),
+    ) as typeof saves.value[number];
     clearContents();
-    store.saves = store.saves.splice(to);
+    saves.value = saves.value.splice(to);
     const cycleCounts = store.debug.keepCycles && story.save().cycleCounts;
     const seedNum = store.debug.keepRandomSeed && ink.seednum;
     await story.load(save as never);
@@ -330,7 +337,7 @@ function newStory(store: ReturnType<typeof useStore>) {
     ip.value = story.copyIp();
   }
   function clearSaves() {
-    store.saves = [];
+    saves.value = [];
   }
 
   type CsvTranslation = {
@@ -480,6 +487,7 @@ function newStory(store: ReturnType<typeof useStore>) {
     ink,
     inkHistory,
 
+    saves,
     save: saveStory,
     load: loadStory,
     clearSaves,

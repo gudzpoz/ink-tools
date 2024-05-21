@@ -1,15 +1,9 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-import { InkVariableType, Options } from '../story';
+import { InkVariableType } from '../story';
 
 export default defineStore('saves', () => {
-  const saves = ref<{
-    save: object,
-    lines: string[],
-    options: Options,
-    title: string,
-  }[]>([]);
   const globalVariables = ref<Record<string, InkVariableType>>({});
   const globalReadCounts = ref<Record<string, number>>({});
   const debug = ref({
@@ -27,7 +21,6 @@ export default defineStore('saves', () => {
     replaceFunctions: true,
   });
   return {
-    saves,
     globalReadCounts,
     globalVariables,
     debug,
