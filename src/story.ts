@@ -21,7 +21,6 @@ import {
   type TypedCycleNode,
 } from './types';
 import PoorOldInkSerializer from './decompiler';
-import { evaluateSequentially } from './utils';
 import { NEW_BUILDING_BLOCK_DEFINITIONS, InkyJsCompiler } from './js2ijson';
 
 export type InkVariableType = string | number | boolean;
@@ -72,7 +71,7 @@ type ConditionTrack = {
   knots: Set<string>,
 };
 
-type Message = 'return' | 'ended' | 'divert_in_function';
+type Message = 'return' | 'ended' | 'divert';
 
 export type ListenerEvent = {
   type: 'variable',
@@ -117,6 +116,8 @@ export class InkStoryRunner {
 
   private decompiler: PoorOldInkSerializer;
 
+  private currentDivertTo: string | null;
+
   useExternal: boolean;
 
   useReplacementFunctions: boolean;
@@ -145,6 +146,7 @@ export class InkStoryRunner {
     this.replacementFunctions = {
       buildingBlocks: compiler.compile(NEW_BUILDING_BLOCK_DEFINITIONS),
     };
+    this.currentDivertTo = null;
     this.logPaths = false;
     this.chunkCaches = {
       original: {
@@ -210,7 +212,11 @@ export class InkStoryRunner {
     this.returnStack = [];
     this.environment = this.newEnvironment();
     this.environment.callStack = [[]];
-    await this.divertTo(`:${initial ?? this.getRoot().initial}`);
+    try {
+      this.divertTo(`:${initial ?? this.getRoot().initial}`);
+    } catch (e) {
+      await this.handleDivertTo(e);
+    }
   }
 
   async copyChunk(name: string): Promise<InkBlock | InkRootNode> {
@@ -224,12 +230,19 @@ export class InkStoryRunner {
     return this.fetcher(name);
   }
 
-  private async getChunk(name: string): Promise<InkChunkNode> {
+  private getChunkSync(name: string): InkChunkNode | null {
     const root = this.useExternal ? this.chunkCaches.external : this.chunkCaches.original;
     if (root[name]) {
       return root[name];
     }
+    return null;
+  }
 
+  private async getChunk(name: string): Promise<InkChunkNode> {
+    const chunkSync = this.getChunkSync(name);
+    if (chunkSync) {
+      return chunkSync;
+    }
     this.chunkCaches.original[name] = await this.copyChunk(name);
     const chunk = await this.copyChunk(name);
     this.loadExternalChunk(name, chunk);
@@ -309,10 +322,10 @@ export class InkStoryRunner {
   /**
    * @param expr 表达式
    */
-  private async evaluateExpr(
+  private evaluateExpr(
     path: JSONPath,
-  ): Promise<string | number | boolean> {
-    const expr: InkBlock | InkBlock[] | undefined = await this.getCurrent(path);
+  ): string | number | boolean {
+    const expr: InkBlock | InkBlock[] | undefined = this.getCurrentSync(path);
     if (expr === undefined) {
       return '';
     }
@@ -320,24 +333,22 @@ export class InkStoryRunner {
       return expr;
     }
     if (Array.isArray(expr)) {
-      await evaluateSequentially(
-        expr.map((_, i) => () => this.evaluateExpr([...path, i])),
-      );
+      expr.forEach((_, i) => () => this.evaluateExpr([...path, i]));
       return '';
     }
     const typed = annotateInkBlockType(expr);
     switch (typed.type) {
       case 'get': {
-        return this.getVar((await this.evaluateExpr(typed.join(path, 'get'))) as string);
+        return this.getVar(this.evaluateExpr(typed.join(path, 'get')) as string);
       }
       case 'set': {
-        const name = await this.evaluateExpr(typed.join(path, 'set', 0));
-        const value = await this.evaluateExpr(typed.join(path, 'set', 1));
+        const name = this.evaluateExpr(typed.join(path, 'set', 0));
+        const value = this.evaluateExpr(typed.join(path, 'set', 1));
         this.setVar(name as string, value);
         return '';
       }
       case 'return': {
-        const result = await this.evaluateExpr(typed.join(path, 'return'));
+        const result = this.evaluateExpr(typed.join(path, 'return'));
         const eax = this.returnStack[this.returnStack.length - 1];
         eax.returned = true;
         eax.value = result;
@@ -349,12 +360,10 @@ export class InkStoryRunner {
       case 'building': {
         const { buildingBlock } = typed.value;
         this.track('functions', buildingBlock);
-        const params = await evaluateSequentially(
-          Object.keys(typed.value.params).map((name) => async () => [
-            name,
-            await this.evaluateExpr(typed.join(path, 'params', name as never)),
-          ]),
-        );
+        const params = Object.keys(typed.value.params).map((name) => [
+          name,
+          this.evaluateExpr(typed.join(path, 'params', name as never)),
+        ]);
         this.returnStack.push({
           returned: false,
           value: '',
@@ -363,7 +372,7 @@ export class InkStoryRunner {
         const callerSaved = params.map(([name]) => [name, this.getVar(name as string)]);
         params.forEach(([name, value]) => this.setVar(name as string, value));
         try {
-          await this.evaluateBuildingBlocks([
+          this.evaluateBuildingBlocks([
             (this.useExternal
               && this.useReplacementFunctions
               && this.replacementFunctions.buildingBlocks[buildingBlock])
@@ -385,17 +394,15 @@ export class InkStoryRunner {
     }
   }
 
-  private async evaluateBuildingBlocks(
+  private evaluateBuildingBlocks(
     path: JSONPath,
-  ): Promise<InkVariableType> {
-    const blocks = await this.getCurrent(path);
+  ): InkVariableType {
+    const blocks = this.getCurrentSync(path);
     if (!blocks) {
       return '';
     }
     if (Array.isArray(blocks)) {
-      await evaluateSequentially(
-        blocks.map((_, i) => () => this.evaluateBuildingBlocks([...path, i])),
-      );
+      blocks.forEach((_, i) => this.evaluateBuildingBlocks([...path, i]));
       return '';
     }
 
@@ -414,7 +421,7 @@ export class InkStoryRunner {
         return this.evaluateExpr(path);
       }
       case 'condition': {
-        const condition = await this.evaluateExpr(typed.join(path, 'condition'));
+        const condition = this.evaluateExpr(typed.join(path, 'condition'));
         if (condition) {
           return this.evaluateBuildingBlocks(typed.join(path, 'then'));
         }
@@ -440,8 +447,8 @@ export class InkStoryRunner {
       case 'divert': {
         // 函数里面出现了 divert，不知道怎么处理。总之就清空 stack 然后跳转吧……
         this.environment.callStack = [[]];
-        await this.divertTo(typed.value.divert);
-        return this.throwError('divert_in_function');
+        this.divertTo(typed.value.divert);
+        return '';
       }
       default:
         throw new Error(`Unknown node: ${typed.type} (${Object.keys(blocks).join(', ')})`);
@@ -508,16 +515,16 @@ export class InkStoryRunner {
     ];
   }
 
-  private async evaluateFuncExpr(
+  private evaluateFuncExpr(
     path: JSONPath,
     typed: TypedInkBlockWithKeys<'func', Type_funcWithParams>,
-  ): Promise<string | number | boolean> {
-    const funcExpr = await this.getCurrent(path) as Type_funcWithParams | undefined;
+  ): string | number | boolean {
+    const funcExpr = this.getCurrentSync(path) as Type_funcWithParams | undefined;
     if (!funcExpr) {
       return '';
     }
-    const [p1, p2] = await evaluateSequentially(
-      funcExpr.params.map((_, i) => () => this.evaluateExpr(typed.join(path, 'params', i))),
+    const [p1, p2] = funcExpr.params.map(
+      (_, i) => this.evaluateExpr(typed.join(path, 'params', i)),
     );
     // 不知道 Ink 是不是动态类型的，所以下面全是 == 和 !=。
     switch (funcExpr.func as InkFuncType) {
@@ -603,22 +610,27 @@ export class InkStoryRunner {
     return output;
   }
 
-  private async getCurrent(path?: JSONPath): Promise<InkBlock | undefined> {
+  private getCurrentSync(path?: JSONPath): InkBlock | undefined {
     const ip = path ?? this.getIp();
-    await this.getChunk(ip[0] as string);
     return ip.reduce(
       (node, key) => (node as Record<string, unknown>)?.[key],
       (this.useExternal ? this.chunkCaches.external : this.chunkCaches.original) as unknown,
     ) as InkBlock | undefined;
   }
 
-  private async evaluateCondition(
+  private async getCurrent(path?: JSONPath): Promise<InkBlock | undefined> {
+    const ip = path ?? this.getIp();
+    await this.getChunk(ip[0] as string);
+    return this.getCurrentSync(ip);
+  }
+
+  private evaluateCondition(
     path: JSONPath,
     expr: Type_set[number],
     elseClass: string,
-  ): Promise<boolean> {
+  ): boolean {
     this.conditionTrackStack.push({ variables: new Set(), functions: new Set(), knots: new Set() });
-    const condition = await this.evaluateExpr(path);
+    const condition = this.evaluateExpr(path);
     const { variables, functions, knots } = this.conditionTrackStack.pop()!;
     const cond = condition ? 'true' : 'false';
     this.debug(
@@ -681,7 +693,7 @@ export class InkStoryRunner {
         return this.collectOutputBuffer();
       }
       case 'condition': {
-        const condition = await this.evaluateCondition(
+        const condition = this.evaluateCondition(
           typed.join(path, 'condition'),
           typed.value.condition,
           typed.value.otherwise ? 'has_otherwise' : '',
@@ -702,13 +714,13 @@ export class InkStoryRunner {
             .map(([, v]) => `${this.decompiler.serializeExpr(v ?? 'undefined', []).toString()}`)
             .join(', ')
         })</span> `);
-        const output = await this.evaluateExpr(path);
+        const output = this.evaluateExpr(path);
         this.output(`${output}`);
         this.debug(`<span class="return">${name}</span>`);
         return this.collectOutputBuffer();
       }
       case 'do': {
-        await this.evaluateExpr(typed.join(path, 'doFuncs'));
+        this.evaluateExpr(typed.join(path, 'doFuncs'));
         this.debug(
           `<span class="expr">${
             escapeHtml(this.decompiler.serializeDoFuncsNode(typed.value, path).toString())
@@ -717,8 +729,8 @@ export class InkStoryRunner {
         return this.collectOutputBuffer();
       }
       case 'divert': {
-        await this.divertTo(typed.value.divert);
         this.debug(`<span class="divert">-&gt; ${escapeHtml(typed.value.divert)}</span>`);
+        this.divertTo(typed.value.divert);
         return null;
       }
       case 'cycle':
@@ -755,7 +767,7 @@ export class InkStoryRunner {
         output.push(options);
 
         if (option.condition) {
-          const condition = await this.evaluateCondition(
+          const condition = this.evaluateCondition(
             typed.join(path, 'condition'),
             option.condition,
             '',
@@ -816,10 +828,23 @@ export class InkStoryRunner {
     if (!option) {
       throw new Error('Invalid option index');
     }
-    await this.divertTo(option.link);
+    try {
+      this.divertTo(option.link);
+    } catch (e) {
+      await this.handleDivertTo(e);
+    }
   }
 
-  async divertTo(divert: string) {
+  private async handleDivertTo(error: unknown) {
+    const msg = error as Message;
+    if (msg !== 'divert') {
+      throw error;
+    }
+    if (!this.currentDivertTo) {
+      throw new Error('Expecting currentDivertTo set');
+    }
+    const divert = this.currentDivertTo;
+    this.currentDivertTo = null;
     if (this.logPaths) {
       console.log(` -> ${divert}`);
     }
@@ -844,13 +869,22 @@ export class InkStoryRunner {
     } else {
       const knot = chunk as InkChunkWithStitches;
       if (!absStitch) {
-        await this.divertTo(`:${absKnot}:${knot.initial}`);
+        try {
+          this.divertTo(`:${absKnot}:${knot.initial}`);
+        } catch (e) {
+          await this.handleDivertTo(e);
+        }
         return;
       }
       ip.splice(1);
       ip[0] = absKnot;
       ip.push('stitches', absStitch, 'content', 0);
     }
+  }
+
+  divertTo(divert: string) {
+    this.currentDivertTo = divert;
+    this.throwError('divert');
   }
 
   private getIp() {
@@ -869,12 +903,13 @@ export class InkStoryRunner {
       }
       return text;
     } catch (e) {
-      if (!this.expectError(e, 'divert_in_function')) {
+      if (!this.expectError(e, 'divert')) {
         if (!this.expectError(e, 'ended')) {
           console.log(e);
         }
         return null;
       }
+      await this.handleDivertTo(e);
       return await this.getUntilNext();
     }
   }
