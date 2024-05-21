@@ -100,6 +100,13 @@
         <button type="button" @click="story.clearSaves">
           🗑️ 清除存盘
         </button>
+        <button type="button" @click="exportLastSave" v-if="store.saves.length > 0">
+          🐞 导出最后一次存档给程序员 debug
+        </button>
+        <label class="file" v-if="DEVELOPMENTAL">
+          🐞 导入导出了的存档
+          <input type="file" @change="(e) => importSave(e)" />
+        </label>
         <label>
           <input type="checkbox" v-model="debug.keepCycles" /> 💫 重开/读取存档保留 Cycle 计数
         </label>
@@ -420,6 +427,25 @@ async function updateStoryWithTranslation(e: Event) {
   if (await story.updateStoryWithFile(file.name, await file.arrayBuffer(), true)) {
     await story.selectNewKnot();
   }
+}
+
+function exportLastSave() {
+  if (store.saves.length === 0) {
+    return;
+  }
+  const save = store.saves[0];
+  const json = JSON.stringify(save, null, 2);
+  story.downloadSomething(json, 'application/json', `${save.title}.json`);
+}
+async function importSave(e: Event) {
+  const { files } = (e.target as HTMLInputElement);
+  if (!files || files.length === 0) {
+    return;
+  }
+  const [file] = files;
+  const save = JSON.parse(await file.text()) as typeof store.saves[number];
+  store.saves = [save];
+  await story.load('0');
 }
 </script>
 <style scoped>

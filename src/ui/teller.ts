@@ -492,6 +492,8 @@ function newStory(store: ReturnType<typeof useStore>) {
 
     coverage,
     setupCoverage,
+
+    downloadSomething,
   };
 }
 

@@ -35,6 +35,7 @@ export async function evaluateSequentially<T>(
   promises: (() => Promise<T>)[],
 ): Promise<T[]> {
   const results: T[] = [];
+  await yieldToMain();
   for (let i = 0; i < promises.length; i += 1) {
     // eslint-disable-next-line no-await-in-loop
     const result = await promises[i]();
