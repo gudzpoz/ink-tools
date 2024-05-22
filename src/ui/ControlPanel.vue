@@ -22,6 +22,9 @@
         <button type="button" @click="story.selectNewKnot()">
           ⟳ 从头再来
         </button>
+        <button type="button" @click="story.selectNewKnot(undefined, true)">
+          🔀 遍历所有 Stitch
+        </button>
         <button type="button" @click="story.selectNewKnot('test')" v-if="DEVELOPMENTAL">
           运行上传的 test.json（不上传就运行的话应该会出很多错）
         </button>

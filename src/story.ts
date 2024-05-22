@@ -212,11 +212,7 @@ export class InkStoryRunner {
     this.returnStack = [];
     this.environment = this.newEnvironment();
     this.environment.callStack = [[]];
-    try {
-      this.divertTo(`:${initial ?? this.getRoot().initial}`);
-    } catch (e) {
-      await this.handleDivertTo(e);
-    }
+    await this.divertTo(`:${initial ?? this.getRoot().initial}`);
   }
 
   async copyChunk(name: string): Promise<InkBlock | InkRootNode> {
@@ -447,7 +443,7 @@ export class InkStoryRunner {
       case 'divert': {
         // 函数里面出现了 divert，不知道怎么处理。总之就清空 stack 然后跳转吧……
         this.environment.callStack = [[]];
-        this.divertTo(typed.value.divert);
+        this.throwDivertTo(typed.value.divert);
         return '';
       }
       default:
@@ -730,7 +726,7 @@ export class InkStoryRunner {
       }
       case 'divert': {
         this.debug(`<span class="divert">-&gt; ${escapeHtml(typed.value.divert)}</span>`);
-        this.divertTo(typed.value.divert);
+        this.throwDivertTo(typed.value.divert);
         return null;
       }
       case 'cycle':
@@ -828,11 +824,7 @@ export class InkStoryRunner {
     if (!option) {
       throw new Error('Invalid option index');
     }
-    try {
-      this.divertTo(option.link);
-    } catch (e) {
-      await this.handleDivertTo(e);
-    }
+    await this.divertTo(option.link);
   }
 
   private async handleDivertTo(error: unknown) {
@@ -869,11 +861,7 @@ export class InkStoryRunner {
     } else {
       const knot = chunk as InkChunkWithStitches;
       if (!absStitch) {
-        try {
-          this.divertTo(`:${absKnot}:${knot.initial}`);
-        } catch (e) {
-          await this.handleDivertTo(e);
-        }
+        await this.divertTo(`:${absKnot}:${knot.initial}`);
         return;
       }
       ip.splice(1);
@@ -882,9 +870,17 @@ export class InkStoryRunner {
     }
   }
 
-  divertTo(divert: string) {
+  private throwDivertTo(divert: string) {
     this.currentDivertTo = divert;
     this.throwError('divert');
+  }
+
+  async divertTo(divert: string) {
+    try {
+      this.throwDivertTo(divert);
+    } catch (e) {
+      await this.handleDivertTo(e);
+    }
   }
 
   private getIp() {

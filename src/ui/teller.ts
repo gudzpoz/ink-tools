@@ -104,13 +104,15 @@ function newStory(store: ReturnType<typeof useStore>) {
     });
     coverageIndices = Object.fromEntries(coverage.value.map((entry, i) => [entry.path, i]));
   }
-  watch(() => store.selectedKnot, async (name) => {
-    const chunk = await story.copyChunk(name) as InkChunkNode;
+  async function getStitchesInKnot(knot: string) {
+    const chunk = await story.copyChunk(knot) as InkChunkNode;
     if (Array.isArray(chunk) || Object.keys(chunk).length === 0) {
-      stitchesInSelectedKnot.value = [];
-      return;
+      return [];
     }
-    stitchesInSelectedKnot.value = Object.keys((chunk as InkChunkWithStitches).stitches);
+    return Object.keys((chunk as InkChunkWithStitches).stitches);
+  }
+  watch(() => store.selectedKnot, async (name) => {
+    stitchesInSelectedKnot.value = await getStitchesInKnot(name);
   });
   function flushVariables() {
     variables.value = Object.fromEntries(
@@ -176,6 +178,11 @@ function newStory(store: ReturnType<typeof useStore>) {
   const lines = ref(['']);
   const options = ref<Options>([]);
   const ip = ref<JSONPath>([]);
+  const iteration = {
+    knot: '',
+    stitches: [] as string[],
+    index: -1,
+  };
 
   const storyUniqueId = ref(0);
   let timeOutHandle: ReturnType<typeof setTimeout> | null = null;
@@ -221,6 +228,7 @@ function newStory(store: ReturnType<typeof useStore>) {
     }${o.text}`;
   }
   async function fetchMore(delay: number = 20) {
+    await yieldToMain();
     ip.value = story.copyIp() as never[];
     if (options.value.length !== 0) {
       return;
@@ -233,6 +241,19 @@ function newStory(store: ReturnType<typeof useStore>) {
     }
     if (!line) {
       lines.value.push('<i>Story Ended</i><hr>');
+      if (iteration.index !== -1) {
+        if (iteration.index >= iteration.stitches.length) {
+          lines.value.push('<i>Iteration Ended</i><hr>');
+          iteration.index = -1;
+          return;
+        }
+        const stitch = iteration.stitches[iteration.index];
+        const divert = `:${iteration.knot}:${stitch}`;
+        iteration.index += 1;
+        outputText(`<i>Iterating ${iteration.index}/${iteration.stitches.length}: ${divert}</i><br><br>`);
+        await story.divertTo(divert);
+        await fetchMore();
+      }
       return;
     }
     line.forEach((l) => {
@@ -277,10 +298,17 @@ function newStory(store: ReturnType<typeof useStore>) {
     options: Options,
     title: string,
   }[]>([]);
-  async function selectNewKnot(knot?: string) {
+  async function selectNewKnot(knot?: string, iterateAll?: boolean) {
     if (timeOutHandle !== null) {
       clearTimeout(timeOutHandle);
       timeOutHandle = null;
+    }
+    if (iterateAll && (knot || store.selectedKnot)) {
+      iteration.knot = knot ?? store.selectedKnot;
+      iteration.index = 0;
+      iteration.stitches = await getStitchesInKnot(iteration.knot);
+    } else {
+      iteration.index = -1;
     }
     await story.init();
     saves.value = [];

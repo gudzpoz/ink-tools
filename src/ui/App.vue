@@ -61,6 +61,9 @@ body {
   margin: 0;
   padding: 0;
 }
+div.body {
+  font-family: serif;
+}
 
 /* Inline 选项的显示 */
 div.inline > div:nth-last-child(2), div.inline > div:nth-last-child(2) > p {
