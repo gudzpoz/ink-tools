@@ -17,7 +17,7 @@ export default defineStore('saves', () => {
     logPaths: false,
     stepping: false,
     keepCycles: false,
-    keepRandomSeed: false,
+    randomizeOnReload: false,
     replaceFunctions: true,
   });
   return {

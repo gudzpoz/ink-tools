@@ -329,7 +329,7 @@ export class InkStoryRunner {
       return expr;
     }
     if (Array.isArray(expr)) {
-      expr.forEach((_, i) => () => this.evaluateExpr([...path, i]));
+      expr.forEach((_, i) => this.evaluateExpr([...path, i]));
       return '';
     }
     const typed = annotateInkBlockType(expr);

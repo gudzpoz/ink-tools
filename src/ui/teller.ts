@@ -292,6 +292,10 @@ function newStory(store: ReturnType<typeof useStore>) {
     await fetchMore();
   }
 
+  function randomize() {
+    ink.seednum = Math.floor(1e6 + Math.random() * 1e4);
+  }
+
   const saves = ref<{
     save: object,
     lines: string[],
@@ -314,13 +318,12 @@ function newStory(store: ReturnType<typeof useStore>) {
     saves.value = [];
     clearContents();
     const cycleCounts = store.debug.keepCycles && story.save().cycleCounts;
-    const seedNum = store.debug.keepRandomSeed && ink.seednum;
     await story.init(knot ?? store.selectedKnot);
     if (cycleCounts) {
       story.environment.cycleCounts = cycleCounts;
     }
-    if (store.debug.keepRandomSeed) {
-      ink.seednum = seedNum;
+    if (store.debug.randomizeOnReload) {
+      randomize();
     }
     Object.entries(store.globalVariables).forEach(([k, v]) => {
       story.setVar(k, v);
@@ -348,13 +351,12 @@ function newStory(store: ReturnType<typeof useStore>) {
     clearContents();
     saves.value = saves.value.splice(to);
     const cycleCounts = store.debug.keepCycles && story.save().cycleCounts;
-    const seedNum = store.debug.keepRandomSeed && ink.seednum;
     await story.load(save as never);
     if (cycleCounts) {
       story.environment.cycleCounts = cycleCounts;
     }
-    if (store.debug.keepRandomSeed) {
-      ink.seednum = seedNum;
+    if (store.debug.randomizeOnReload) {
+      randomize();
     }
     lines.value = savedLines;
     options.value = savedOptions;
@@ -514,6 +516,8 @@ function newStory(store: ReturnType<typeof useStore>) {
 
     ink,
     inkHistory,
+
+    randomize,
 
     saves,
     save: saveStory,

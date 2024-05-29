@@ -119,7 +119,7 @@
           <input type="checkbox" v-model="debug.keepCycles" /> 💫 重开/读取存档保留 Cycle 计数
         </label>
         <label>
-          <input type="checkbox" v-model="debug.keepRandomSeed" /> 🎲 重开/读取存档不恢复随机数种子
+          <input type="checkbox" v-model="debug.randomizeOnReload" /> 🎲 重开/读取存档时随机化随机数
         </label>
       </div>
       <p class="ip">你现在处在：{{ story.ip.value.join('.') }}</p>
@@ -174,7 +174,7 @@
       </TabPanel>
       <TabPanel header="变量常用操作">
         <p>下面是一些常用操作以及它们的相关变量。如果觉得有其它常用操作的话欢迎在群里反馈～</p>
-        <button type="button" @click="ink.seednum = Math.floor(1e6 + Math.random() * 1e4)">
+        <button type="button" @click="story.randomize()">
           🌱 随机化随机数种子（seednum）
         </button>
         <button type="button" @click="ink.money = 10 * 10000 * 240 + (ink.money as number)">
