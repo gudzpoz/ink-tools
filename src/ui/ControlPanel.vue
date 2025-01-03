@@ -288,7 +288,7 @@
             <Dropdown
               id="stitchBrowserSelector"
               v-model="store.browsingStitch"
-              :options="story.stitchesInSelectedKnot.value.map((stitch) => ({
+              :options="story.stitchesInBrowsingKnot.value.map((stitch) => ({
                 label: `:${stitch}`,
                 value: stitch,
               }))"
@@ -301,7 +301,7 @@
           </label>
           <label>
             :{{ store.browsingKnot }}:{{
-              story.stitchesInSelectedKnot.value.includes(
+              story.stitchesInBrowsingKnot.value.includes(
                 store.browsingStitch,
               ) ? store.browsingStitch : '???'
             }} 访问次数
@@ -311,9 +311,9 @@
               ] !== undefined">（已修改）</span>：
             <input
               type="number"
-              :disabled="!story.stitchesInSelectedKnot.value.includes(store.browsingStitch)"
+              :disabled="!story.stitchesInBrowsingKnot.value.includes(store.browsingStitch)"
               :value="story.story.getReadCount(`:${store.browsingKnot}:${
-                story.stitchesInSelectedKnot.value.includes(store.browsingStitch)
+                story.stitchesInBrowsingKnot.value.includes(store.browsingStitch)
                   ? store.browsingStitch : '???'
               }`)"
               @change="inkHistory[

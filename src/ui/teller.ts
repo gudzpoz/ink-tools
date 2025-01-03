@@ -42,7 +42,7 @@ function newStory(store: ReturnType<typeof useStore>) {
     text: string,
   }[]>([]);
   const variables = ref<Record<string, InkVariableType>>({});
-  const stitchesInSelectedKnot = ref<string[]>([]);
+  const stitchesInBrowsingKnot = ref<string[]>([]);
   // 因为会卡……Listener 涉及到的变量后面接的 UI 更新太多了，结束之后统一更新吧。
   const listenerEventBuffer = {
     variables: {} as Record<string, InkVariableType>,
@@ -111,8 +111,8 @@ function newStory(store: ReturnType<typeof useStore>) {
     }
     return Object.keys((chunk as InkChunkWithStitches).stitches);
   }
-  watch(() => store.selectedKnot, async (name) => {
-    stitchesInSelectedKnot.value = await getStitchesInKnot(name);
+  watch(() => store.browsingKnot, async (name) => {
+    stitchesInBrowsingKnot.value = await getStitchesInKnot(name);
   });
   function flushVariables() {
     variables.value = Object.fromEntries(
@@ -512,7 +512,7 @@ function newStory(store: ReturnType<typeof useStore>) {
 
     variables,
     resetVariables,
-    stitchesInSelectedKnot,
+    stitchesInBrowsingKnot,
 
     ink,
     inkHistory,
